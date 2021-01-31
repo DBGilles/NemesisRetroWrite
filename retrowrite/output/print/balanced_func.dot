@@ -1,0 +1,16 @@
+digraph func{ 
+ node [shape=record]; 
+0 [label=" 1130: pushq %rbp - 2 , \n1131: movq %rsp, %rbp - 1 , \n1134: movl %edi, -8(%rbp) - 1 , \n1137: movl %esi, -0xc(%rbp) - 1 , \n113a: movl -8(%rbp), %eax - 1 , \n113d: cmpl -0xc(%rbp), %eax - 2 , \n1140: jge .L1167 - 99  "]
+1 [label=" 1146: movl -8(%rbp), %eax - 1 , \n1149: movl %eax, -0x10(%rbp) - 1 , \n114c: movl -0x10(%rbp), %eax - 1 , \n114f: movl %eax, -0xc(%rbp) - 1 , \n1152: movl -0xc(%rbp), %eax - 1 , \n1155: movl %eax, -8(%rbp) - 1 , \n1158: movl -8(%rbp), %eax - 1 , \n115b: imull -0xc(%rbp), %eax - 2 , \n115f: movl %eax, -4(%rbp) - 1 , \n1162: jmp .L118b - 1  "]
+2 [label=" 1167: movl -8(%rbp), %eax - 1 , \nadd %eax $0 - 1 , \nadd %eax $0 - 1 , \nadd %eax $0 - 1 , \nadd %eax $0 - 1 , \nadd %eax $0 - 1 , \nadd %eax $0 - 1 , \n116a: cmpl -0xc(%rbp), %eax - 2 , \nadd %eax $0 - 1 , \n116d: jle .L1181 - 1  "]
+3 [label=" 1173: movl -8(%rbp), %eax - 1 , \n1176: addl -0xc(%rbp), %eax - 1 , \nmovl %eax, %eax - 2 , \n1179: movl %eax, -4(%rbp) - 1 , \n117c: jmp .L118b - 1  "]
+4 [label=" 1181: movl -0xc(%rbp), %eax - 1 , \nadd %eax $0 - 1 , \n1184: imull -0xc(%rbp), %eax - 2 , \nadd %eax $0 - 1 , \n1188: movl %eax, -4(%rbp) - 1  "]
+5 [label=" 118b: movl -4(%rbp), %eax - 1 , \n118e: popq %rbp - 1 , \n118f: retq  - 1  "]
+0 -> 1
+0 -> 2
+1 -> 5
+2 -> 3
+2 -> 4
+3 -> 5
+4 -> 5
+ }

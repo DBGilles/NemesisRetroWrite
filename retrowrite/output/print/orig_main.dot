@@ -1,0 +1,30 @@
+digraph main{ 
+ node [shape=record]; 
+0 [label=" 1190: pushq %rbp - 2  "]
+1 [label=" 1191: movq %rsp, %rbp - 1  "]
+2 [label=" 1194: subq $0x10, %rsp - 99  "]
+3 [label=" 1198: movl $0xa, -4(%rbp) - 1  "]
+4 [label=" 119f: movl $0x14, -8(%rbp) - 1  "]
+5 [label=" 11a6: movl -4(%rbp), %edi - 1  "]
+6 [label=" 11a9: movl -8(%rbp), %esi - 1  "]
+7 [label=" 11ac: callq .L1130 - 99  "]
+8 [label=" 11b1: xorl %ecx, %ecx - 99  "]
+9 [label=" 11b3: movl %eax, -0xc(%rbp) - 1  "]
+10 [label=" 11b6: movl %ecx, %eax - 1  "]
+11 [label=" 11b8: addq $0x10, %rsp - 99  "]
+12 [label=" 11bc: popq %rbp - 1  "]
+13 [label=" 11bd: retq  - 1  "]
+0 -> 1
+1 -> 2
+2 -> 3
+3 -> 4
+4 -> 5
+5 -> 6
+6 -> 7
+7 -> 8
+8 -> 9
+9 -> 10
+10 -> 11
+11 -> 12
+12 -> 13
+ }
