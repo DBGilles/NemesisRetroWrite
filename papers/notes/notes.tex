@@ -1,0 +1,295 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+
+\title{Initial notes papers}
+\author{Gilles De Borger}
+\begin{document}
+\maketitle
+
+\section{SoK: Eternal War in Memory}
+\subsection{Abstract}
+we describe attacks that succeed on today’s systems.We
+systematize the current knowledge about various protection
+techniques by setting up a general model for memory corrup-
+tion attacks. Using this model we show what policies can stop
+which attacks. The model identifies weaknesses of currently
+deployed techniques, as well as other proposed protections
+enforcing stricter policies. 
+
+We analyze the reasons why protection mechanisms imple-
+menting stricter polices are not deployed. Especially important is performance as experience shows that only
+solutions whose overhead is in reasonable bounds get deployed
+
+\subsection{Introduction}
+According to the MITRE ranking [1], memory corruption bugs are considered one of the top three most 
+dangerous software errors.  
+
+A multitude of defense mechanisms have been proposed
+to overcome one or more of the possible attack vectors. Yet
+most of them are not used in practice, due to one or more
+of the following factors: the performance overhead of the
+approach outweighs the potential protection, the approach
+is not compatible with all currently used features (e.g., in
+legacy programs), the approach is not robust and the offered
+protection is not complete, or the approach depends on
+changes in the compiler toolchain or in the source-code
+while the toolchain is not publicly available.
+ 
+The motivation for this
+paper is to systematize and evaluate previously proposed
+approaches. The systematization is done by setting up a
+general model for memory corruption vulnerabilities and
+exploitation techniques. The evaluation is based
+on robustness, performance and compatibility.
+
+\subsection{Attacks}
+(verwijs naar figuur 1 in de paper) 
+
+\subsubsection{Memory corruption}
+The root cause of vulnerabilities discussed in this paper are memory corruption. First step is to trigger memory error. 
+To do so, first you make a pointer invalid, and then you dereference this pointer. A pointer can become invalid by going out of bounds of its pointed object, or by deallocating it (\textit{dangling pointer}). 
+Dereferencing an out-of-bounds pointer causes a so
+called spatial error, while dereferencing a dangling pointer
+causes a temporal error.
+Forcing a pointer out of bounds: 
+\begin{itemize}
+\item trigger \textit{allocation failure} that is left unchecked -> result in null pointer 
+\item incrementing or decrementing an array pointer in a loop without proper bound checking -> a buffer overflow/underflow
+\item By causing indexing bugs where an attacker has control over the index into an array, but the bounds check is missing or incomplete -> the pointer might be pointed to any
+address.
+\item Lastly, pointers can be corrupted using the memory errors under discussion. This is represented by the backward loop in Figure 1
+\end{itemize}
+Making a pointer "dangling"
+\begin{itemize}
+\item (for instance) exploiting an incorrect exception handler, which deallocates an object, but does not reinitialize the pointers to it.
+\item 
+\end{itemize}
+
+Then, we exploit an out-of-bound or dangling pointer to execute any third step in the exploitation model by reading or writing it. 
+When a value is read from memory into a register by dereferencing a pointer controlled by the attacker, the value can be corrupted. It 
+can also leak information (as with \textit{printf})
+
+If an attacker controlled pointer is used to write the
+memory, then any variable, including other pointers or even
+code, can be overwritten. (including other pointers -> backwards loop in figure) 
+
+\subsection{Attacks}
+\textbf{Code corruption attack}: Use abovementioned bugs to overwrite program code in memory. 
+
+\textbf{Control-flow hijack attack}: take control over the program by diverting its control-flow by corrupting a \textit{code pointer}. Can be done (for example) by modifying return address due to buffer overflow. A substep is to know the correct target value (address of payload, code we want to execute). Suppose the code pointer (e.g. function pointer) has been corrupted. Fifth step is to load it into instruction pointer. This can only be done indirectly, 
+by executing indirect control-flow transfer function (e.g. indirect function call, indirect jump, or function return instruction). Finally, execute the attacker specified malicious code (present in data). A combination of Non-executable Data and Code Integrity results in the Write XOR Execute. This is cheap and easily applicable except for the case of JIT compilation or self modifying-code 
+
+To bypass the non-executable data policy, attackers can reuse existing code in memory.For example, return-to-libc. Libc contains usefull calls, such as system calls. Hijack the control-flow to execute some system call to get access to the system or whatnot. Reused code can also be small instruction sequences (gadgets) found anywhere in the code that can be chained together (Return oriented programming). To bypass the non-executable data policy, attackers can
+reuse existing code in memory.
+
+There is no policy which can stop the attack at this
+point, since the execution of valid and already existing code
+cannot be prevented.
+
+We classify a control-flow hijacking attack successful as
+soon as attacker-specified code starts to execute. There are higher level policies that can restrict attacker (file permissions, sandbox), but the focus of this paper is preventing
+ the compromise of trusted programs, so there are not covered in this paper. 
+
+\textbf{Data-only attack} The target of the corruption can be any security critical data in memory, e.g., configuration data, the representation of the user identity, or keys. (setting bool isAdmin to true). Same steps as before, except the target of corruption is a variable, not a code pointer. Requires knowledge of the variable you want to overwrite (where it is, what value it needs to be). Similar to code pointer corruption, data-only attacks will
+succeed as soon as the corrupted variable is used.
+
+\textbf{information leak}We showed that any type of memory error might be exploited to leak memory contents, which would otherwise
+be excluded from the output. This is typically used to circumvent probabilistic defenses based on randomization and
+secrets.
+
+\subsection{Currently used protections and real world exploits}
+Most widely deployed protection mechanisms are stack smashing protection, DEP/Write XOR Read and ASLR. Stack smashing protection detects buffer overflows of local stack-based buffers. Place a random value (canary) between return adress and the local buffers and check integrity before returning. Example of a Control-flow integrity solution. These techniques provide the weakest protection: they place checks only before a small ubset of indirect jumps, focusing checking the integrity of only some specific code pointers, namely saved return addresses and exception handler pointers (in case of SafeSEH and SEHOP) on the stack. 
+
+\subsection{approaches and evaluation criteria}
+Two main categories: probabilistic and deterministic protection. Probabilistic solutions, e.g., Instruction
+Set Randomization, Address Space Randomization, or Data
+Space Randomization, build on randomization or encryption. 
+All other approaches enforce a deterministic safety policy by implementing a low-level reference monitor which observes the program execution and halts it whenever it is about to violate the given policy. 
+Reference monitors enforcing lower level policies, e.g.,
+Memory Safety or Control-flow Integrity, can be implemented efficiently in two ways: in hardware or by embedding the reference monitor into the code. 
+
+Since adding new features to the hardware is unrealistic,
+from this point we focus only on solutions which transform
+existing programs to enforce various policies
+
+Dynamic
+(binary) instrumentation can be used to dynamically insert safety checks into unsafe binaries at run-
+time. Dynamic binary instrumentation supports arbitrary
+transformations but introduces some additional slowdown
+due to the dynamic translation process. Simple reference
+monitors, however, can be implemented with low overhead. Static instrumentation inlines reference
+monitors statically. This can be done by the compiler or
+by static binary rewriting. Inline reference monitors can
+implement any safety policy and are usually more efficient
+than dynamic solutions, since the instrumentation is not
+carried out at run-time.
+
+\subsubsection{Properties, requirements} 
+\begin{itemize}
+\item enforced policy 
+\item false negatives
+\item false positives
+\item performance overhead 
+\item memory overhead 
+\item source compatibility. Most experts from the industry consider solutions which require porting or annotating the source code impractical.
+\item binary compatibility. Binary compatibility allows compatibility with unmodified binary modules
+\item modularity support. Support for modularity means that individual modules (e.g. libraries) are handled separately.
+\end{itemize}
+
+\textit{groot stuk van de rest van de paper is een beschrijving van defences tegen verschillende attacks. Voor complete beschrijving, lees paper of Google}
+\textbf{probabilistic methods}
+\begin{itemize}
+\item Address space randomization
+\item Data space randomization
+\end{itemize}
+
+\textbf{Memory safety}
+Our focus is transforming existing unsafe code to enforce similar policies by embedding low-level reference monitors.
+\begin{itemize}
+\item Spatial safety with pointer bounds. SoftBound addresses the compatibility problem by splitting the metadata (contains pointer bounds) from the pointer, thus the pointer
+representation remains unchanged
+\item Spatial safety with object bounds. associate bounds information with the object instead of the pointer. object based techniques focus on pointer arithmetic instead of dereferences. One problem is that pointers
+can legitimately go out of bounds as long as they are not dereferenced. For example a pointer typically goes off the array by one,but it is not dereferenced.
+\end{itemize}
+\textbf{temporal safety}
+\begin{enumerate}
+\item Special allocators. The naive (wasteful) approach to protect against use-after-free exploits would be to never reuse the same virtual memory area. Special memory allocators, like Cling, ... . Cling is a replacement for malloc, which allows address space reuse only among objects of the same type and alignment
+\item Object based approaches. These tools
+try to detect use-after-free bugs by marking locations which
+were de-allocated in a shadow memory space. Accessing
+a newly de-allocated location can be detected this way. ?? 
+\item Pointer based approaches. 
+\end{enumerate}
+\textbf{Data integrity}
+
+\subsection{Generic attack defenses}
+bla bla bla 
+
+\section{What you corrupt is not what you crash: challenges in fuzzing embedded devices}
+\subsection{Introduction}
+\begin{enumerate}
+\item fuzz-testing, or “fuzzing”, describes the process of automatically generating and sending malformed input to the software under test, while monitoring its behavior for
+anomalies [51]. Anomalies themselves are visible ramifications of fault states, often resulting in crashes
+\item embedded devices often lack such mechanisms (to detect and analyze faulty states) because of their limited I/O capabilities, constrained cost, and limited computing power.
+As a result, silent memory corruptions occur more frequently on embedded devices than on traditional computer systems, creating a significant challenge for conducting fuzzing sessions
+on embedded systems software.
+\item Indeed, the only way left to identify a successful memory corruption is to monitor the [emdedded] device to detect signs of an incorrect behavior
+\item In this paper, we show that these “liveness” checks are insufficient to detect many classes of vulnerabilities because it is often difficult to detect in a blackbox manner when 
+the internal memory of the embedded device has been corrupted.
+\end{enumerate}
+
+\subsection{Fuzzing embedded systems}
+\begin{enumerate}
+\item Most of the theory behind fuzzing and most of the available fuzzing tools were designed to test software running on
+desktop PCs. As we will discuss later in this paper, there are a number of relevant differences that makes fuzzing embedded system particularly challenging
+\item \textbf{classes of embedded devices}
+	\begin{enumerate}
+	\item General purpose OS-based devices: general purpose OS, retrofitted to suit embedded system. For example Linux OS, coupled with lightweight user space environments. 
+	\item Embedded OS-based devices: custom operating systems for embedded devices. a logical seperation between kernel and application code is present
+	\item Devices without an OS-Abstraction: "monolithic firmware" - operation is typically based on a single control loop and interrupts triggered from the peripherals in order to handle events from the outer world
+	\end{enumerate}
+\item \textbf{Main challenges of fuzzing embedded devices}
+\end{enumerate}
+
+
+\section{Nemesis: Studying Microarchitectural Timing Leaks in Rudimentary CPU Interrupt Logic}
+\subsection{Introduction}
+\begin{enumerate}
+\item today, software components (of different stakeholders) are isolated with help of a sizeable privileged software layer (part of the OS?). This can be vulnerable to bugs
+\item in response: Protected Module Architectures (PMA). They safeguard \textit{enclaves} (security sensitive application components) by enforcing isolation and attestation primitives directly in hardware or in a small hypervisor (software that creates/runs VMs)
+\item the untrusted OS is prevented from accesing enclave code, data
+\item PMA has black box view -- kernel-level attacker should only be able to observe input and output. 
+\item \textbf{enclave-internal behavior may still leak through the CPU's underlying architectural state} -- side-channel attacks exploit this weakness
+\item \textit{controlled-channel attack} when PMA's are targeted, the OS itself has become an untrusted agent, two major consequences (see paper)
+\item \textit{We abuse the key microarchitectural property that hardware interrupts/faults are only served upon instruction retirement, after the currently
+executing instruction has completed, which can take a variable amount of CPU cycles depending on the instruction type and the microarchitectural state of the processor}
+\item \textit{delaying interrupt handling until instruction retirement introduces a subtle timing difference that by itself reveals side-channel information
+about the interrupted instruction and the microarchitectural state when the interrupt request arrived}
+\item \textit{an untrusted operating system can exploit this timing measurement when interrupting
+enclaved instructions to differentiate between secret-dependent program branches, or to extract information for different side-channel analyses}
+\end{enumerate}
+
+\subsection{BACKGROUND AND BASIC ATTACK}
+\subsubsection{Attacker Model and Assumptions}
+\begin{enumerate}
+\item The adversary’s goal is to derive information regarding the internal
+state of an enclaved application
+\item we consider an adversary with (i) access to the (compiled) source code of the victim application,
+and (ii) full control over the Operating System (OS) and unprotected application parts.
+\item we assume the untrusted OS can securely interrupt and resume enclaves
+\item In this paper we focus exclusively on hardware-level security monitors
+\item We assume that enclaves can be interrupted repeatedly within the same run
+\item Nemesis-type interrupt timing attacks only assume a generic stored program
+computer with a multi-cycle instruction set, where each individual instruction is uninterruptible (i.e., executes to completion)
+\end{enumerate}
+
+\subsubsection{Fetch-Decode-Execute Operation}
+uitleg over hoe die werkt -- zie paper
+
+\subsubsection{Basic Nemesis Attack}
+\begin{enumerate}
+\item We consider processors that serve interrupts after the execute stage has completed
+\item Our attacks are based on the key observation that an IRQ during a multi-cycle instruction increases the interrupt latency with the number of cycles
+left to execute – where interrupt latency is defined as the number of clock cycles between arrival of the hardware IRQ and execution of the first instruction in the software ISR
+\item When interrupt arrival time is known (e.g., generated by a timer), untrusted system software can
+infer the duration of the interrupted instruction from a timestamp obtained on ISR entry.
+\item figure 2 example: attack for an enclaved execution that branches on a secret -- trigger interrupt request and measure the interrupt latency to infer the number of clock cycles needed by the instruction after the conditional jump. This breaks the black box view on protected modules by leaking a piece of the CPU's microarchitectural state (in this case the instruction opcode)
+\item Nemesis-type interrupt timing attacks exploit secret-dependent control flow
+\item The main difficulty
+for a successful attack lies in determining a suitable timer value
+so as to interrupt the instruction of interest (the one after the conditional jump in the example)
+\end{enumerate}
+
+\section{Static Detection of Side Channels in MSP430 Programs}
+\subsection{Introduction}
+\begin{enumerate}
+\item we present a security type system to statically verify
+assembly programs for the TI MSP430 microcontroller for the ab-
+sence of timing side channel attacks, interrupt-latency attacks (i.e.,
+Nemesis [14]), and undesired direct and indirect information flow.
+\item We show that SCF MSP can identify
+vulnerabilities in these programs, and also verify the absence of
+information leakage in manually repaired versions of the examples.
+\item In this paper, we focus on detecting, rather than mitigating, side
+channel attacks based on a security type system
+\end{enumerate}
+
+\section{Nemesis 2.0}
+\subsection{Introduction}
+\begin{enumerate}
+\item Two important trends. 1) network connectivity of devices keeps increasing 2) more and
+more devices support extensibility of the software they run – often even by third parties dierent from the device manufacturer or device owner
+\item the combination of connectivity and software extensibility leads to malware threats
+\item the key contribution of this paper is the design, implementation and evaluation of a security architecture for low-end networked devices. 
+\item Paper contributions: 
+\begin{enumerate}
+\item Propose Sancus, (the architecture itself) 
+\item Implement the hardware required for Sancus as an extension of a mainstream microprocessor. 
+\item Implement a C compiler that targets Sancus-enabled devices
+\item implement a software stack to automate deployment process of Sancus modules. 
+\item ... (niet belangrijk)
+\end{enumerate}
+
+\subsection{Problem statement}
+\begin{enumerate}
+\item for the given system model it is important that different modules (from different software providers) cannot interfere with eachother. In high-level devices -> use of virtual memory or memory-safe virtual machine (e.g. JVM). For low-end systems this is still an open problem.
+\item This can be 'transplanted' to low-end systems but 1) higher cost in terms of resources and 2) these solutions require presence of a sizable trusted software layer (e.g. OS or JVM) 
+\item this architecture does not rely on a trusted software layer. The software provider needs to trust only the hardware (e.g. know that Sancus is supported on it) -- the trusted computer base (TCB) consists of \textit{only} the hardware
+\item attackers are very powerfull. 1) can manipulate all software on the nodes and tamper with OS or even install a completely new one 2) control the communication network
+\item attack against hardware of individual nodes (IoT devices) are out of scope 
+\item following properties are enforced: 
+\begin{enumerate}
+\item Software module isolation -- no software outside the module can read or write its runtime state and code
+\item Remote attestation -- A software provider can verify with high assurance that a specific software module is loaded unmodified on a specific node. 
+\item Secure communication 
+\item Secure linking 
+\item confidential deployment 
+\item hardware breach confinement 
+\end{enumerate}
+\end{enumerate}
+
+\subsection{Design of Sancus}
+\begin{enumerate}
+\item 
+\end{enumerate}
+\end{document}

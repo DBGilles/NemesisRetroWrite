@@ -1,0 +1,11 @@
+https://github.com/jovanbulck/sgx-step
+
+From the readme:
+SGX-Step is an open-source framework to facilitate side-channel attack research
+on Intel x86 processors in general and Intel SGX platforms in particular
+
+They provide a seperate readme that specifies building for 32-bit versions.
+
+In the Nemesis paper they run SGX-step on a 64 bit processor.
+
+Hardware that supports intel SGX - https://github.com/ayeks/SGX-hardware
