@@ -1,6 +1,10 @@
-from rwtools.nemesis.utils.latency_map import get_latency_map
+import os
 
-latency_map = get_latency_map()
+from rwtools.nemesis.LatencyMapper import construct_latency_mapper
+from rwtools.nemesis.utils.latency_map import load_latency_map
+
+latency_mapper = construct_latency_mapper(os.path.abspath("rwtools/nemesis/utils/data.p"))
+
 
 class CodeSequence:
     """
@@ -14,7 +18,7 @@ class CodeSequence:
         self.branches_in = []
         self.latencies = []
         for i in self.instructions:
-            self.latencies.append([latency_map[i.mnemonic, i.op_str]])
+            self.latencies.append([latency_mapper.get_latency(i.mnemonic, i.op_str)])
 
     def add_branch_out(self, code_seq):
         self.branches_out.append(code_seq)
@@ -27,7 +31,7 @@ class CodeSequence:
         self.instructions += instructions
         for i in instructions:
             assert len(i.before) == 0 and len(i.after) == 0
-            self.latencies.append([latency_map[i.mnemonic, i.op_str]])
+            self.latencies.append([latency_mapper.get_latency(i.mnemonic, i.op_str)])
 
     def __str__(self):
         out_strings = []
@@ -35,7 +39,7 @@ class CodeSequence:
         for inst, lat in zip(self.instructions, self.latencies):
             # for each instruction wrapper, collect all the instruction strings (i.e. before + instruction itself + after)
             instr_strings = [b for b in inst.before] + [str(inst)] + [a for a in inst.after]
-            assert(len(lat) == len(instr_strings))
+            assert (len(lat) == len(instr_strings))
             # zip the instructions with their latencies, create output string, add to list
             for instr, l in zip(instr_strings, lat):
                 out_strings.append(f"{instr} - {l} ")
@@ -50,7 +54,8 @@ class CodeSequence:
         return self.get(item)
 
     def __len__(self):
-        return sum(map(lambda x : len(x), self.latencies))
+        # return the sum of the latencies
+        return sum(map(lambda x: len(x), self.latencies))
 
     def __lt__(self, other):
         return len(self) < len(other)

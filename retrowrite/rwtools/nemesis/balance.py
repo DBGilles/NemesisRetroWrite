@@ -1,3 +1,8 @@
+"""
+Functions (including helper functions) for balancing two CodeSequence instancees
+add instructions of specific latencies to balance both branches
+"""
+
 def needs_balancing(b1, b2):
     # map each sublist to its total sum, copmare the sum of these
     if sum(map(lambda x: sum(x), b1.latencies)) == sum(map(lambda x: sum(x), b2.latencies)):
@@ -20,6 +25,8 @@ def get_null_instr(latency):
         return "add %eax $0"
     if latency == 2:
         return "movl %eax, %eax"
+    else:
+        return f"instr with lat {3}"
 
 
 def nested_f(b, f):
@@ -44,7 +51,6 @@ def balance(b1, b2):
     while True:
         short_b = min(b1, b2)
         long_b = b1 if short_b == b2 else b2
-
         if instr_index >= len(short_b):
             if instr_index >= len(long_b):
                 # branches should be balanced at this point

@@ -7,7 +7,6 @@ from archinfo import ArchX86
 
 from rwtools.nemesis.balance import balance
 from rwtools.nemesis.code_sequence import CodeSequence
-from rwtools.nemesis.utils.latency_map import get_latency_map
 
 GCC_FUNCTIONS = [
     "_start",

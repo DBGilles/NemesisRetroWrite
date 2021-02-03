@@ -39,12 +39,12 @@ if __name__ == '__main__':
     branch_analyzer.init_code_sequences(loader.container)
     branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="orig")
 
-    # analyze the control flow, merging code sequences
-    branch_analyzer.analyze_control_flow()
-    branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="merged")
-
-    branch_analyzer.balance_branches()
-    branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
+    # # analyze the control flow, merging code sequences
+    # branch_analyzer.analyze_control_flow()
+    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="merged")
+    #
+    # branch_analyzer.balance_branches()
+    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
 
     # analyze the latency in each code sequence
     # branch_analyzer.analyze_branch_latencies()

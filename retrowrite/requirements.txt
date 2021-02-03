@@ -2,3 +2,5 @@ archinfo
 pyelftools
 capstone
 intervaltree
+pandas
+opcodes
