@@ -2,7 +2,7 @@ import copy
 import os
 import pickle
 
-from rwtools.nemesis.types import construct_type, Register
+from rwtools.nemesis.types import Register
 
 
 def split_operands(op_string):

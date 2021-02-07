@@ -1,28 +1,4 @@
-import os
-import pandas as pd
-import opcodes
-from opcodes.x86_64 import read_instruction_set
-
-#############
-# Constants #
-#############
-
-REG_NAMES = ["r"] + [f"r{x}" for x in [8, 16, 32, 64, 128, 256]] + [f"{x}mm" for x in ["", "x", "y", "z"]]
-REG_NAMES += ["x", "y", "z"]
-REG_NAMES += ["v", "sr"]
-REG_NAMES += ['r8l', 'r8h']
-REG_NAMES += ['AX', 'ax']
-
-MEM_OPERANDS = [f"m{x}" for x in ['', 8, 16, 32, 64, 128, 256, 512]]
-
-IMM_OPERANDS = ["i"]
-
-ALL_TYPES = REG_NAMES + MEM_OPERANDS + IMM_OPERANDS
-
-
-####################
-# Helper functions #
-####################
+from rwtools.nemesis.op_types import map_latencydata_types
 
 def convert_latency(lat):
     """
@@ -49,66 +25,28 @@ def convert_latency(lat):
             return int(lat[1:])
 
 
-def is_type(a):
-    return a in ALL_TYPES
+def split_operands(ops):
+    # special cases mm/x, mm/y refer to xmm or mmx and mmy or ymm
+    if ops == "mm/x":
+        return ["mmx", "xmm"]
+    elif ops == "mm/y":
+        return ["mmy", "ymm"]
 
-
-def is_reg(a):
-    if isinstance(a, opcodes.x86_64.Operand):
-        return a.is_register
+    if '/' not in ops:
+        return [ops.strip()]
     else:
-        return a in REG_NAMES
+        ops = list(map(lambda x: x.strip(), ops.split('/')))
 
+    # take care of special cases here
+    # (1) 2 ops where the second type is only a number -- first op has one or more chars that need to be appended to second op
+    # eg m8/16 --> [m8, 16] --> [m8, m16]
+    if len(ops) == 2 and ops[1].isnumeric():
+        # first get the index of the first non-numerical character in ops[0]
+        i = ops[0].index(list(filter(lambda x: x.isnumeric(), ops[0]))[0])
+        ops[1] = ops[0][:i] + ops[1]
+        return ops
 
-def is_mem(a):
-    if isinstance(a, opcodes.x86_64.Operand):
-        return a.is_memory
-    else:
-        return a in MEM_OPERANDS
-
-
-def is_imm(a):
-    if isinstance(a, opcodes.x86_64.Operand):
-        return a.is_immediate
-    else:
-        return a in IMM_OPERANDS
-
-
-def type_match(a, b):
-    if is_reg(a) and is_reg(b):
-        return True
-    elif is_mem(a) and is_mem(b):
-        return True
-    elif is_imm(a) and is_imm(b):
-        return True
-    else:
-        return False
-
-
-def cast_to_types(op_types):
-    if not False in map(lambda x: is_type(x), op_types):
-        return op_types
-    # first, determine if this is some special case
-    if '[' in op_types[0] and ']' in op_types[0]:
-        # 'r+s*y' (represents some compound type maybe? IDK?)
-        return []
-    elif 'stack pointer' in op_types[0]:
-        # TODO: check if stack pointer needs its own type
-        return ['m']
-    elif 'cl' in op_types[0]:
-        # no clue what this could be
-        return []
-    elif 'short' in op_types[0] or 'near' in op_types[0]:
-        # TODO check if distinction between short and near is important for latency
-        return ['m']
-    elif 'a' in op_types[0] or 'b' in op_types[0]:
-        return ['i16']  # use only in enter (and somehwere else, idk) https://www.felixcloutier.com/x86/enter
-    elif '0' in op_types[0] or '1' in op_types[0]:
-        return ['i16']  # TODO nakijken
-    elif len(op_types) == 2 and is_type(op_types[0]):
-        # cast second op type to type of first --
-        # at this point you can simply preprend first char to get crrect type
-        return [op_types[0], op_types[0][0] + op_types[1]]
+    return ops
 
 
 def extract_operand_types(op_string):
@@ -124,9 +62,13 @@ def extract_operand_types(op_string):
     operand_positions = op_string.split(",")
     operand_types = []
     for ops in operand_positions:
-        # now we are looking at individual operands -- ensure they are one of the types defined above, if not cast
-        op_types = list(map(lambda x: x.strip(), ops.split("/")))
-        operand_types.append(cast_to_types(op_types))
+        # now we are looking at individual operands
+        op_types = split_operands(ops)
+        try:
+            op_types = list(map(lambda x: map_latencydata_types(x), op_types))
+        except ValueError:
+            print("unable to map one of types ", op_types)
+        operand_types.append(op_types)
     return operand_types
 
 
@@ -149,11 +91,11 @@ def best_candidate(key, candidates):
         for c in candidates:
             candidate_ops = c[1]
             candidate_op_types = extract_operand_types(candidate_ops)
+
             match_count = 0
             for op, candidate_types in zip(operands, candidate_op_types):
-                op = opcodes.x86_64.Operand(op)
-                for c in candidate_types:
-                    if type_match(op, c):
+                for candidate_type in candidate_types:
+                    if candidate_type == op:
                         match_count += 1
                         break
             candidate_match_counts.append(match_count)

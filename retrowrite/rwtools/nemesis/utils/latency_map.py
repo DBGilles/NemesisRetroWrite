@@ -1,14 +1,9 @@
-import json
 import pickle
-
+from rwtools.nemesis.op_types import map_opcode_types
 from rwtools.nemesis.utils.latency_map_utils import convert_latency, best_candidate
 import os
 import pandas as pd
-import opcodes
 from opcodes.x86_64 import read_instruction_set
-
-
-# TODO: zien dat dit helemaal correct is (zie ook bijbehorende notebook)
 
 def initialize_latency_map():
     """
@@ -21,7 +16,7 @@ def initialize_latency_map():
             # instances of InstructionForm -- forms mainly differen by operands
             name = form.name  # base mnemonic (i think)
             gas_name = form.gas_name  # name with possible modifiers (I think)
-            operands = [op.type for op in form.operands]
+            operands = [map_opcode_types(op.type) for op in form.operands]
             entry_key = (name, gas_name) + tuple(operands)
             init_latency_map[entry_key] = 1
 
@@ -86,16 +81,13 @@ def populate_latency_map(latency_map, latency_data):
     """
     for key, value in latency_map.items():
         name = key[0]  # get the instruction name
-        gas_name = key[1]
-        #  find all rows that potentially contain this instruction
-        candidates = latency_data[latency_data['instruction'].str.contains(name, case=False)]
+        candidates = latency_data[latency_data['instruction'].str.contains(name, case=False)] #  find all rows that potentially contain this instruction
         if len(candidates) == 0:
             continue
-            # find the best match among these candidates
+        # find the best match among these candidates
         best = best_candidate(key, candidates)
         best_latency = best[-1]
         latency_map[key] = best_latency
-
     return latency_map
 
 
@@ -107,6 +99,7 @@ def construct_latency_map():
     data_file = os.path.abspath("../data1/skylave_extracted.ods")
     latency_data = load_latency_data(data_file)
 
+    # populate the latency map using the data in the pandas dataframe
     latency_map = populate_latency_map(latency_map, latency_data)
     return latency_map
 
@@ -114,8 +107,8 @@ def construct_latency_map():
 def load_latency_map():
     latency_file = os.path.abspath("../data1/pickled_latency_map.p")
     with open(latency_file, 'rb') as fp:
-        latency_map = pickle.load(fp)
-    return latency_map
+        l_map = pickle.load(fp)
+    return l_map
 
 
 if __name__ == '__main__':
@@ -123,5 +116,3 @@ if __name__ == '__main__':
     latency_of = os.path.abspath("../data1/pickled_latency_map.p")
     with open(latency_of, 'wb') as fp:
         pickle.dump(latency_map, fp, protocol=pickle.HIGHEST_PROTOCOL)
-
-    # latency_map = load_latency_map()
