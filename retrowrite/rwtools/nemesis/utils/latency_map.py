@@ -104,8 +104,7 @@ def construct_latency_map():
     return latency_map
 
 
-def load_latency_map():
-    latency_file = os.path.abspath("../data1/pickled_latency_map.p")
+def load_latency_map(latency_file):
     with open(latency_file, 'rb') as fp:
         l_map = pickle.load(fp)
     return l_map
@@ -113,6 +112,6 @@ def load_latency_map():
 
 if __name__ == '__main__':
     latency_map = construct_latency_map()
-    latency_of = os.path.abspath("../data1/pickled_latency_map.p")
+    latency_of = os.path.abspath("../utils/pickled_latency_map.p")
     with open(latency_of, 'wb') as fp:
         pickle.dump(latency_map, fp, protocol=pickle.HIGHEST_PROTOCOL)

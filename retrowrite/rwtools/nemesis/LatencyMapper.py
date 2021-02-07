@@ -2,7 +2,7 @@ import copy
 import os
 import pickle
 
-from rwtools.nemesis.types import Register
+from rwtools.nemesis.op_types import map_assembly_values, BaseType
 
 
 def split_operands(op_string):
@@ -14,7 +14,7 @@ def all_present(target_ops, candidate_ops):
     """
     Return true if all of the ops in target_ops are found in candidate_ops, otherwise return False
     """
-    candidate_copy = copy.deepcopy(candidate_ops)
+    candidate_copy = list(copy.deepcopy(candidate_ops))
 
     for target in target_ops:
         matched = False
@@ -40,7 +40,6 @@ class LatencyMapper:
             category = key[0]  # eg PUSH
             instruction = key[1]  # eg pushq
             operands = key[1:]
-
             if instruction not in self.latency_map.keys():
                 self.latency_map[instruction] = {}
 
@@ -59,7 +58,10 @@ class LatencyMapper:
         # operands contain the operands as found in assembly
 
         candidates = self.latency_map[instruction]  # dictionary mapping insruction + op_types to latency -- need to determine which is most suitable
-        operand_types = list(map(construct_type, operands))  # to match candidates, convert the supplied operands to types
+        operand_types = list(map(map_assembly_values, operands))  # to match candidates, convert the supplied operands to types
+
+        for x in operand_types:
+            assert isinstance(x, BaseType)
 
         # if all candidates have the same latency (meaning latency is same regardless of operand types), return that latency
         candidate_latencies = list(candidates.values())
@@ -69,7 +71,7 @@ class LatencyMapper:
         # otherwise, loop over the candidates, get the best match (should be an identical match really)
         for candidate in candidates:
             candidate_op_types = candidate[1:]
-            candidate_op_types = list(map(construct_type, candidate_op_types))
+            # candidate_op_types = list(map(construct_type, candidate_op_types))
 
             if all_present(operand_types, candidate_op_types):
                 return self.latency_map[instruction][candidate]
@@ -77,7 +79,6 @@ class LatencyMapper:
         print(f"Warning -- latency not found for instruction {instruction} with operands {operands}")
         print(candidates)
         return 1
-
 
     def _map_to_type(self, op):
         if "(" in op and ")" in op:

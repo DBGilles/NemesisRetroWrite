@@ -3,7 +3,7 @@ import os
 from rwtools.nemesis.LatencyMapper import construct_latency_mapper
 from rwtools.nemesis.utils.latency_map import load_latency_map
 
-latency_mapper = construct_latency_mapper(os.path.abspath("rwtools/nemesis/utils/data.p"))
+latency_mapper = construct_latency_mapper(os.path.abspath("/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/utils/pickled_latency_map.p"))
 
 
 class CodeSequence:
