@@ -156,10 +156,12 @@ class BranchAnalyzer:
                     fn_sequences.remove(nextSeq)
                     continue
 
-    def balance_branches(self):
+    def balance_branches(self, branch_targets):
+        print(branch_targets)
         for fn_name, fn_sequences in self.code_sequences.items():
-            if fn_name != "func":
-                continue  # TODO remove this
+            targets = branch_targets[fn_name]
+            print(targets)
+            exit()
             currentSeq = fn_sequences[0]
             branches = []
             while True:

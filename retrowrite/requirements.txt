@@ -4,3 +4,4 @@ capstone
 intervaltree
 pandas
 opcodes
+odfpy

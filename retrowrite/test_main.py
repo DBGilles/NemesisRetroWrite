@@ -2,10 +2,11 @@ import os
 
 from librw.loader import Loader
 from librw.rw import Rewriter
+from rwtools.nemesis.load_branching_targets import target_branches_from_json
 from rwtools.nemesis.nemesistool import NemesisInstrument, BranchAnalyzer
 
 if __name__ == '__main__':
-    binary = "/home/gilles/git-repos/thesis_v2/src/print"
+    binary = "/home/gilles/git-repos/NemesisRetroWrite/src/print"
     bin_name = binary.split("/")[-1]
     output_dir = f"output/{bin_name}"
     os.makedirs(name=output_dir, exist_ok=True)
@@ -28,8 +29,9 @@ if __name__ == '__main__':
     loader.load_globals_from_glist(global_list)
 
     loader.container.attach_loader(loader)
-    # container is a class that contains dictionaries mapping sections to their attributes and a bunch of function
-    # create a Rewriter with access to this container (i.e. with access to information about the various sections)
+    # container is a class that contains dictionaries mapping sections to their attributes and
+    # a bunch of function create a Rewriter with access to this container (i.e. with access to
+    # information about the various sections)
     rw = Rewriter(loader.container, outfile)
     rw.symbolize()
 
@@ -39,12 +41,15 @@ if __name__ == '__main__':
     branch_analyzer.init_code_sequences(loader.container)
     branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="orig")
 
-    # # analyze the control flow, merging code sequences
-    # branch_analyzer.analyze_control_flow()
-    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="merged")
+    # analyze the control flow, merging code sequences
+    branch_analyzer.analyze_control_flow()
+    branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="merged")
     #
-    # branch_analyzer.balance_branches()
-    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
+    # j_file = "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/branching_targets.json"
+    # branch_targets = target_branches_from_json(j_file)
+    #
+    # branch_analyzer.balance_branches(branch_targets)
+    # # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
 
     # analyze the latency in each code sequence
     # branch_analyzer.analyze_branch_latencies()

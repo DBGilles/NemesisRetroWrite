@@ -205,7 +205,7 @@ def map_latencydata_types(type_name):
 
 REGISTER_REGEX = re.compile("%[a-z]{3}")  # '%' followed by 3 chars in alphabet
 RELATIVE_FROM_REGISTER_REGEX = re.compile("-([0-9]+|0[xX][0-9a-fA-F]+)\\(%[a-z]{3}\\)")  # '-', decimal or hex number, '(' register ')'
-IMM_VALUES_REGEX = re.compile("\\$(0[xX][0-9a-fA-F]+|[0-9]+)")
+IMM_VALUES_REGEX = re.compile("\\$-?(0[xX][0-9a-fA-F]+|[0-9]+)")
 LABELS_REGEX = re.compile(".L[a-zA-Z0-9]+")  # '.L' followed by nonempty string of alphanumeric values
 
 def map_assembly_values(asm_value):
@@ -223,7 +223,8 @@ def map_assembly_values(asm_value):
     if LABELS_REGEX.match(asm_value):
         return Label(asm_value)
 
-    raise ValueError(f"unable to map unknown value {asm_value} to typ")
+    print(f"warning, unable to map unknown value {asm_value} to type")
+    return Unknown(asm_value)
 
 
 if __name__ == '__main__':

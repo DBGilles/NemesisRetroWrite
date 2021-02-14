@@ -42,7 +42,7 @@ class CodeSequence:
             assert (len(lat) == len(instr_strings))
             # zip the instructions with their latencies, create output string, add to list
             for instr, l in zip(instr_strings, lat):
-                out_strings.append(f"{instr} - {l} ")
+                out_strings.append(f"{instr} ~ {l} ")
 
         # join the list together, return
         return ", \\n".join(out_strings)
@@ -70,8 +70,9 @@ class CodeSequence:
         taking into account that InstructionWrapper can have multiple instructions
         """
 
-        # iterate over the latencies (nested lists) while incrementing a counter.
-        # when the counter is equal to the target index, stop the iteration, get the iterator indices values
+        # iterate over the latencies (nested lists) while incrementing a counter. when the
+        # counter is equal to the target index, stop the iteration, get the iterator indices
+        # values
         c = 0
         out = None
         for i in range(len(self.latencies)):

@@ -8,7 +8,8 @@ def needs_balancing(b1, b2):
     if sum(map(lambda x: sum(x), b1.latencies)) == sum(map(lambda x: sum(x), b2.latencies)):
         return True
 
-    # map each sublist to its length, if sum of these lenghts not equal then number of instruction not equal, return True
+    # map each sublist to its length, if sum of these length not equal then number of
+    # instruction not equal, return True
     if sum(map(lambda x: len(x), b1.latencies)) != sum(map(lambda x: len(x), b2.latencies)):
         return True
 
