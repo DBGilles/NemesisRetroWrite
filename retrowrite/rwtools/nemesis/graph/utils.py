@@ -2,7 +2,7 @@
 # Utility functions functions for modifying and querying #
 # leafs and (sub)trees composed of NemesisNodes          #
 ##########################################################
-from rwtools.nemesis.graph.nemesis_node import NemesisNode
+from rwtools.nemesis.graph.nemesis_node import AbstractNemesisNode
 
 
 def is_leaf(graph, node):
@@ -30,7 +30,7 @@ def add_latencies_as_descendants(graph, leaf, latencies):
     for lat in latencies:
         # lat is a list of latencies that belong in a single node
         # create a new node, add it to the graph, add edge from prev node to this node
-        new_node = NemesisNode(lat, f"{parent_node.id}{i}")
+        new_node = AbstractNemesisNode(lat, f"{parent_node.id}{i}")
         graph.add_node(new_node)
         graph.add_edge(parent_node, new_node)
 
@@ -50,7 +50,7 @@ def replace_latencies_descendants(graph, root, latencies):
             s.latencies = latencies[0]
     else:
         # no sucessors, add new nodes with the given latency
-        new_node = NemesisNode(latencies[0], f"{root.id}{1}")
+        new_node = AbstractNemesisNode(latencies[0], f"{root.id}{1}")
         graph.add_node(new_node)
         graph.add_edge(root, new_node)
     for s in successors:

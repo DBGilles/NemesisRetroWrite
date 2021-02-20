@@ -6,7 +6,7 @@ from rwtools.nemesis.load_branching_targets import target_branches_from_json
 from rwtools.nemesis.nemesistool import NemesisInstrument, BranchAnalyzer
 
 if __name__ == '__main__':
-    binary = "/home/gilles/git-repos/NemesisRetroWrite/src/print"
+    binary = "/home/gilles/git-repos/NemesisRetroWrite/src/simple"
     bin_name = binary.split("/")[-1]
     output_dir = f"output/{bin_name}"
     os.makedirs(name=output_dir, exist_ok=True)
@@ -44,12 +44,15 @@ if __name__ == '__main__':
     # analyze the control flow, merging code sequences
     branch_analyzer.analyze_control_flow()
     branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="merged")
-    #
+
     # j_file = "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/branching_targets.json"
     # branch_targets = target_branches_from_json(j_file)
-    #
-    # branch_analyzer.balance_branches(branch_targets)
-    # # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
+
+    branch_targets = {
+        'main': ['1146']
+    }
+    branch_analyzer.balance_branches(branch_targets)
+    branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
 
     # analyze the latency in each code sequence
     # branch_analyzer.analyze_branch_latencies()

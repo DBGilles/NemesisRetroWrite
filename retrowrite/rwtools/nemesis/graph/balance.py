@@ -6,7 +6,7 @@ import copy
 from itertools import zip_longest
 
 # algoritmes robust
-from rwtools.nemesis.graph.nemesis_node import NemesisNode
+from rwtools.nemesis.graph.nemesis_node import AbstractNemesisNode
 
 # TODO: overal asserts toevoegen om na te gaan of aan alle voorwaarden wel bepaald wordt -- maak
 from rwtools.nemesis.graph.utils import is_leaf, get_balanced_tree_latencies, \
@@ -57,6 +57,9 @@ def balance_node_tree_latencies(graph, leaf, tree):
 
 def balance_branching_point(graph, node):
     successors = list(graph.successors(node))
+    if len(successors) == 1:
+        # don't need to do anything?
+        return
     assert (len(successors) == 2)  # if not two, do someting special
     child1, child2 = successors
 
@@ -70,7 +73,7 @@ def balance_branching_point(graph, node):
         # both nodes are trees if all values are false <=> no value are true
         balance_tree_latencies(graph, child1, child2)
     else:
-        if nodes_are_leaves[0] == True:
+        if nodes_are_leaves[0]:
             leaf = child1
             tree = child2
         else:
