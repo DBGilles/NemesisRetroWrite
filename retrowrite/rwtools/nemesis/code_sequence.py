@@ -90,7 +90,8 @@ class CodeSequence:
         if out is None:
             raise IndexError
 
-        # finally, return the instructionWrapper with the given index (the first one) and the latency of the relevant instruction
+        # finally, return the instructionWrapper with the given index (the first one) and the
+        # latency of the relevant instruction
         return self.instructions[out[0]], self.latencies[out[0]][out[1]]
 
     def insert(self, target_i, instr, lat):
@@ -107,7 +108,6 @@ class CodeSequence:
                 break
 
         i, j = out
-
         inst_wrapper = self.instructions[i]
 
         # inside inst_wrapper, instert instruction at correct index

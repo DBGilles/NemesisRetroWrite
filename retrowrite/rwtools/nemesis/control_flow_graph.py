@@ -1,9 +1,10 @@
 from collections import defaultdict
 
+from rwtools.nemesis.graph.balance import balance_branching_point
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 import networkx as nx
 
-from rwtools.nemesis.utils.graph_utils import get_root
+from rwtools.nemesis.graph.utils import get_root
 
 GCC_FUNCTIONS = [
     "_start",
@@ -99,9 +100,25 @@ class ControlFlowGraph:
                         for neighbor in self.graph.neighbors(next_node):
                             self.graph.add_edge(current_node, neighbor)
 
-                        # 3) remove node (also removes all edges)
+                        # 3) remove node from graph (also removes edges) and from list of nodes
                         self.graph.remove_node(next_node)
+                        self.nodes[fn_name].remove(next_node)
                 elif out_d > 1:
                     branches += [n for n in self.graph.neighbors(current_node)]
                     current_node = branches[0]
                     branches.remove(current_node)
+
+    def balance_branches(self, targets):
+        for fn_name, fn_nodes in self.nodes.items():
+            fn_targets = set(targets[fn_name])
+            # step 1) find all the nodes that need to be balanced
+            target_nodes = []
+            for node in fn_nodes:
+                node_labels = node.get_node_labels_set()
+                if len(fn_targets.intersection(node_labels)) > 0:
+                    target_nodes.append(node)
+            # step 2) filter out targets that are descendants of other targets (TOOD)
+
+            # step 3) apply balancing algorithm
+            for target in target_nodes:
+                balance_branching_point(self.graph, target)

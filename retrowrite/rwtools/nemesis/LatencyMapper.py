@@ -57,18 +57,24 @@ class LatencyMapper:
         # instruction contains the instruction as found in the assembly
         # operands contain the operands as found in assembly
 
-        candidates = self.latency_map[instruction]  # dictionary mapping insruction + op_types to latency -- need to determine which is most suitable
-        operand_types = list(map(map_assembly_values, operands))  # to match candidates, convert the supplied operands to types
+        # dictionary mapping insruction + op_types to latency --
+        # need to determine which is most suitable
+        candidates = self.latency_map[instruction]
+
+        # to match candidates, convert the supplied operands to types
+        operand_types = list(map(map_assembly_values, operands))
 
         for x in operand_types:
             assert isinstance(x, BaseType)
 
-        # if all candidates have the same latency (meaning latency is same regardless of operand types), return that latency
+        # if all candidates have the same latency (meaning latency is same regardless of
+        # operand types), return that latency
         candidate_latencies = list(candidates.values())
         if len(set(candidate_latencies)) == 1:
             return candidate_latencies[0]
 
-        # otherwise, loop over the candidates, get the best match (should be an identical match really)
+        # otherwise, loop over the candidates, get the best match (should be an identical match
+        # really)
         for candidate in candidates:
             candidate_op_types = candidate[1:]
             # candidate_op_types = list(map(construct_type, candidate_op_types))
@@ -76,7 +82,8 @@ class LatencyMapper:
             if all_present(operand_types, candidate_op_types):
                 return self.latency_map[instruction][candidate]
 
-        print(f"Warning -- latency not found for instruction {instruction} with operands {operands}")
+        print(f"Warning -- latency not found for instruction {instruction} "
+              f"with operands {operands}")
         print(candidates)
         return 1
 

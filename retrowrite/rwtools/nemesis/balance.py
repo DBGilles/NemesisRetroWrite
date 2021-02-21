@@ -57,9 +57,9 @@ def balance(b1, b2):
                 # branches should be balanced at this point
                 break
             else:
-                # TODO: check dit
-                # special case -- the shorter branch needs additional instructions inserted, but take care that the last
-                # instruction remains a jump (if it is a jump)
+                # TODO: check dit special case -- the shorter branch needs additional
+                #  instructions inserted, but take care that the last instruction remains a
+                #  jump (if it is a jump)
                 inst_wrapper_long, lat_long = long_b.get(instr_index)
                 # inst_wrapper_short, lat_short = short_b.get(instr_index - 1)
                 filler_instr = get_null_instr(latency=lat_long)
@@ -76,8 +76,9 @@ def balance(b1, b2):
             instr_index += 1
             continue
 
-        # otherwise, determine 'filler' instruction, add it to shortest -- take latency from the longer branch as target latency
-        # take the latency from the longer branch as target latency
+        # otherwise, determine 'filler' instruction, add it to shortest -- take latency from
+        # the longer branch as target latency take the latency from the longer branch as target
+        # latency
         filler_instr = get_null_instr(latency=lat_long)
 
         # finally, insert the instruction into the shorter branch

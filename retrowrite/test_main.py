@@ -59,31 +59,14 @@ if __name__ == '__main__':
     control_flow_graph.merge_consecutive_nodes()
     to_png(control_flow_graph.graph, out_dir="test_out", name="merged")
 
-    # previous code (before control flow graph class)
+    branch_targets = {
+        'main': ['1146']
+    }
 
-    # branch_analyzer = BranchAnalyzer()
+    control_flow_graph.balance_branches(branch_targets)
+    to_png(control_flow_graph.graph, out_dir="test_out", name="balanced")
 
-    # create initial (atomic) code sequences
-    # branch_analyzer.init_code_sequences(loader.container)
-    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="orig")
+    instrumenter = NemesisInstrument(rw)
+    instrumenter.do_instrument()
 
-    # # analyze the control flow, merging code sequences
-    # branch_analyzer.analyze_control_flow()
-    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="merged")
-
-    # j_file = "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/branching_targets.json"
-    # branch_targets = target_branches_from_json(j_file)
-
-    # branch_targets = {
-    #     'main': ['1146']
-    # }
-    # branch_analyzer.balance_branches(branch_targets)
-    # branch_analyzer.generate_dot_files(output_dir=f"output/{bin_name}", prefix="balanced")
-
-    # analyze the latency in each code sequence
-    # branch_analyzer.analyze_branch_latencies()
-
-    # instrumenter = NemesisInstrument(rw)
-    # instrumenter.do_instrument()
-
-    # rw.dump()
+    rw.dump()
