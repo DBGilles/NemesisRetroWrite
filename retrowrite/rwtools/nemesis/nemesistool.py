@@ -108,10 +108,12 @@ class BranchAnalyzer:
         return
 
     def init_code_sequences(self, container):
-        # first, iterate over each function that is not a GCC function, creating initial code sequences of length 1
+        # first, iterate over each function that is not a GCC function, creating initial code
+        # sequences of length 1
         for _, fn in filter(lambda x: x[1].name not in GCC_FUNCTIONS, container.functions.items()):
-            # the cache contains a numver of InstructionWrappers. these contain an instruction as well as some extra information (mnemonic, location ,etc. )
-            # create the initial list of length 1 sequences by iterating over these
+            # the cache contains a numver of InstructionWrappers. these contain an instruction
+            # as well as some extra information (mnemonic, location ,etc. ) create the initial
+            # list of length 1 sequences by iterating over these
             for instr in fn.cache:
                 self.code_sequences[fn.name].append(CodeSequence([instr]))
 
@@ -176,6 +178,12 @@ class BranchAnalyzer:
                 else:
                     currentSeq = branches[0]
                     branches.remove(currentSeq)
+
+    def generate_graph(self):
+        """
+        Create a graph of NemesisNodes (that contain the code sequences) that can be balanced
+        using the balancing algorithm
+        """
 
 class NemesisInstrument:
     def __init__(self, rewriter):

@@ -37,7 +37,8 @@ class CodeSequence:
         out_strings = []
         # loop over the instruction wrappers and their latencies
         for inst, lat in zip(self.instructions, self.latencies):
-            # for each instruction wrapper, collect all the instruction strings (i.e. before + instruction itself + after)
+            # for each instruction wrapper, collect all the instruction strings (i.e. before +
+            # instruction itself + after)
             instr_strings = [b for b in inst.before] + [str(inst)] + [a for a in inst.after]
             assert (len(lat) == len(instr_strings))
             # zip the instructions with their latencies, create output string, add to list
