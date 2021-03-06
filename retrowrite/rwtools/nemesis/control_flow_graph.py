@@ -35,90 +35,51 @@ GCC_FUNCTIONS = [
     "__cxa_finalize",
 ]
 
-
 class ControlFlowGraph:
-    def __init__(self):
-        self.nodes = defaultdict(list)
-        self.graph = nx.DiGraph()
-
-    def initialize_cfg(self, rwcontainer):
-        """
-        Create an initial control flow graph based on the given RetroWrite container
-        """
-        # first, iterate over each function that is not a GCC function, creating initial code
-        # sequences of length 1
-        for _, fn in filter(lambda x: x[1].name not in GCC_FUNCTIONS,
-                            rwcontainer.functions.items()):
-            # the cache contains a number of InstructionWrappers. these contain an instruction
-            # as well as some extra information (mnemonic, location ,etc. ) create the initial
-            # list of length 1 sequences by iterating over these
-            for instr in fn.cache:
-                # instr is an instance of class librw.container.InstructionWrapper
-                self.nodes[fn.name].append(NemesisNode(instr))
-            self.graph.add_nodes_from(self.nodes[fn.name])
-
-            # add branching information to the sequences
-            for cache_i, next_is in fn.nexts.items():
-                node = self.nodes[fn.name][cache_i]
-                for i in next_is:
-                    if isinstance(i, int):
-                        next_node = self.nodes[fn.name][i]
-                        self.graph.add_edge(node, next_node)
+    def __init__(self, nodes, graph):
+        self.nodes = nodes
+        self.graph = graph
 
     def merge_consecutive_nodes(self):
-        """
-        Merge consecutive nodes that are do not have incoming or outoing edges
-        """
-        for fn_name, fn_nodes in self.nodes.items():
-            # get in and out degrees for all nodes that belong to this function
-            current_node = get_root(self.graph, fn_nodes)
-            branches = []
-            while True:
-                # get out degree current nodes
-                out_d = self.graph.out_degree[current_node]
-                if out_d == 0:
-                    # current node is leaf
-                    if len(branches) == 0:
-                        break
-                    else:
-                        current_node = branches[0]
-                        branches.remove(current_node)
-                if out_d == 1:
-                    # we can merge this node into the next node
-                    # iff the next node has in degree == 1
-                    next_node = self.graph.neighbors(current_node).__next__()
-                    if self.graph.in_degree[next_node] > 1:
-                        branches.append(next_node)
-                        current_node = branches[0]
-                        branches.remove(current_node)
-                    else:
-                        # actually merge the two nodes
-                        # 1) add instructions
-                        current_node.add_instructions(next_node.instructions)
-
-                        # 2) add edge from all neighbors of next_node
-                        for neighbor in self.graph.neighbors(next_node):
-                            self.graph.add_edge(current_node, neighbor)
-
-                        # 3) remove node from graph (also removes edges) and from list of nodes
-                        self.graph.remove_node(next_node)
-                        self.nodes[fn_name].remove(next_node)
-                elif out_d > 1:
-                    branches += [n for n in self.graph.neighbors(current_node)]
+        # get in and out degrees for all nodes that belong to this function
+        current_node = get_root(self.graph, self.nodes)
+        branches = []
+        while True:
+            # get out degree current nodes
+            out_d = self.graph.out_degree[current_node]
+            if out_d == 0:
+                # current node is leaf
+                if len(branches) == 0:
+                    break
+                else:
                     current_node = branches[0]
                     branches.remove(current_node)
+            if out_d == 1:
+                # we can merge this node into the next node
+                # iff the next node has in degree == 1
+                next_node = self.graph.neighbors(current_node).__next__()
+                if self.graph.in_degree[next_node] > 1:
+                    branches.append(next_node)
+                    current_node = branches[0]
+                    branches.remove(current_node)
+                else:
+                    # actually merge the two nodes
+                    # 1) add instructions
+                    current_node.append_node(next_node)
 
-    def balance_branches(self, targets):
-        for fn_name, fn_nodes in self.nodes.items():
-            fn_targets = set(targets[fn_name])
-            # step 1) find all the nodes that need to be balanced
-            target_nodes = []
-            for node in fn_nodes:
-                node_labels = node.get_node_labels_set()
-                if len(fn_targets.intersection(node_labels)) > 0:
-                    target_nodes.append(node)
-            # step 2) filter out targets that are descendants of other targets (TOOD)
+                    # 2) add edge from all neighbors of next_node
+                    for neighbor in self.graph.neighbors(next_node):
+                        self.graph.add_edge(current_node, neighbor)
 
-            # step 3) apply balancing algorithm
-            for target in target_nodes:
-                balance_branching_point(self.graph, target)
+                    # 3) remove node from graph (also removes edges) and from list of nodes
+                    self.graph.remove_node(next_node)
+                    self.nodes.remove(next_node)
+            elif out_d > 1:
+                branches += [n for n in self.graph.neighbors(current_node)]
+                current_node = branches[0]
+                branches.remove(current_node)
+
+    def balance_branching_node(self, node):
+        balance_branching_point(self.graph, node)
+
+

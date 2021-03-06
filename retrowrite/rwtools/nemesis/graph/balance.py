@@ -16,15 +16,18 @@ from rwtools.nemesis.nop_insructions import get_nop_instruction
 
 def balance_branching_point(graph, node):
     successors = list(graph.successors(node))
+    if len(successors) == 0:
+        return
     if len(successors) == 1:
         # don't need to do anything?
+        # return
+        balance_branching_point(graph, successors[0])  # TODO: check of dit klopt ??
         return
     assert (len(successors) == 2)  # if not two, do someting special
     child1, child2 = successors
 
     # determine if the children are laeves or non-leaves (i.e. subtrees
     nodes_are_leaves = [is_leaf(graph, n) for n in successors]
-
     if False not in nodes_are_leaves:
         # both nodes are leaves if all values are true <=> no values are false
         balance_node_latencies(graph, child1, child2)
@@ -41,24 +44,40 @@ def balance_branching_point(graph, node):
         balance_node_tree_latencies(graph, leaf, tree)
 
 
-def balance_node_latencies(graph, n1, n2):
-    # balance the latencies contained in two nodes (leaves)
+def copy_latencies_between_nodes(source, target):
+    i = 0
+    for sublist in source.latencies:
+        for latency in sublist:
+            target.insert(index=i, instruction="placeholder", latency=latency)
+            i += 1
 
-    n1_c = n1
-    n2_c = n2
+def balance_node_latencies(graph, n1, n2):
+    # If either of the two nodes is empty, do something special
+    if n1.num_instructions() == 0 and n2.num_instructions() == 0:
+        raise RuntimeError("Not sure what to do here quite yet")
+    elif n1.num_instructions() == 0:
+        copy_latencies_between_nodes(n2, n1)
+        return
+    elif n2.num_instructions() == 0:
+        copy_latencies_between_nodes(n1, n2)
+        return
+
+    # balance the latencies contained in two nodes (leaves)
     i = 0
     while True:
-        if i >= len(n1_c) and i >= len(n2_c):
+        if i >= n1.num_instructions() and i >= n2.num_instructions():
             break
-        if n1_c.get(i) == n2_c.get(i):
+        n1_lat = n1.get_latency(i) if i < n1.num_instructions() else n1.get_latency(-1)
+        n2_lat = n2.get_latency(i) if i < n2.num_instructions() else n2.get_latency(-1)
+        if n1_lat == n2_lat:
             # equal latencies -- skip
             i += 1
         else:
             # unequal latencies, add latency of the longer brancher to the shorter one
-            longer = max(n1_c, n2_c)
-            shorter = n1_c if longer == n2_c else n2_c
+            longer = max(n1, n2)
+            shorter = n1 if longer == n2 else n2
             # get the latency from the longer one, add it to the shorter one
-            target_latency = longer[i]
+            target_latency = longer.get_latency(i)
 
             # determine what instruction to use
             nop_instruction, mod_registers = get_nop_instruction(target_latency)
@@ -80,7 +99,7 @@ def balance_node_latencies(graph, n1, n2):
                 shorter.insert(i+1, nop_instruction, target_latency)
 
                 # identical) add the pop instruction to both nodes
-                # problem and (hacky) solution. If the instructioon we want to balance is a
+                # problem and (hacky) solution. If the instruction we want to balance is a
                 # jump, the pop wont be executed. in that case add the pop before the jump
                 # (fortunately jump and pop are both 3 so to an attacker these cases are
                 shorter.insert(i+2, pop_instr, 3)
@@ -138,9 +157,9 @@ def balance_latency_lists(latencies1, latencies2):
 
                     # get the latency from the longer one, add it to the shorter one
                     target_latency = longer[i]
-                    nop_instruction, mod_registers = get_nop_instruction(target_latency)
+                    # nop_instruction, mod_registers = get_nop_instruction(target_latency)
 
-                    return
+                    # return
                     shorter.insert(i, target_latency)
 
                     i += 1

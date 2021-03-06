@@ -55,7 +55,7 @@ class BranchAnalyzer:
 
     def count_instructions(self):
         # return a dictionary that contains the number of instructions for each function (for testing purposes)
-        return {fn_name: sum(len(seq.instructions) for seq in self.code_sequences[fn_name]) for fn_name in self.code_sequences.keys()}
+        return {fn_name: sum(len(seq.latencies) for seq in self.code_sequences[fn_name]) for fn_name in self.code_sequences.keys()}
 
     def generate_dot_files(self, output_dir, prefix=""):
         """
@@ -153,7 +153,7 @@ class BranchAnalyzer:
                         currentSeq = branches[0]
                         branches.remove(branches[0])
                         continue
-                    currentSeq.add_instructions(nextSeq.instructions)
+                    currentSeq.add_instructions(nextSeq.latencies)
                     currentSeq.branches_out = nextSeq.branches_out
                     fn_sequences.remove(nextSeq)
                     continue
