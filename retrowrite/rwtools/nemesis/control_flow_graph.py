@@ -42,7 +42,7 @@ class ControlFlowGraph:
 
     def merge_consecutive_nodes(self):
         # get in and out degrees for all nodes that belong to this function
-        current_node = get_root(self.graph, self.nodes)
+        current_node = get_root(self.graph)
         branches = []
         while True:
             # get out degree current nodes
@@ -57,7 +57,7 @@ class ControlFlowGraph:
             if out_d == 1:
                 # we can merge this node into the next node
                 # iff the next node has in degree == 1
-                next_node = self.graph.neighbors(current_node).__next__()
+                next_node = next(self.graph.neighbors(current_node))
                 if self.graph.in_degree[next_node] > 1:
                     branches.append(next_node)
                     current_node = branches[0]
@@ -79,7 +79,12 @@ class ControlFlowGraph:
                 current_node = branches[0]
                 branches.remove(current_node)
 
-    def balance_branching_node(self, node):
-        balance_branching_point(self.graph, node)
-
+    def balance_branching_node(self, label):
+        # iterate over all nodes, find the node with the given label
+        target_node = None
+        for node in self.graph.nodes:
+            if node.id == label:
+                target_node = node
+                break
+        balance_branching_point(self.graph, target_node)
 

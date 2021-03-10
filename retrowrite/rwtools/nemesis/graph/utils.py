@@ -8,15 +8,19 @@ from collections import defaultdict
 import networkx as nx
 import matplotlib.image as mpimg
 from networkx.algorithms.cycles import simple_cycles
-from rwtools.nemesis.graph.nemesis_node import AbstractNemesisNode
+from rwtools.nemesis.graph.nemesis_node import AbstractNemesisNode, NemesisNode
 from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
 import random
+
+from rwtools.nemesis.nemesistool import GCC_FUNCTIONS
 
 random.seed(10)
 
 
-def to_img(graph, name="temp"):
-    out_file = os.path.abspath(f"./{name}.dot")
+def to_img(graph, out_dir= "image", name="temp"):
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    out_file = os.path.abspath(f"./{out_dir}/{name}.dot")
     nx.drawing.nx_agraph.write_dot(graph, out_file)
     cmd = f"dot -Tpng {out_file} -o {name}.png"
     os.system(cmd)
@@ -188,13 +192,13 @@ def get_node_depth(graph, root, node):
     return longest_pathlength
 
 
-def unwind_graph(graph):
+def unwind_graph(graph, root = None):
     # 1) first determine which edges to remove (keep track of tuples of node)
     # 2) remove the nodes
 
     cyclic_edges = []
-    root = get_root(graph)
-
+    if root is None:
+        root = get_root(graph)
     # step 1: determine which edges to remove by first finding cycles and then removing the edge
     # that goes from the deepest node to the most shallow node
     cycles = simple_cycles(graph)
@@ -257,3 +261,37 @@ def restore_cycles(graph):
 
     for node in remove_nodes:
         graph.remove_node(node)
+
+def create_graph_structure(rwcontainer, func_name):
+    """
+    Create an initial control flow graph based on the given RetroWrite container
+    """
+    nodes = []
+    graph = nx.DiGraph()
+
+    target_fn = None
+    for _, fn in rwcontainer.functions.items():
+        if fn.name == func_name:
+            target_fn = fn
+
+    if target_fn is None:
+        raise ValueError(f"Funtion with name {func_name} not found")
+
+    # the cache contains a number of InstructionWrappers. these contain an instruction
+    # as well as some extra information (mnemonic, location ,etc. ) create the initial
+    # list of length 1 sequences by iterating over these
+    for instr in target_fn.cache:
+        # instr is an instance of class librw.container.InstructionWrapper
+        nodes.append(NemesisNode(instr))
+        # nodes[fn.name].append(NemesisNode(instr))
+    graph.add_nodes_from(nodes)
+
+    # add branching information to the sequences
+    for cache_i, next_is in target_fn.nexts.items():
+        node = nodes[cache_i]
+        for i in next_is:
+            if isinstance(i, int):
+                next_node = nodes[i]
+                graph.add_edge(node, next_node)
+
+    return nodes, graph

@@ -16,6 +16,7 @@ from rwtools.nemesis.nop_insructions import get_nop_instruction
 
 def balance_branching_point(graph, node):
     successors = list(graph.successors(node))
+    print(f"balancing node {node.id}, with {len(successors)} children")
     if len(successors) == 0:
         return
     if len(successors) == 1:
@@ -26,7 +27,7 @@ def balance_branching_point(graph, node):
     assert (len(successors) == 2)  # if not two, do someting special
     child1, child2 = successors
 
-    # determine if the children are laeves or non-leaves (i.e. subtrees
+    # determine if the children are laeves or non-leaves (i.e. subtrees)
     nodes_are_leaves = [is_leaf(graph, n) for n in successors]
     if False not in nodes_are_leaves:
         # both nodes are leaves if all values are true <=> no values are false
@@ -50,6 +51,7 @@ def copy_latencies_between_nodes(source, target):
         for latency in sublist:
             target.insert(index=i, instruction="placeholder", latency=latency)
             i += 1
+
 
 def balance_node_latencies(graph, n1, n2):
     # If either of the two nodes is empty, do something special
@@ -89,29 +91,41 @@ def balance_node_latencies(graph, n1, n2):
                 # , the nop instruction to the shorter one,
                 # and a pop instruction to both nodes
                 reg = mod_registers[0]
-                push_instr = f"push {reg}"
-                pop_instr = f"pop {reg}"
+                push_instr = f"pushq {reg}"
+                pop_instr = f"popq {reg}"
+
+                sp_dec_instr = f"sub $0x8, %rsp"
+                sp_inc_instr = f"add $0x8, %rsp"
+                longer.insert(i, sp_dec_instr, 3)
+                shorter.insert(i, sp_dec_instr, 3)
+                i += 1
+
                 # add a push instruction to both nodes
                 longer.insert(i, push_instr, 3)
                 shorter.insert(i, push_instr, 3)
 
                 # add the nop to the shorter one
-                shorter.insert(i+1, nop_instruction, target_latency)
+                shorter.insert(i + 1, nop_instruction, target_latency)
 
                 # identical) add the pop instruction to both nodes
                 # problem and (hacky) solution. If the instruction we want to balance is a
                 # jump, the pop wont be executed. in that case add the pop before the jump
                 # (fortunately jump and pop are both 3 so to an attacker these cases are
-                shorter.insert(i+2, pop_instr, 3)
+                # identical)
+                shorter.insert(i + 2, pop_instr, 3)
+                shorter.insert(i + 3, sp_inc_instr, 3)
 
-                instr = longer.get_instruction_i(i+1)
+                instr = longer.get_instruction_i(i + 1)
                 if "jmp" in instr:
-                    longer.insert(i+1, pop_instr, 3)
+                    longer.insert(i + 1, pop_instr, 3)
+                    longer.insert(i + 2, sp_inc_instr, 3)
                 else:
-                    longer.insert(i+2, pop_instr, 3)
-                i += 3
+                    longer.insert(i + 2, pop_instr, 3)
+                    longer.insert(i + 3, sp_inc_instr, 3)
+                i += 4
             else:
                 raise NotImplementedError
+
 
 def balance_node_tree_latencies(graph, leaf, tree):
     # balance a subtree and a node
@@ -170,23 +184,30 @@ def balance_latency_lists(latencies1, latencies2):
 
 def balance_tree_latencies(graph, tree1, tree2):
     # balance two subtrees
+    print(f"balancing trees {tree1.id}, {tree2.id}")
 
-    # first balance the two trees seperately
+    # 1) first balance the two trees independently
     balance_branching_point(graph, tree1)
     balance_branching_point(graph, tree2)
 
-    # then balance the roots
+    # then balance the root nodes
     balance_node_latencies(graph, tree1, tree2)
 
-    # then get the latencies from root to leaf for both subtrees
+    # at this point the nodes are balanced, and the seperate trees.
+    # balance the entire tree by balancing the left subtree and the right subtreee
+    # because both subtrees are balanced we can simply treat them as a list of latencies
+    # (for determining a balanced latency list)
     latencies1 = get_balanced_tree_latencies(graph, tree1)
     latencies2 = get_balanced_tree_latencies(graph, tree2)
+
+    if latencies1 == latencies2:
+        # latencies are already equal, no need to balance
+        return
 
     # insert these latencies into BOTH trees, following a balancing approach similar to the one
     # when balancing nodes (except seperate by level)
     # first determine optimal interlacing of latencies, and then add these where neccessary?
     # (i.e. assign them)
-
     target_latencies = balance_latency_lists(latencies1, latencies2)
 
     # recursively asssign these latencies to each of the trees (not including the root)
