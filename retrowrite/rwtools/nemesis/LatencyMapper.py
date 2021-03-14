@@ -1,14 +1,64 @@
 import copy
 import os
 import pickle
+import re
 
 from rwtools.nemesis.op_types import map_assembly_values, BaseType
+from rwtools.nemesis.string_matching import REGISTER_REGEX_STR, IMM_VALUES_REGEX_STR, \
+    LABELS_REGEX, LABELS_REGEX_STR, RELATIVE_FROM_REGISTER_REGEX_STR, \
+    LABEL_RELATIVE_FROM_REGISTER_STR, COMPOUND_OP_STR, RELATIVE_FROM_COMPOUND_OP, \
+    RELATIVE_FROM_COMPOUND_OP_STR
 
 
 def split_operands(op_string):
     operands = list(filter(lambda x: len(x) > 0, map(lambda x: x.strip(), op_string.split(","))))
     return operands
 
+
+operand_regex_str = f"({REGISTER_REGEX_STR})|" \
+                    f"({IMM_VALUES_REGEX_STR})|" \
+                    f"({LABELS_REGEX_STR})|" \
+                    f"{RELATIVE_FROM_REGISTER_REGEX_STR}|" \
+                    f"{LABEL_RELATIVE_FROM_REGISTER_STR}|" \
+                    f"{RELATIVE_FROM_COMPOUND_OP_STR}"
+
+# \([%a-zA-Z0-9]+,[%a-zA-Z0-9]+(, [[%a-zA-Z0-9]+)? \)
+operand_regex = re.compile(operand_regex_str, re.VERBOSE)  # set verbose for spaces in pattern
+
+one_op_regex_str = f"{operand_regex_str}"
+two_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str})"
+
+one_op_regex = re.compile(operand_regex_str)
+two_ops_regex = re.compile(two_ops_regex_str)
+
+def split_operands_v2(op_string):
+    # first use the various regex to determine the structure of the operands (i.e. how many,
+    # what form) given the form, split the string suitably. Ideally you could use the capture
+    # groups, but because of the way the regexes are constructed this might be confusing
+    op_string = op_string.strip()
+    if len(op_string) == 0:
+        return []
+    if one_op_regex.fullmatch(op_string):
+        return [op_string]
+    elif two_ops_regex.fullmatch(op_string):
+        if RELATIVE_FROM_COMPOUND_OP.match(op_string):
+            # contains compound operation, take into account opening and closing parentheses
+            # note: return a flat list with all ops or nested list?
+            opening_paren = op_string.find("(")
+            closing_paren = op_string.find(")")
+            first_op = op_string[:opening_paren]
+            compound_ops = op_string[opening_paren+1:closing_paren].split(", ")
+            last_op = op_string[closing_paren+1:]
+            if last_op[:2] == ', ':
+                last_op = last_op[2:]
+            operands = [first_op] + compound_ops + [last_op]
+            return operands
+        else:
+            return op_string.split(', ')
+    elif "@" in op_string:
+        return [op_string]
+    else:
+        print("unknown type:", op_string)
 
 def all_present(target_ops, candidate_ops):
     """
@@ -26,6 +76,8 @@ def all_present(target_ops, candidate_ops):
         if not matched:
             return False
     return True
+
+
 
 
 class LatencyMapper:
@@ -52,8 +104,13 @@ class LatencyMapper:
 
     def get_latency(self, *args):
         instruction = args[0]
-        operands = split_operands(args[1]) if len(args) > 1 else []
 
+        # Some special cases
+        if instruction == 'endbr64':
+            # endbr64 signifies end of branch, but is essentially a NOP instruction
+            return 0
+
+        operands = split_operands_v2(args[1]) if len(args) > 1 else []
         # instruction contains the instruction as found in the assembly
         # operands contain the operands as found in assembly
 
@@ -62,7 +119,12 @@ class LatencyMapper:
         candidates = self.latency_map[instruction]
 
         # to match candidates, convert the supplied operands to types
-        operand_types = list(map(map_assembly_values, operands))
+        try:
+            operand_types = [map_assembly_values(op) for op in operands]
+        except ValueError as e:
+            print(args[1])
+            print(operands)
+            raise e
 
         for x in operand_types:
             assert isinstance(x, BaseType)
@@ -82,9 +144,8 @@ class LatencyMapper:
             if all_present(operand_types, candidate_op_types):
                 return self.latency_map[instruction][candidate]
 
-        print(f"Warning -- latency not found for instruction {instruction} "
+        print(f"Warning -- latency not found for instruction `{instruction}` "
               f"with operands {operands}")
-        print(candidates)
         return 1
 
     def _map_to_type(self, op):

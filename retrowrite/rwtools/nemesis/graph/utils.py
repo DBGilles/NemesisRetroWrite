@@ -222,6 +222,7 @@ def unwind_graph(graph, root = None):
 
         # add a copy of the first node as a child of the last node
         new_node = copy.deepcopy(first_node)
+        # new_node = copy.copy(first_node)
         new_node.id = new_node.id + f"_{random.randint(0, 100)}"
         node_copies[first_node].append(new_node)
         # new_node.mapped_node = first_node

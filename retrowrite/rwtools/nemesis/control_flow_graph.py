@@ -35,6 +35,7 @@ GCC_FUNCTIONS = [
     "__cxa_finalize",
 ]
 
+
 class ControlFlowGraph:
     def __init__(self, nodes, graph):
         self.nodes = nodes
@@ -43,6 +44,7 @@ class ControlFlowGraph:
     def merge_consecutive_nodes(self):
         # get in and out degrees for all nodes that belong to this function
         current_node = get_root(self.graph)
+        marked = []  # keep track of the ndoes we have already visited
         branches = []
         while True:
             # get out degree current nodes
@@ -54,14 +56,22 @@ class ControlFlowGraph:
                 else:
                     current_node = branches[0]
                     branches.remove(current_node)
+                    marked.append(current_node)
             if out_d == 1:
                 # we can merge this node into the next node
-                # iff the next node has in degree == 1
+                # iff the next node has in degree == 1 and the node has not been visited yet(?)
                 next_node = next(self.graph.neighbors(current_node))
-                if self.graph.in_degree[next_node] > 1:
+                if next_node in marked:
+                    if len(branches) == 0:
+                        break
+                    current_node = branches[0]
+                    branches.remove(current_node)
+                    marked.append(current_node)
+                elif self.graph.in_degree[next_node] > 1:
                     branches.append(next_node)
                     current_node = branches[0]
                     branches.remove(current_node)
+                    marked.append(current_node)
                 else:
                     # actually merge the two nodes
                     # 1) add instructions
@@ -74,10 +84,14 @@ class ControlFlowGraph:
                     # 3) remove node from graph (also removes edges) and from list of nodes
                     self.graph.remove_node(next_node)
                     self.nodes.remove(next_node)
+                    # marked.remove(next_node)
             elif out_d > 1:
-                branches += [n for n in self.graph.neighbors(current_node)]
+                branches += [n for n in self.graph.neighbors(current_node) if n not in marked]
+                if len(branches) == 0:
+                    break
                 current_node = branches[0]
                 branches.remove(current_node)
+                marked.append(current_node)
 
     def balance_branching_node(self, label):
         # iterate over all nodes, find the node with the given label
@@ -87,4 +101,3 @@ class ControlFlowGraph:
                 target_node = node
                 break
         balance_branching_point(self.graph, target_node)
-

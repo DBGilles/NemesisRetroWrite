@@ -1,7 +1,11 @@
 from archinfo.arch_x86 import ArchX86
 import re
 
-REGISTER_TYPES = ["r"] + [f"r{x}" for x in [8, 16, 32, 64, 128, 256]] + [f"{x}mm" for x in ["", "x", "y", "z"]]
+from rwtools.nemesis.string_matching import REGISTER_REGEX, RELATIVE_FROM_REGISTER_REGEX, \
+    LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, LABELS_REGEX
+
+REGISTER_TYPES = ["r"] + [f"r{x}" for x in [8, 16, 32, 64, 128, 256]] + [f"{x}mm" for x in
+                                                                         ["", "x", "y", "z"]]
 REGISTER_TYPES += ["x", "y", "z"]
 REGISTER_TYPES += ["v", "sr"]
 REGISTER_TYPES += ['r8l', 'r8h']
@@ -203,17 +207,19 @@ def map_latencydata_types(type_name):
         return Unknown(type_name)
     raise ValueError(f"uknown type {type_name}")
 
-REGISTER_REGEX = re.compile("%[a-z]{3}")  # '%' followed by 3 chars in alphabet
-RELATIVE_FROM_REGISTER_REGEX = re.compile("-([0-9]+|0[xX][0-9a-fA-F]+)\\(%[a-z]{3}\\)")  # '-', decimal or hex number, '(' register ')'
-IMM_VALUES_REGEX = re.compile("\\$-?(0[xX][0-9a-fA-F]+|[0-9]+)")
-LABELS_REGEX = re.compile(".L[a-zA-Z0-9]+")  # '.L' followed by nonempty string of alphanumeric values
-
 def map_assembly_values(asm_value):
+    # if re.compile("[0-9]?").fullmatch(asm_value):
+    #     return Immediate(asm_value)
 
+    try:
+        _ = int(asm_value)
+        return Immediate(asm_value)
+    except ValueError:
+        pass
     if REGISTER_REGEX.match(asm_value):
         return Register(asm_value)
 
-    if RELATIVE_FROM_REGISTER_REGEX.match(asm_value):
+    if RELATIVE_FROM_REGISTER_REGEX.match(asm_value) or LABEL_RELATIVE_FROM_REGISTER.match(asm_value):
         # TODO: is dit correct? heb je in dit geval een memory address?
         return Memory(asm_value)
 
@@ -223,9 +229,15 @@ def map_assembly_values(asm_value):
     if LABELS_REGEX.match(asm_value):
         return Label(asm_value)
 
-    print(f"warning, unable to map unknown value {asm_value} to type")
-    return Unknown(asm_value)
+    if 'memset@' in asm_value:
+        # TODO: uitzoeken hoe dit zit
+        return Memory(asm_value)
+    raise ValueError(f"warning, unable to map unknown value {asm_value} to type")
+    # print(f"warning, unable to map unknown value {asm_value} to type")
+    # return Unknown(asm_value)
 
 
 if __name__ == '__main__':
-    print("main")
+    test_string = ".LC200c(%rip)"
+
+
