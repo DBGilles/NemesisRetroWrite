@@ -78,6 +78,7 @@ def balance_node_latencies(graph, n1, n2):
             # unequal latencies, add latency of the longer brancher to the shorter one
             longer = max(n1, n2)
             shorter = n1 if longer == n2 else n2
+
             # get the latency from the longer one, add it to the shorter one
             target_latency = longer.get_latency(i)
 
@@ -85,8 +86,11 @@ def balance_node_latencies(graph, n1, n2):
             nop_instruction, mod_registers = get_nop_instruction(target_latency)
             if len(mod_registers) == 0:
                 # simply insert the instruction at index i
-                shorter.insert(i, nop_instruction, target_latency)
-                i += 1
+                try:
+                    shorter.insert(i, nop_instruction, target_latency)
+                    i += 1
+                except ValueError:
+                    return
             elif len(mod_registers) == 1:
                 # , the nop instruction to the shorter one,
                 # and a pop instruction to both nodes
