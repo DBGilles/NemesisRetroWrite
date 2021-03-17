@@ -1,40 +1,36 @@
-####################################################################
-# Various functions related to (sub)trees composed of NemesisNodes #
-####################################################################
+########################################################
+# Various functions for balancing a Control Flow Graph #
+########################################################
 
 import copy
 from itertools import zip_longest
 
-# algoritmes robust
-from rwtools.nemesis.graph.nemesis_node import AbstractNemesisNode
-
 # TODO: overal asserts toevoegen om na te gaan of aan alle voorwaarden wel bepaald wordt -- maak
-from rwtools.nemesis.graph.utils import is_leaf, get_balanced_tree_latencies, \
-    add_latencies_as_descendants, replace_latencies_descendants
+# algoritmes robust
 from rwtools.nemesis.nop_insructions import get_nop_instruction
 
 
-def balance_branching_point(graph, node):
-    successors = list(graph.successors(node))
+def balance_branching_point(cfg, node):
+    successors = list(cfg.get_successors(node))
     print(f"balancing node {node.id}, with {len(successors)} children")
     if len(successors) == 0:
         return
     if len(successors) == 1:
         # don't need to do anything?
         # return
-        balance_branching_point(graph, successors[0])  # TODO: check of dit klopt ??
+        balance_branching_point(cfg, successors[0])  # TODO: check of dit klopt ??
         return
     assert (len(successors) == 2)  # if not two, do someting special
     child1, child2 = successors
 
     # determine if the children are laeves or non-leaves (i.e. subtrees)
-    nodes_are_leaves = [is_leaf(graph, n) for n in successors]
+    nodes_are_leaves = [cfg.is_leaf(n) for n in successors]
     if False not in nodes_are_leaves:
         # both nodes are leaves if all values are true <=> no values are false
-        balance_node_latencies(graph, child1, child2)
+        balance_node_latencies(child1, child2)
     elif True not in nodes_are_leaves:
         # both nodes are trees if all values are false <=> no value are true
-        balance_tree_latencies(graph, child1, child2)
+        balance_tree_latencies(cfg, child1, child2)
     else:
         if nodes_are_leaves[0]:
             leaf = child1
@@ -42,7 +38,7 @@ def balance_branching_point(graph, node):
         else:
             leaf = child2
             tree = child1
-        balance_node_tree_latencies(graph, leaf, tree)
+        balance_node_tree_latencies(cfg, leaf, tree)
 
 
 def copy_latencies_between_nodes(source, target):
@@ -53,7 +49,7 @@ def copy_latencies_between_nodes(source, target):
             i += 1
 
 
-def balance_node_latencies(graph, n1, n2):
+def balance_node_latencies(n1, n2):
     # If either of the two nodes is empty, do something special
     if n1.num_instructions() == 0 and n2.num_instructions() == 0:
         raise RuntimeError("Not sure what to do here quite yet")
@@ -131,21 +127,21 @@ def balance_node_latencies(graph, n1, n2):
                 raise NotImplementedError
 
 
-def balance_node_tree_latencies(graph, leaf, tree):
+def balance_node_tree_latencies(cfg, leaf, tree):
     # balance a subtree and a node
-    balance_branching_point(graph, tree)  # recursively balance the tree
+    balance_branching_point(cfg, tree)  # recursively balance the tree
 
     # then balance the root of the tree and the leaf (luckily the tree is actually represented
     # by root)
-    balance_node_latencies(graph, leaf, tree)
+    balance_node_latencies(leaf, tree)
     # TODO: verify that tree was correctly balanced
 
     # Because the tree is balanced,you can take any path from the root to a leaf and simply
     # copy over the latencies
-    target_latencies = get_balanced_tree_latencies(graph, tree)
+    target_latencies = cfg.get_balanced_tree_latencies(tree)
 
     # now, insert the target latencies into new nodes that are descendants of the leaf
-    add_latencies_as_descendants(graph, leaf, target_latencies)
+    cfg.add_latencies_as_descendants(leaf, target_latencies)
 
 
 def balance_latency_lists(latencies1, latencies2):
@@ -186,23 +182,23 @@ def balance_latency_lists(latencies1, latencies2):
     return target_latencies
 
 
-def balance_tree_latencies(graph, tree1, tree2):
+def balance_tree_latencies(cfg, tree1, tree2):
     # balance two subtrees
     print(f"balancing trees {tree1.id}, {tree2.id}")
 
     # 1) first balance the two trees independently
-    balance_branching_point(graph, tree1)
-    balance_branching_point(graph, tree2)
+    balance_branching_point(cfg, tree1)
+    balance_branching_point(cfg, tree2)
 
     # then balance the root nodes
-    balance_node_latencies(graph, tree1, tree2)
+    balance_node_latencies(tree1, tree2)
 
     # at this point the nodes are balanced, and the seperate trees.
     # balance the entire tree by balancing the left subtree and the right subtreee
     # because both subtrees are balanced we can simply treat them as a list of latencies
     # (for determining a balanced latency list)
-    latencies1 = get_balanced_tree_latencies(graph, tree1)
-    latencies2 = get_balanced_tree_latencies(graph, tree2)
+    latencies1 = cfg.get_balanced_tree_latencies(tree1)
+    latencies2 = cfg.get_balanced_tree_latencies(tree2)
 
     if latencies1 == latencies2:
         # latencies are already equal, no need to balance
@@ -215,5 +211,5 @@ def balance_tree_latencies(graph, tree1, tree2):
     target_latencies = balance_latency_lists(latencies1, latencies2)
 
     # recursively asssign these latencies to each of the trees (not including the root)
-    replace_latencies_descendants(graph, tree1, target_latencies)
-    replace_latencies_descendants(graph, tree2, target_latencies)
+    cfg.replace_latencies_descendants(tree1, target_latencies)
+    cfg.replace_latencies_descendants(tree2, target_latencies)

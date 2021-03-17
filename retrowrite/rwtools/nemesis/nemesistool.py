@@ -5,8 +5,6 @@ from collections import defaultdict
 
 from archinfo import ArchX86
 
-from rwtools.nemesis.balance import balance
-
 GCC_FUNCTIONS = [
     "_start",
     "__libc_start_main",
