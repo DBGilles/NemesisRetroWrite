@@ -1,9 +1,13 @@
+############################################
+# Definition of Abstract NemesisNode class #
+############################################
 
 def flatten(nested_list):
     ret = []
     for sublist in nested_list:
         ret += sublist
     return ret
+
 
 class AbstractNemesisNode:
     """
@@ -14,14 +18,14 @@ class AbstractNemesisNode:
     list of latencies
     """
 
-    def __init__(self, instruction_latency, name, mapped_node=None):
+    def __init__(self, instruction_latency, name):
         if isinstance(instruction_latency, int):
             self.latencies = [[instruction_latency]]
         elif isinstance(instruction_latency, list):
             self.latencies = [instruction_latency]
         self.frozen = False
         self.id = name
-        self.mapped_nodes = mapped_node  # reference to original node - acts as a pointer of sorts
+        self.mapped_nodes = None  # reference to original node - acts as a pointer of sorts
 
     def __hash__(self):
         return hash(self.id)
@@ -39,21 +43,20 @@ class AbstractNemesisNode:
     # def __repr__(self):
     #     return self.id
 
-    def num_instructions(self):
-        """
-        Return the total number of instructions
-        """
-        return sum(len(lat) for lat in self.latencies)
-
-    def __lt__(self, other):
-        return sum(self.latencies) < sum(other.latencies)
-
     def __gt__(self, other):
         """
         A node is 'larger' than another node if it takes a longer time to execute
         i.e. when the sum of all the latencies is larger than the other's
         """
-        return sum(flatten(self.latencies)) > sum(flatten(other.latencies))
+        # return sum(flatten(self.latencies)) > sum(flatten(other.latencies))
+        return sum(sum(lats) for lats in self.latencies) > sum(
+            sum(lats) for lats in other.latencies)
+
+    def num_instructions(self):
+        """
+        Return the total number of instructions
+        """
+        return sum(len(lat) for lat in self.latencies)
 
     def insert(self, index, instruction, latency):
         """
@@ -83,23 +86,9 @@ class AbstractNemesisNode:
             j += 1
 
         self.latencies[i].insert(j, latency)
-        # if self.mapped_nodes is not None:
-        #     for mapped_node in self.mapped_nodes:
-        #         if mapped_node == self:
-        #             continue
-        #         else:
-        #             mapped_node.latencies[i].insert(j, latency)
 
-    def get(self, item):
-        if item >= len(self.latencies):
-            return_val = self[-1]
-        else:
-            return_val = self[item]
-        assert (isinstance(return_val, int))
-        return return_val
-
-    def __getitem__(self, item):
-        return self.latencies[item]
+    def get_instr_mnemonic(self, index):
+        return ""
 
     def get_latency(self, i):
         """

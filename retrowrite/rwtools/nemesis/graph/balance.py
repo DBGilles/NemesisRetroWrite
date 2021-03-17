@@ -119,7 +119,7 @@ def balance_node_latencies(graph, n1, n2):
                 shorter.insert(i + 2, pop_instr, 3)
                 shorter.insert(i + 3, sp_inc_instr, 3)
 
-                instr = longer.get_instruction_i(i + 1)
+                instr = longer.get_instr_mnemonic(i + 1)
                 if "jmp" in instr:
                     longer.insert(i + 1, pop_instr, 3)
                     longer.insert(i + 2, sp_inc_instr, 3)
