@@ -113,7 +113,7 @@ class ControlFlowGraph:
             if node.id == label:
                 target_node = node
                 break
-        balance_branching_point(self.graph, target_node)
+        balance_branching_point(self, target_node)
 
     def add_latencies_as_descendants(self, leaf, latencies):
         # TODO: moet ook werken voor concrete nodes
