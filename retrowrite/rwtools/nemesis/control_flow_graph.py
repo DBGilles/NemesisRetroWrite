@@ -121,6 +121,7 @@ class ControlFlowGraph:
         for lat in latencies:
             # lat is a list of latencies that belong in a single node
             # create a new node, add it to the graph, add edge from prev node to this node
+
             new_node = AbstractNemesisNode(lat, f"{parent_node.id}{i}")
             self.graph.add_node(new_node)
             self.graph.add_edge(parent_node, new_node)
@@ -139,6 +140,11 @@ class ControlFlowGraph:
         successors = list(self.graph.successors(root))
         if len(successors) > 0:
             for s in successors:
+                # TODO: do this by 'inserting' instruction
+                # in case of abstract node -- only insert latency
+                # in case of concrete node -- inserts actual nop instruction
+                # enige probleem -- wat als we push en pop moeten inserten? Dan moet dat ook
+                # bij alle neighbors
                 s.latencies[0] = latencies[0]  # TODD: deze lijn checken
         else:
             # no sucessors, add new nodes with the given latency
@@ -246,6 +252,38 @@ class ControlFlowGraph:
                 for larger_node in largest_d_nodes:
                     self.equalize_path_lengths(smaller_node, larger_node)
 
+    def merge_inserted_nodes(self):
+        current_node = get_root(self.graph)
+        branches = []
+        while True:
+            # walk over the tree
+            # when current ode has a successor that is an abstract node
+            # 1) merge it into the current node
+            # 2) update control flow graph
+
+            successors = list(self.graph.successors(current_node))
+            successor_is_abstract = [succ.is_abstract() for succ in successors]
+            if True in successor_is_abstract:
+                # if some successor is abstract, merge it into current node
+                # don't update current node, because it will have a new successor that might be
+                # abstract
+                abstract_successor = successors[successor_is_abstract.index(True)]
+                current_node.append_instructions(abstract_successor.instructions, abstract_successor.latencies)
+                node_successors = list(self.graph.successors(abstract_successor))
+                assert len(node_successors) == 1  # should be true by construction
+                new_successor = node_successors[0]
+                self.graph.add_edge(current_node, new_successor)
+                self.nodes.remove(abstract_successor)
+                self.graph.remove_node(abstract_successor)
+            else:
+                # add both successors to list of nodes we have to visit still
+                branches += successors
+                if len(branches) == 0:
+                    break
+                # set current node equal to first node in branches
+                current_node = branches[0]
+                branches.remove(current_node)
+
     def unwind_graph(self, root=None):
         # 1) first determine which edges to remove (keep track of tuples of node)
         # 2) remove the nodes
@@ -309,3 +347,20 @@ class ControlFlowGraph:
 
     def get_successors(self, node):
         return list(self.graph.successors(node))
+
+    def cleanup(self):
+        remove = []
+        for node in self.nodes:
+            if not isinstance(node, NemesisNode):
+                remove.append(node)
+        for node in remove:
+            self.nodes.remove(node)
+            self.graph.remove_node(node)
+
+    def insert_between_nodes(self, new_node, from_node, to_node):
+        self.graph.add_node(new_node)
+        self.graph.add_edge(from_node, new_node)
+        self.graph.add_edge(new_node, to_node)
+
+        self.graph.remove_edge(from_node, to_node)
+        self.nodes.append(new_node)

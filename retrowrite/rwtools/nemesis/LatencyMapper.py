@@ -7,12 +7,11 @@ from rwtools.nemesis.op_types import map_assembly_values, BaseType
 from rwtools.nemesis.string_matching import REGISTER_REGEX_STR, IMM_VALUES_REGEX_STR, \
     LABELS_REGEX, LABELS_REGEX_STR, RELATIVE_FROM_REGISTER_REGEX_STR, \
     LABEL_RELATIVE_FROM_REGISTER_STR, COMPOUND_OP_STR, RELATIVE_FROM_COMPOUND_OP, \
-    RELATIVE_FROM_COMPOUND_OP_STR
+    RELATIVE_FROM_COMPOUND_OP_STR, COMPOUND_OP
 
 
-def split_operands(op_string):
-    operands = list(filter(lambda x: len(x) > 0, map(lambda x: x.strip(), op_string.split(","))))
-    return operands
+# def split_operands(op_string): operands = list(filter(lambda x: len(x) > 0, map(lambda x:
+# x.strip(), op_string.split(",")))) return operands
 
 
 operand_regex_str = f"({REGISTER_REGEX_STR})|" \
@@ -20,7 +19,8 @@ operand_regex_str = f"({REGISTER_REGEX_STR})|" \
                     f"({LABELS_REGEX_STR})|" \
                     f"{RELATIVE_FROM_REGISTER_REGEX_STR}|" \
                     f"{LABEL_RELATIVE_FROM_REGISTER_STR}|" \
-                    f"{RELATIVE_FROM_COMPOUND_OP_STR}"
+                    f"{RELATIVE_FROM_COMPOUND_OP_STR}|" \
+                    f"{COMPOUND_OP_STR}"
 
 # \([%a-zA-Z0-9]+,[%a-zA-Z0-9]+(, [[%a-zA-Z0-9]+)? \)
 operand_regex = re.compile(operand_regex_str, re.VERBOSE)  # set verbose for spaces in pattern
@@ -30,6 +30,7 @@ two_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str})"
 
 one_op_regex = re.compile(operand_regex_str)
 two_ops_regex = re.compile(two_ops_regex_str)
+
 
 def split_operands_v2(op_string):
     # first use the various regex to determine the structure of the operands (i.e. how many,
@@ -41,17 +42,34 @@ def split_operands_v2(op_string):
     if one_op_regex.fullmatch(op_string):
         return [op_string]
     elif two_ops_regex.fullmatch(op_string):
-        if RELATIVE_FROM_COMPOUND_OP.match(op_string):
+        if RELATIVE_FROM_COMPOUND_OP.search(op_string):
             # contains compound operation, take into account opening and closing parentheses
             # note: return a flat list with all ops or nested list?
             opening_paren = op_string.find("(")
             closing_paren = op_string.find(")")
             first_op = op_string[:opening_paren]
-            compound_ops = op_string[opening_paren+1:closing_paren].split(", ")
-            last_op = op_string[closing_paren+1:]
+            compound_ops = op_string[opening_paren + 1:closing_paren].split(", ")
+            last_op = op_string[closing_paren + 1:]
             if last_op[:2] == ', ':
                 last_op = last_op[2:]
-            operands = [first_op] + compound_ops + [last_op]
+            operands = [first_op, compound_ops, last_op]
+            return operands
+        elif COMPOUND_OP.search(op_string):
+            opening_paren = op_string.find("(")
+            closing_paren = op_string.find(")")
+            first_op = op_string[:opening_paren]
+            compound_ops = op_string[opening_paren + 1:closing_paren].split(", ")
+            last_op = op_string[closing_paren + 1:]
+            if last_op[:2] == ', ':
+                last_op = last_op[2:]
+            if first_op[:2] == ', ':
+                first_op = first_op[2:]
+            operands = []
+            if len(first_op) > 0:
+                operands.append(first_op)
+            operands.append(compound_ops)
+            if len(last_op) > 0:
+                operands.append(last_op)
             return operands
         else:
             return op_string.split(', ')
@@ -59,6 +77,8 @@ def split_operands_v2(op_string):
         return [op_string]
     else:
         print("unknown type:", op_string)
+        raise ValueError
+
 
 def all_present(target_ops, candidate_ops):
     """
@@ -76,8 +96,6 @@ def all_present(target_ops, candidate_ops):
         if not matched:
             return False
     return True
-
-
 
 
 class LatencyMapper:
@@ -125,7 +143,6 @@ class LatencyMapper:
             print(args[1])
             print(operands)
             raise e
-
         for x in operand_types:
             assert isinstance(x, BaseType)
 

@@ -207,19 +207,30 @@ def map_latencydata_types(type_name):
         return Unknown(type_name)
     raise ValueError(f"uknown type {type_name}")
 
+
 def map_assembly_values(asm_value):
+    # TODO: dit afwerken
     # if re.compile("[0-9]?").fullmatch(asm_value):
     #     return Immediate(asm_value)
+
+    if isinstance(asm_value, list):
+        substring = ", ".join(asm_value)
+        asm_value = f"({substring})"
+        return Memory(asm_value)
 
     try:
         _ = int(asm_value)
         return Immediate(asm_value)
     except ValueError:
         pass
+    except TypeError:
+        pass
+
     if REGISTER_REGEX.match(asm_value):
         return Register(asm_value)
 
-    if RELATIVE_FROM_REGISTER_REGEX.match(asm_value) or LABEL_RELATIVE_FROM_REGISTER.match(asm_value):
+    if RELATIVE_FROM_REGISTER_REGEX.match(asm_value) or LABEL_RELATIVE_FROM_REGISTER.match(
+            asm_value):
         # TODO: is dit correct? heb je in dit geval een memory address?
         return Memory(asm_value)
 
@@ -239,5 +250,3 @@ def map_assembly_values(asm_value):
 
 if __name__ == '__main__':
     test_string = ".LC200c(%rip)"
-
-

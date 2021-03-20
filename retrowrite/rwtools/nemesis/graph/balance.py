@@ -12,7 +12,6 @@ from rwtools.nemesis.nop_insructions import get_nop_instruction
 
 def balance_branching_point(cfg, node):
     successors = list(cfg.get_successors(node))
-    print(f"balancing node {node.id}, with {len(successors)} children")
     if len(successors) == 0:
         return
     if len(successors) == 1:
@@ -45,11 +44,17 @@ def copy_latencies_between_nodes(source, target):
     i = 0
     for sublist in source.latencies:
         for latency in sublist:
-            target.insert(index=i, instruction="placeholder", latency=latency)
-            i += 1
-
+            nop_instr, mod_regs = get_nop_instruction(latency)
+            if len(mod_regs) == 0:
+                # simply insert instruction into the target
+                target.insert(index=i, instruction=nop_instr, latency=latency)
+                i += 1
+            else:
+                # otherwise insert push and pop instructions into both
+                raise NotImplementedError
 
 def balance_node_latencies(n1, n2):
+    print(f"balancing_nodes {n1.id}, {n2.id}")
     # If either of the two nodes is empty, do something special
     if n1.num_instructions() == 0 and n2.num_instructions() == 0:
         raise RuntimeError("Not sure what to do here quite yet")
@@ -67,6 +72,7 @@ def balance_node_latencies(n1, n2):
             break
         n1_lat = n1.get_latency(i) if i < n1.num_instructions() else n1.get_latency(-1)
         n2_lat = n2.get_latency(i) if i < n2.num_instructions() else n2.get_latency(-1)
+        print(n1_lat, n2_lat)
         if n1_lat == n2_lat:
             # equal latencies -- skip
             i += 1
@@ -93,7 +99,6 @@ def balance_node_latencies(n1, n2):
                 reg = mod_registers[0]
                 push_instr = f"pushq {reg}"
                 pop_instr = f"popq {reg}"
-
                 sp_dec_instr = f"sub $0x8, %rsp"
                 sp_inc_instr = f"add $0x8, %rsp"
                 longer.insert(i, sp_dec_instr, 3)
@@ -116,7 +121,7 @@ def balance_node_latencies(n1, n2):
                 shorter.insert(i + 3, sp_inc_instr, 3)
 
                 instr = longer.get_instr_mnemonic(i + 1)
-                if "jmp" in instr:
+                if "jmp" in instr or "retq" in instr:
                     longer.insert(i + 1, pop_instr, 3)
                     longer.insert(i + 2, sp_inc_instr, 3)
                 else:

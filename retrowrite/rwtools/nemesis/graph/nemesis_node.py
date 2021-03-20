@@ -33,6 +33,9 @@ class NemesisNode(AbstractNemesisNode):
                 out_strings.append(f"{i} ~ {l} ")
         return ", \\n".join(out_strings)
 
+    def is_abstract(self):
+        return False
+
     def insert(self, index, instruction, latency):
         # instr = get_nop_instruction(target_latency)
         c = 0
@@ -112,3 +115,11 @@ class NemesisNode(AbstractNemesisNode):
     def append_node(self, node):
         self.latencies += node.latencies
         self.instruction_wrappers += node.instruction_wrappers
+
+    def append_instructions(self, instructions, latencies):
+        for instrs, lats in zip(instructions, latencies):
+            for instr, lat in zip(instrs, lats):
+                # add isntr, lat as last instruction, latenccy in the node
+                self.instruction_wrappers[-1].instrument_after(instr)
+                self.latencies[-1].append(lat)
+

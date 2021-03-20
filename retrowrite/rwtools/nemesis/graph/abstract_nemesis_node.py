@@ -23,9 +23,13 @@ class AbstractNemesisNode:
             self.latencies = [[instruction_latency]]
         elif isinstance(instruction_latency, list):
             self.latencies = [instruction_latency]
+        self.instructions = [[]]
         self.frozen = False
         self.id = name
         self.mapped_nodes = None  # reference to original node - acts as a pointer of sorts
+
+    def is_abstract(self):
+        return True
 
     def __hash__(self):
         return hash(self.id)
@@ -35,9 +39,19 @@ class AbstractNemesisNode:
 
     def __repr__(self):
         out_str = ""
-        out_str += f"{self.id}\n"
-        for sublist in self.latencies:
-            out_str += "[" + "\n".join(str(x) for x in sublist) + "]\n"
+        out_str += f"#{self.id}#\n"
+        for i, sublist in enumerate(self.latencies):
+            strings = []
+            for j, latency in enumerate(sublist):
+                try:
+                    instruction = self.instructions[i][j]
+                except IndexError:
+                    instruction = ""
+                strings.append(f"{instruction} ~ {latency}")
+            out_str += "\n".join(strings) + "\n"
+        #
+        # for sublist in self.latencies:
+        #     out_str += "[" + "\n".join(str(x) for x in sublist) + "]\n"
         return out_str
 
     # def __repr__(self):
@@ -63,6 +77,7 @@ class AbstractNemesisNode:
         Insert instruction at absolute index i
         Find where instruction at absolute index i-1 is locted, insert right after it
         """
+        print("inserting ", instruction, latency)
         if index == 0:
             i, j = 0, 0
         elif index > self.num_instructions():
@@ -84,8 +99,8 @@ class AbstractNemesisNode:
             # i, j are the indices of item with i = 'index'-1, to insert at 'index', insert at j+1
             i, j = out
             j += 1
-
         self.latencies[i].insert(j, latency)
+        self.instructions[i].insert(j, instruction)
 
     def get_instr_mnemonic(self, index):
         return ""
@@ -98,3 +113,4 @@ class AbstractNemesisNode:
 
     def append_node(self, node):
         self.latencies += node.latencies
+
