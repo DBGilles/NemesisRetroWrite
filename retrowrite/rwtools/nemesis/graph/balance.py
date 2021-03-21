@@ -7,7 +7,8 @@ from itertools import zip_longest
 
 # TODO: overal asserts toevoegen om na te gaan of aan alle voorwaarden wel bepaald wordt -- maak
 # algoritmes robust
-from rwtools.nemesis.nop_insructions import get_nop_instruction
+# from rwtools.nemesis.nop_insructions import get_nop_instruction
+from rwtools.nemesis.nop_instructions import get_nop_instruction
 
 
 def balance_branching_point(cfg, node):
@@ -54,7 +55,6 @@ def copy_latencies_between_nodes(source, target):
                 raise NotImplementedError
 
 def balance_node_latencies(n1, n2):
-    print(f"balancing_nodes {n1.id}, {n2.id}")
     # If either of the two nodes is empty, do something special
     if n1.num_instructions() == 0 and n2.num_instructions() == 0:
         raise RuntimeError("Not sure what to do here quite yet")
@@ -72,7 +72,6 @@ def balance_node_latencies(n1, n2):
             break
         n1_lat = n1.get_latency(i) if i < n1.num_instructions() else n1.get_latency(-1)
         n2_lat = n2.get_latency(i) if i < n2.num_instructions() else n2.get_latency(-1)
-        print(n1_lat, n2_lat)
         if n1_lat == n2_lat:
             # equal latencies -- skip
             i += 1
@@ -148,49 +147,85 @@ def balance_node_tree_latencies(cfg, leaf, tree):
     # now, insert the target latencies into new nodes that are descendants of the leaf
     cfg.add_latencies_as_descendants(leaf, target_latencies)
 
-
-def balance_latency_lists(latencies1, latencies2):
-    # create a deecopy of the two lists (we dont want to modify the originals)
-    latencies1 = copy.deepcopy(latencies1)
-    latencies2 = copy.deepcopy(latencies2)
+def balance_latency_lists(tree1_lats, tree2_lats):
+    latencies1 = copy.deepcopy(tree1_lats)
+    latencies2 = copy.deepcopy(tree2_lats)
     target_latencies = []
-    for a, b, in zip_longest(latencies1, latencies2, fillvalue=[]):
+    for a, b in zip(latencies1, latencies2):
+
         if len(a) == 0:
             target_latencies.append(b)
         elif len(b) == 0:
             target_latencies.append(a)
         else:
-            # merge the two in the same way you would balance two nodes
+            # insert nodes into the shorter list, taking into account how instructions
+            # will eventually be added
+            # e.g., you can only insert a triple of 3's (including push, pop, etc)
             i = 0
             while True:
                 if i >= len(a) and i >= len(b):
                     break
-
-                if a[min(i, len(a) - 1)] == b[min(i, len(b) - 1)]:
-                    # equal latencies -- skip
-                    i += 1
+                if i < len(a) and i < len(b) and a[i] == b[i]:
+                    i +=1
+                elif i >= len(a):
+                    # take the end of b, add it to a
+                    a += b[i:]
+                elif i >= len(b):
+                    b += a[i:]
                 else:
-                    # unequal latencies, add latency of the longer branche to the shorter one
-                    longer = max(a, b, key=lambda x: sum(x))
-                    shorter = a if longer == b else b
-
-                    # get the latency from the longer one, add it to the shorter one
-                    target_latency = longer[i]
-                    # nop_instruction, mod_registers = get_nop_instruction(target_latency)
-
-                    # return
-                    shorter.insert(i, target_latency)
-
-                    i += 1
-            assert (a == b)
+                    # variant van balance, maar er moet altijd 1 eigenschhap gelden
+                    # voor elke serie van latencies van dezelfde waarde (e.g 1,1,1 of 3,3,3,3,3)
+                    # moet het aantal latencies in die series een veelvoud zijn
+                    # van het aantal instructies die je toevoegd wanneer je balanceert
+                    # bijvoorbeeld, voor latency 3, insert 5 instrutions (instr + push + pop + inc SP + dec SP)
+                    # dus elke serie van 3's moet veelvoud zijn van 1 of van 5
+                    # (is er een meer algemene manier om dit uit te drukken, en te implementeren?)
+                    raise NotImplementedError
+            assert a==b
             target_latencies.append(a)
     return target_latencies
+
+# def balance_latency_lists(latencies1, latencies2):
+#
+#     # create a deecopy of the two lists (we dont want to modify the originals)
+#     latencies1 = copy.deepcopy(latencies1)
+#     latencies2 = copy.deepcopy(latencies2)
+#     target_latencies = []
+#     for a, b, in zip_longest(latencies1, latencies2, fillvalue=[]):
+#         if len(a) == 0:
+#             target_latencies.append(b)
+#         elif len(b) == 0:
+#             target_latencies.append(a)
+#         else:
+#             # merge the two in the same way you would balance two nodes
+#             i = 0
+#             while True:
+#                 if i >= len(a) and i >= len(b):
+#                     break
+#
+#                 if a[min(i, len(a) - 1)] == b[min(i, len(b) - 1)]:
+#                     # equal latencies -- skip
+#                     i += 1
+#                 else:
+#                     # unequal latencies, add latency of the longer branche to the shorter one
+#                     longer = max(a, b, key=lambda x: sum(x))
+#                     shorter = a if longer == b else b
+#
+#                     # get the latency from the longer one, add it to the shorter one
+#                     target_latency = longer[i]
+#                     # nop_instruction, mod_registers = get_nop_instruction(target_latency)
+#
+#                     # return
+#                     shorter.insert(i, target_latency)
+#
+#                     i += 1
+#             # assert (a == b)
+#             target_latencies.append(a)
+#     return target_latencies
 
 
 def balance_tree_latencies(cfg, tree1, tree2):
     # balance two subtrees
-    print(f"balancing trees {tree1.id}, {tree2.id}")
-
     # 1) first balance the two trees independently
     balance_branching_point(cfg, tree1)
     balance_branching_point(cfg, tree2)
@@ -205,6 +240,7 @@ def balance_tree_latencies(cfg, tree1, tree2):
     latencies1 = cfg.get_balanced_tree_latencies(tree1)
     latencies2 = cfg.get_balanced_tree_latencies(tree2)
 
+    return
     if latencies1 == latencies2:
         # latencies are already equal, no need to balance
         return
@@ -215,6 +251,18 @@ def balance_tree_latencies(cfg, tree1, tree2):
     # (i.e. assign them)
     target_latencies = balance_latency_lists(latencies1, latencies2)
 
+    print(target_latencies)
+
+    return
     # recursively asssign these latencies to each of the trees (not including the root)
     cfg.replace_latencies_descendants(tree1, target_latencies)
     cfg.replace_latencies_descendants(tree2, target_latencies)
+#
+# def balance_tree_latencies_v2(cfg, tree1, tree2):
+#     # balance two subtrees
+#     # 1) first balance the two trees independently
+#     balance_branching_point(cfg, tree1)
+#     balance_branching_point(cfg, tree2)
+#
+#     # then balance the root nodes
+#     balance_node_latencies(tree1, tree2)

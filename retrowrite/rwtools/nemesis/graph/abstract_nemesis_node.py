@@ -49,13 +49,7 @@ class AbstractNemesisNode:
                     instruction = ""
                 strings.append(f"{instruction} ~ {latency}")
             out_str += "\n".join(strings) + "\n"
-        #
-        # for sublist in self.latencies:
-        #     out_str += "[" + "\n".join(str(x) for x in sublist) + "]\n"
         return out_str
-
-    # def __repr__(self):
-    #     return self.id
 
     def __gt__(self, other):
         """
@@ -77,7 +71,6 @@ class AbstractNemesisNode:
         Insert instruction at absolute index i
         Find where instruction at absolute index i-1 is locted, insert right after it
         """
-        print("inserting ", instruction, latency)
         if index == 0:
             i, j = 0, 0
         elif index > self.num_instructions():

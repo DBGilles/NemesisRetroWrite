@@ -20,3 +20,13 @@ def get_nop_instruction(target_latency):
     print(f"warning, no nop instruction found with latency {target_latency}")
     return "placeholder", []
 
+def get_added_instructions(target_latency):
+    #
+    if target_latency == 1:
+        return 1
+    elif target_latency == 2:
+        return 1
+    elif target_latency == 3:
+        return 5  # instruction itself + push + pop + increment SP + decrement SP
+    elif target_latency == 5:
+        return 1

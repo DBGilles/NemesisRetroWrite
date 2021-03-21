@@ -4,7 +4,8 @@
 from rwtools.nemesis.LatencyMapper import construct_latency_mapper
 import os
 
-from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
+from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode, flatten
+from rwtools.nemesis.nop_instructions import get_nop_instruction
 
 latency_mapper = construct_latency_mapper(os.path.abspath(
     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/utils"
@@ -99,7 +100,7 @@ class NemesisNode(AbstractNemesisNode):
 
         # if out is still none, index is out of range
         if out is None:
-            total_latencies = sum(len(lats) for lats in self.instruction_wrappers)
+            total_latencies = sum(len(lats) for lats in self.latencies)
             raise IndexError(
                 f"Invalid index {orig_index} for node with {total_latencies} latencies")
         i, j = out
@@ -123,3 +124,71 @@ class NemesisNode(AbstractNemesisNode):
                 self.instruction_wrappers[-1].instrument_after(instr)
                 self.latencies[-1].append(lat)
 
+    def replace_latencies(self, target_latencies):
+        current_latencies = []
+        for l in self.latencies:
+            current_latencies += l
+
+        missing_latencies = self.compute_missing_latencies(current_latencies, target_latencies)
+        for (index, latencies) in missing_latencies:
+            instructions = self.map_to_instruction_sequence(latencies)
+            if "jmp" in self.get_instr_mnemonic(index-1):
+                index = index - 1
+            for i, instr in enumerate(instructions):
+                self.insert(index + i, instructions[i], latencies[i])
+            # insert for each latency in latencies some instructions
+            continue
+
+    def map_to_instruction_sequence(self, latency_sequence):
+        # TODO: doe dit (minder) hardcoded - hoe?
+        latency = latency_sequence[0]
+        nop_instruction, registers = get_nop_instruction(latency)
+        if len(registers) == 0:
+            # simply return the same nop instruction a number of times
+            return len(latency_sequence) * [nop_instruction]
+        elif latency == 3 and len(latency_sequence) == 4:
+            reg = registers[0]
+            instructions = [
+                f"sub $0x8, %rsp",
+                f"pushq {reg}",
+                f"popq {reg}",
+                f"add $0x8, %rsp"
+            ]
+            return instructions
+        else:
+            raise NotImplementedError
+
+    def compute_missing_latencies(self, current_latencies, target_latencies):
+        # determine which seqeuences I need to insert where to go from current_latencies
+        # to target_latencies
+        missing_latencies = []
+        if current_latencies == target_latencies:
+            return missing_latencies
+        while True:
+            if current_latencies == target_latencies:
+                return missing_latencies
+
+            # find length of longest common prefix, this is the index where we will need to insert
+            # some sequence
+            common_prefix_length = len(
+                os.path.commonprefix([current_latencies, target_latencies]))
+            # find longest sequence of identical latencies starting at this index
+            lat = target_latencies[common_prefix_length]
+            end_index = len(target_latencies)
+            for j in range(len(target_latencies) - common_prefix_length):
+                if target_latencies[common_prefix_length + j] != lat:
+                    end_index = j
+                    break
+
+            start_index = common_prefix_length
+            sequence = target_latencies[start_index:end_index]
+
+            # add the sequence and its index to the output list
+            missing_latencies.append((common_prefix_length, sequence))
+
+            # add it to the current latency list to get the next sequence
+            current_latencies = current_latencies[
+                                :common_prefix_length] + sequence + current_latencies[
+                                                                    common_prefix_length:]
+
+        return missing_latencies

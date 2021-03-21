@@ -8,6 +8,7 @@ import networkx as nx
 from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
 from networkx.algorithms.cycles import simple_cycles
 import random
+
 random.seed(10)
 
 from rwtools.nemesis.graph.utils import get_root, get_candidate_edges, \
@@ -47,6 +48,7 @@ class ControlFlowGraph:
     """
     Wrapper class for modifying and querying networkx graph
     """
+
     def __init__(self, nodes, graph):
         self.nodes = nodes
         self.graph = graph
@@ -140,12 +142,8 @@ class ControlFlowGraph:
         successors = list(self.graph.successors(root))
         if len(successors) > 0:
             for s in successors:
-                # TODO: do this by 'inserting' instruction
-                # in case of abstract node -- only insert latency
-                # in case of concrete node -- inserts actual nop instruction
-                # enige probleem -- wat als we push en pop moeten inserten? Dan moet dat ook
-                # bij alle neighbors
-                s.latencies[0] = latencies[0]  # TODD: deze lijn checken
+                # assume here that latencies[0] can be achieved perfectly
+                s.replace_latencies(latencies[0])
         else:
             # no sucessors, add new nodes with the given latency
             new_node = AbstractNemesisNode(latencies[0], f"{root.id}{1}")
@@ -268,7 +266,8 @@ class ControlFlowGraph:
                 # don't update current node, because it will have a new successor that might be
                 # abstract
                 abstract_successor = successors[successor_is_abstract.index(True)]
-                current_node.append_instructions(abstract_successor.instructions, abstract_successor.latencies)
+                current_node.append_instructions(abstract_successor.instructions,
+                                                 abstract_successor.latencies)
                 node_successors = list(self.graph.successors(abstract_successor))
                 assert len(node_successors) == 1  # should be true by construction
                 new_successor = node_successors[0]
@@ -337,7 +336,11 @@ class ControlFlowGraph:
         while True:
             # get the first child of the current node
             curr_node = list(self.graph.successors(curr_node))[0]
-            latencies += curr_node.latencies
+            node_latencies = []
+            for lats in curr_node.latencies:
+                node_latencies += lats
+            latencies.append(node_latencies)
+            # latencies += curr_node.latencies
             if is_leaf(self.graph, curr_node):
                 break
         return latencies
