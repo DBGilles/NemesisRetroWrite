@@ -70,10 +70,6 @@ class NemesisNode(AbstractNemesisNode):
         self.latencies[i].insert(j, latency)
 
     def get_instr_mnemonic(self, index):
-        """
-        Return i'th latency, corresponding latency, in the code sequence
-        taking into account that InstructionWrapper can have multiple instructions
-        """
         orig_index = index
         if index < 0:
             total_latencies = sum(len(lats) for lats in self.instruction_wrappers)
@@ -109,7 +105,8 @@ class NemesisNode(AbstractNemesisNode):
         if j < len(inst_wrapper.before):
             return inst_wrapper.before[j]
         elif j == len(inst_wrapper.before):
-            return str(inst_wrapper)
+            return f"{inst_wrapper.mnemonic} {inst_wrapper.op_str}"
+            # return str(inst_wrapper)
         else:
             return inst_wrapper.after[j - len(inst_wrapper.before) - 1]
 
@@ -192,3 +189,22 @@ class NemesisNode(AbstractNemesisNode):
                                                                     common_prefix_length:]
 
         return missing_latencies
+
+    def get_instructions_with_latencies(self, flatten=True):
+        all_instructions = []
+        for wrapper, wrapper_latencies in zip(self.instruction_wrappers, self.latencies):
+            instructions = wrapper.before + [f"{wrapper.mnemonic} {wrapper.op_str}"] + wrapper.after
+            instructions = list(zip(instructions, wrapper_latencies))
+            if flatten:
+                all_instructions += instructions
+            else:
+                all_instructions.append(instructions)
+        return all_instructions
+
+    def replace_instructions(self, new_sequence):
+        for i, (instr, latency) in enumerate(new_sequence):
+            if i < self.num_instructions() and instr == self.get_instr_mnemonic(i):
+                continue
+            else:
+                # insert the instruction at index i
+                self.insert(i, instr, latency)

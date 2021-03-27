@@ -240,9 +240,11 @@ def map_assembly_values(asm_value):
     if LABELS_REGEX.match(asm_value):
         return Label(asm_value)
 
-    if 'memset@' in asm_value:
-        # TODO: uitzoeken hoe dit zit
+    if "@PLT" in asm_value or "@plt" in asm_value:
+        # @PLT: https://stackoverflow.com/questions/5469274/what-does-plt-mean-here
+        # Use only for 'call' instruction
         return Memory(asm_value)
+
     raise ValueError(f"warning, unable to map unknown value {asm_value} to type")
     # print(f"warning, unable to map unknown value {asm_value} to type")
     # return Unknown(asm_value)

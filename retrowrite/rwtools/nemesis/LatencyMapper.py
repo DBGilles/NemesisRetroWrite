@@ -77,7 +77,7 @@ def split_operands_v2(op_string):
         return [op_string]
     else:
         print("unknown type:", op_string)
-        raise ValueError
+        raise ValueError(f"unkown type {op_string}")
 
 
 def all_present(target_ops, candidate_ops):
@@ -128,7 +128,10 @@ class LatencyMapper:
             # endbr64 signifies end of branch, but is essentially a NOP instruction
             return 0
 
-        operands = split_operands_v2(args[1]) if len(args) > 1 else []
+        try:
+            operands = split_operands_v2(args[1]) if len(args) > 1 else []
+        except ValueError:
+            raise ValueError(f"error on spliting operands for instruction {instruction}")
         # instruction contains the instruction as found in the assembly
         # operands contain the operands as found in assembly
 

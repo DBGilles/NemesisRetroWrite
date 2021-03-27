@@ -145,7 +145,9 @@ class ControlFlowGraph:
                 # assume here that latencies[0] can be achieved perfectly
                 s.replace_latencies(latencies[0])
         else:
-            # no sucessors, add new nodes with the given latency
+            # TODO dit deel is nog niet aangepast voor concrete nodes
+            # create a new abstract node, insert the instructions (as in balancing), then they
+            # will later be merged (in the case of a loop any successors are removed)
             new_node = AbstractNemesisNode(latencies[0], f"{root.id}{1}")
             self.graph.add_node(new_node)
             self.graph.add_edge(root, new_node)
@@ -154,7 +156,6 @@ class ControlFlowGraph:
         return
 
     def equalize_path_lengths(self, root, node):
-        # TODO: Moet ook werken voor conrete nodes
         # equalize all path lenghts to the given node
         # path length is defined as the number of nodes from the root to the target node
         paths = list(all_simple_edge_paths(self.graph, root, node))
@@ -352,6 +353,7 @@ class ControlFlowGraph:
         return list(self.graph.successors(node))
 
     def cleanup(self):
+        # unused ?
         remove = []
         for node in self.nodes:
             if not isinstance(node, NemesisNode):
@@ -361,6 +363,7 @@ class ControlFlowGraph:
             self.graph.remove_node(node)
 
     def insert_between_nodes(self, new_node, from_node, to_node):
+        # used for testing purposes mostly
         self.graph.add_node(new_node)
         self.graph.add_edge(from_node, new_node)
         self.graph.add_edge(new_node, to_node)

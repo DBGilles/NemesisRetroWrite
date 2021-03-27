@@ -107,3 +107,38 @@ class AbstractNemesisNode:
     def append_node(self, node):
         self.latencies += node.latencies
 
+    def get_instructions(self, flatten=True):
+        if flatten:
+            out = []
+            for x in self.instructions:
+                out += x
+            return out
+        else:
+            return self.instructions
+
+    def get_latencies(self, flatten=True):
+        if flatten:
+            out = []
+            for lats in self.latencies:
+                out += lats
+            return out
+        else:
+            return self.latencies
+
+    def get_instructions_with_latencies(self, flatten=True):
+        all_instructions = []
+        for instruction_list, latency_list in zip(self.instructions, self.latencies):
+            instructions = list(zip(instruction_list, latency_list))
+            if flatten:
+                all_instructions += instructions
+            else:
+                all_instructions.append(instructions)
+        return all_instructions
+
+    def replace_instructions(self, new_sequence):
+        for i, (instr, latency) in enumerate(new_sequence):
+            if i < self.num_instructions() and instr == self.get_instr_mnemonic(i):
+                continue
+            else:
+                # insert the instruction at index i
+                self.insert(i, instr, latency)
