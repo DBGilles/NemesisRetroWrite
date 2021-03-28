@@ -39,7 +39,6 @@ def balance_branching_point(cfg, node):
 def balance_node_latencies(n1, n2):
     n1_latencies = n1.get_latencies()
     n2_latencies = n2.get_latencies()
-
     # determine the set of latencies for a balanced node
     balanced_latencies = balance_node_latency_lists(n1_latencies, n2_latencies)
 
@@ -73,50 +72,43 @@ def balance_latency_lists(tree1_lats, tree2_lats):
     latencies_2 = copy.deepcopy(tree2_lats)
     target_latencies = []
     for a, b in zip(latencies_1, latencies_2):
-        print(a, b)
         balanced_latencies = balance_node_latency_lists(a, b)
         target_latencies.append(balanced_latencies)
     return target_latencies
 
+def replace_tree_latencies(cfg, subtree, target_latencies):
+    if len(target_latencies) == 0:
+        return
+    successors = cfg.get_successors(subtree)
+    latencies = target_latencies[0]
+    # for each successor
+    # 1) replace the latencies in the node itself, replace the latencies for its successors
+    for s in successors:
+        # for both nodes, determine a new sequence of instructions and replace the current
+        # sequence
+        new_instructions = create_new_instruction_sequence(
+            instructions=s.get_instructions_with_latencies(),
+            target_latencies=latencies)
+        s.replace_instructions(new_instructions)
+        replace_tree_latencies(cfg, s, target_latencies[1:])
+
 def balance_tree_latencies(cfg, tree1, tree2):
-    # balance two subtrees
-    # 1) first balance the two trees independently
+    # First balance the roots
+    balance_node_latencies(tree1, tree2)
+
+    # then balance the subtrees independentely from one another
     balance_branching_point(cfg, tree1)
     balance_branching_point(cfg, tree2)
 
-    # then balance the root nodes
-    balance_node_latencies(tree1, tree2)
+    # consider the latency sequences for both subtrees, create a balanced one
 
     # at this point the nodes are balanced, and the seperate trees.
     # balance the entire tree by balancing the left subtree and the right subtreee
     # because both subtrees are balanced we can simply treat them as a list of latencies
     # (for determining a balanced latency list)
-    latencies1 = cfg.get_balanced_tree_latencies(tree1)
-    latencies2 = cfg.get_balanced_tree_latencies(tree2)
+    balanced = balance_latency_lists(cfg.get_balanced_tree_latencies(tree1),
+                                     cfg.get_balanced_tree_latencies(tree2))
 
-    return
-    if latencies1 == latencies2:
-        # latencies are already equal, no need to balance
-        return
+    replace_tree_latencies(cfg, tree1, balanced)
+    replace_tree_latencies(cfg, tree2, balanced)
 
-    # insert these latencies into BOTH trees, following a balancing approach similar to the one
-    # when balancing nodes (except seperate by level)
-    # first determine optimal interlacing of latencies, and then add these where neccessary?
-    # (i.e. assign them)
-    target_latencies = balance_latency_lists(latencies1, latencies2)
-
-    print(target_latencies)
-
-    return
-    # recursively asssign these latencies to each of the trees (not including the root)
-    cfg.replace_latencies_descendants(tree1, target_latencies)
-    cfg.replace_latencies_descendants(tree2, target_latencies)
-#
-# def balance_tree_latencies_v2(cfg, tree1, tree2):
-#     # balance two subtrees
-#     # 1) first balance the two trees independently
-#     balance_branching_point(cfg, tree1)
-#     balance_branching_point(cfg, tree2)
-#
-#     # then balance the root nodes
-#     balance_node_latencies(tree1, tree2)

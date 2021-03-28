@@ -116,6 +116,7 @@ class ControlFlowGraph:
         return target_node
 
     def add_latencies_as_descendants(self, leaf, latencies):
+        # wordt voorlopig niet gebruikt
         # TODO: moet ook werken voor concrete nodes
         parent_node = leaf
         i = 0
@@ -129,30 +130,6 @@ class ControlFlowGraph:
 
             parent_node = new_node
             i += 1
-
-    def replace_latencies_descendants(self, root, latencies):
-        # TODO: moet ook werken voor concrete nodes
-        # get the successors of this node, add the first latency in the list of latencies to both
-        # recursively add to both children
-
-        if len(latencies) == 0:
-            return
-
-        successors = list(self.graph.successors(root))
-        if len(successors) > 0:
-            for s in successors:
-                # assume here that latencies[0] can be achieved perfectly
-                s.replace_latencies(latencies[0])
-        else:
-            # TODO dit deel is nog niet aangepast voor concrete nodes
-            # create a new abstract node, insert the instructions (as in balancing), then they
-            # will later be merged (in the case of a loop any successors are removed)
-            new_node = AbstractNemesisNode(latencies[0], f"{root.id}{1}")
-            self.graph.add_node(new_node)
-            self.graph.add_edge(root, new_node)
-        for s in successors:
-            self.replace_latencies_descendants(s, latencies[1:])
-        return
 
     def equalize_path_lengths(self, root, node):
         # equalize all path lenghts to the given node

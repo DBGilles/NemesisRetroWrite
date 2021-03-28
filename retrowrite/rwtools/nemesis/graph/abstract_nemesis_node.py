@@ -28,15 +28,6 @@ class AbstractNemesisNode:
         self.id = name
         self.mapped_nodes = None  # reference to original node - acts as a pointer of sorts
 
-    def is_abstract(self):
-        return True
-
-    def __hash__(self):
-        return hash(self.id)
-
-    def __eq__(self, other):
-        return self.id == other.id
-
     def __repr__(self):
         out_str = ""
         out_str += f"#{self.id}#\n"
@@ -51,6 +42,12 @@ class AbstractNemesisNode:
             out_str += "\n".join(strings) + "\n"
         return out_str
 
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
     def __gt__(self, other):
         """
         A node is 'larger' than another node if it takes a longer time to execute
@@ -60,20 +57,30 @@ class AbstractNemesisNode:
         return sum(sum(lats) for lats in self.latencies) > sum(
             sum(lats) for lats in other.latencies)
 
-    def get_latency(self, i):
-        """
-        Return the latency with absolute position i
-        """
-        return flatten(self.latencies)[i]
+    def get_instruction_sequence(self, i):
+        return self.instructions[i]
 
-    def get_instruction(self, i):
-        return flatten(self.instructions)[i]
+    def get_latency_sequence(self, i):
+        return self.latencies[i]
 
-    def num_instructions(self):
-        """
-        Return the total number of instructions
-        """
-        return sum(len(lat) for lat in self.latencies)
+    def insert_into_instruction_sequence(self, i, j, val):
+        self.instructions[i].insert(j, val)
+
+    def insert_into_latency_sequence(self, i, j, val):
+        self.latencies[i].insert(j, val)
+
+    def get_instruction_sequence_length(self, index):
+        return len(self.instructions[index])
+
+    def get_nr_of_instruction_sequences(self):
+        return len(self.instructions)
+
+    def get_instr_mnemonic(self, index):
+        return flatten(self.instructions)[index]
+
+    def append_node(self, node):
+        self.instructions += node.instruction
+        self.latencies += node.latencies
 
     def insert(self, index, instruction, latency):
         """
@@ -86,31 +93,52 @@ class AbstractNemesisNode:
             raise ValueError(f"Cant insert instruction at index {index} into node with "
                              f"{self.num_instructions()} instructions")
         else:
-            counter = 0
-            out = None
-            for i in range(len(self.latencies)):
-                for j in range(len(self.latencies[i])):
-                    if counter == index - 1:
-                        out = (i, j)
-                    if out is not None:
-                        break
-                    counter += 1
+            i, j = self.get_instruction_index(index - 1)
+            j += 1
+
+        self.insert_into_instruction_sequence(i, j, instruction)
+        self.insert_into_latency_sequence(i, j, latency)
+
+    def is_abstract(self):
+        return True
+
+    def get_instruction_index(self, index):
+        orig_index = index
+        if index < 0:
+            # if index negative convert it by adding number instructions
+            index = self.num_instructions() + index
+
+        c = 0
+        out = None
+        for i in range(self.get_nr_of_instruction_sequences()):
+            # instruction_sequence = self.instructions[i]
+            # instruction_sequence_len = len(instruction_sequence)
+            instr_sequence_len = self.get_instruction_sequence_length(i)
+            # for j in range(len(self.instruction_wrappers[i])):
+            for j in range(instr_sequence_len):
+                if c == index:
+                    out = (i, j)
                 if out is not None:
                     break
+                c += 1
+            if out is not None:
+                break
 
-            # i, j are the indices of item with i = 'index'-1, to insert at 'index', insert at j+1
-            i, j = out
-            j += 1
-        self.latencies[i].insert(j, latency)
-        self.instructions[i].insert(j, instruction)
+        # if out is still none, index is out of range
+        if out is None:
+            total_latencies = sum(len(lats) for lats in self.latencies)
+            raise IndexError(
+                f"Invalid index {orig_index} for node with {total_latencies} latencies")
+        i, j = out
 
-    def get_instr_mnemonic(self, index):
-        return ""
+        # inst_wrapper = self.instruction_wrappers[i]
+        return i, j
 
-
-
-    def append_node(self, node):
-        self.latencies += node.latencies
+    def num_instructions(self):
+        """
+        Return the total number of instructions
+        """
+        return sum(len(lat) for lat in self.latencies)
 
     def get_instructions(self, flatten=True):
         if flatten:
