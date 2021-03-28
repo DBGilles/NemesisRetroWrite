@@ -42,20 +42,6 @@ def balance_branching_point(cfg, node):
             tree = child1
         balance_node_tree_latencies(cfg, leaf, tree)
 
-
-# def copy_latencies_between_nodes(source, target):
-#     i = 0
-#     for sublist in source.latencies:
-#         for latency in sublist:
-#             nop_instr, mod_regs = get_nop_instruction(latency)
-#             if len(mod_regs) == 0:
-#                 # simply insert instruction into the target
-#                 target.insert(index=i, instruction=nop_instr, latency=latency)
-#                 i += 1
-#             else:
-#                 # otherwise insert push and pop instructions into both
-#                 raise NotImplementedError
-
 def balance_node_latencies(n1, n2):
     n1_latencies = n1.get_latencies()
     n2_latencies = n2.get_latencies()
@@ -94,7 +80,7 @@ def balance_latency_lists(tree1_lats, tree2_lats):
     target_latencies = []
     for a, b in zip(latencies_1, latencies_2):
         print(a, b)
-        balanced_latencies = balance_node_latencies(a, b)
+        balanced_latencies = balance_node_latency_lists(a, b)
         target_latencies.append(balanced_latencies)
     return target_latencies
 

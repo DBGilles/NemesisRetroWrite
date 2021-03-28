@@ -201,10 +201,3 @@ class NemesisNode(AbstractNemesisNode):
                 all_instructions.append(instructions)
         return all_instructions
 
-    def replace_instructions(self, new_sequence):
-        for i, (instr, latency) in enumerate(new_sequence):
-            if i < self.num_instructions() and instr == self.get_instr_mnemonic(i):
-                continue
-            else:
-                # insert the instruction at index i
-                self.insert(i, instr, latency)

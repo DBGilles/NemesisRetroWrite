@@ -2,7 +2,8 @@ from archinfo.arch_x86 import ArchX86
 import re
 
 from rwtools.nemesis.string_matching import REGISTER_REGEX, RELATIVE_FROM_REGISTER_REGEX, \
-    LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, LABELS_REGEX
+    LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, LABELS_REGEX, RELATIVE_FROM_COMPOUND_OP, \
+    COMPOUND_OP
 
 REGISTER_TYPES = ["r"] + [f"r{x}" for x in [8, 16, 32, 64, 128, 256]] + [f"{x}mm" for x in
                                                                          ["", "x", "y", "z"]]
@@ -209,14 +210,11 @@ def map_latencydata_types(type_name):
 
 
 def map_assembly_values(asm_value):
-    # TODO: dit afwerken
-    # if re.compile("[0-9]?").fullmatch(asm_value):
-    #     return Immediate(asm_value)
-
     if isinstance(asm_value, list):
-        substring = ", ".join(asm_value)
-        asm_value = f"({substring})"
-        return Memory(asm_value)
+        raise ValueError("obsolete, should never occur anymore")
+        # substring = ", ".join(asm_value)
+        # asm_value = f"({substring})"
+        # return Memory(asm_value)
 
     try:
         _ = int(asm_value)
@@ -225,6 +223,12 @@ def map_assembly_values(asm_value):
         pass
     except TypeError:
         pass
+
+    if COMPOUND_OP.fullmatch(asm_value):
+        return Memory(asm_value)
+
+    if RELATIVE_FROM_COMPOUND_OP.fullmatch(asm_value):
+        return Memory(asm_value)
 
     if REGISTER_REGEX.match(asm_value):
         return Register(asm_value)

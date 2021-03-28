@@ -60,6 +60,15 @@ class AbstractNemesisNode:
         return sum(sum(lats) for lats in self.latencies) > sum(
             sum(lats) for lats in other.latencies)
 
+    def get_latency(self, i):
+        """
+        Return the latency with absolute position i
+        """
+        return flatten(self.latencies)[i]
+
+    def get_instruction(self, i):
+        return flatten(self.instructions)[i]
+
     def num_instructions(self):
         """
         Return the total number of instructions
@@ -98,11 +107,7 @@ class AbstractNemesisNode:
     def get_instr_mnemonic(self, index):
         return ""
 
-    def get_latency(self, i):
-        """
-        Return the latency with absolute position i
-        """
-        return flatten(self.latencies)[i]
+
 
     def append_node(self, node):
         self.latencies += node.latencies
