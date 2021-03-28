@@ -14,44 +14,44 @@ _IO_stdin_used_2000: # 2000 -- 2004
 
 .section .data
 .align 8
-.LC4018:
+.LC4000:
 	.byte 0x0
-.LC4019:
+.LC4001:
 	.byte 0x0
-.LC401a:
+.LC4002:
 	.byte 0x0
-.LC401b:
+.LC4003:
 	.byte 0x0
-.LC401c:
+.LC4004:
 	.byte 0x0
-.LC401d:
+.LC4005:
 	.byte 0x0
-.LC401e:
+.LC4006:
 	.byte 0x0
-.LC401f:
+.LC4007:
 	.byte 0x0
-.LC4020:
-	.quad .LC4020
+.LC4008:
+	.quad .LC4008
 .section .bss
 .align 1
-.type	completed.8060_4028,@object
-.globl completed.8060_4028
-completed.8060_4028: # 4028 -- 4029
-.LC4028:
+.type	completed.8060_4010,@object
+.globl completed.8060_4010
+completed.8060_4010: # 4010 -- 4011
+.LC4010:
 	.byte 0x0
-.LC4029:
+.LC4011:
 	.byte 0x0
-.LC402a:
+.LC4012:
 	.byte 0x0
-.LC402b:
+.LC4013:
 	.byte 0x0
-.LC402c:
+.LC4014:
 	.byte 0x0
-.LC402d:
+.LC4015:
 	.byte 0x0
-.LC402e:
+.LC4016:
 	.byte 0x0
-.LC402f:
+.LC4017:
 	.byte 0x0
 .section .text
 .align 16
@@ -59,28 +59,33 @@ completed.8060_4028: # 4028 -- 4029
 .globl main
 .type main, @function
 main:
-.L1130:
-.LC1130:
+.L1129:
+.LC1129:
+	endbr64 
+.LC112d:
 	pushq %rbp
-.LC1131:
+.LC112e:
 	movq %rsp, %rbp
-.LC1134:
+.LC1131:
+	movl $1, -8(%rbp)
+.LC1138:
 	movl $0, -4(%rbp)
-.LC113b:
-	movl $0xa, -8(%rbp)
-.LC1142:
-	movl $0xb, -0xc(%rbp)
+.LC113f:
+	jmp .L1149
+.L1141:
+.LC1141:
+	addl $1, -8(%rbp)
+.LC1145:
+	addl $1, -4(%rbp)
+.L1149:
 .LC1149:
-	cmpl $0x64, -8(%rbp)
+	cmpl $9, -4(%rbp)
 .LC114d:
-	jge .L115a
-.LC1153:
-	movl $0xa, -0xc(%rbp)
-.L115a:
-.LC115a:
-	movl -0xc(%rbp), %eax
-.LC115d:
+	jle .L1141
+.LC114f:
+	movl -8(%rbp), %eax
+.LC1152:
 	popq %rbp
-.LC115e:
+.LC1153:
 	retq 
 .size main,.-main

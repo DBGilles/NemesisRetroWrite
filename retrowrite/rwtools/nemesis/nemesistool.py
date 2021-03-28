@@ -1,6 +1,5 @@
 # class Tool:
 #     def __init__(self):
-import os
 from collections import defaultdict
 
 from archinfo import ArchX86

@@ -1,5 +1,4 @@
 from archinfo.arch_x86 import ArchX86
-import re
 
 from rwtools.nemesis.string_matching import REGISTER_REGEX, RELATIVE_FROM_REGISTER_REGEX, \
     LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, LABELS_REGEX, RELATIVE_FROM_COMPOUND_OP, \
@@ -117,7 +116,8 @@ class Relative(BaseType):
 def map_opcode_types(type_name):
     """
     Map the type representation used by package opcodes to an instance of the correct type
-    Examples of type representations - imm8, imm16, ..., r8, r16, ..., mm16, mm32, ... (i.e. not actual names of registers or actual immediate values or whatnot)
+    Examples of type representations - imm8, imm16, ..., r8, r16, ..., mm16, mm32, ... (i.e.
+    not actual names of registers or actual immediate values or whatnot)
     """
     # first check if the name is a register name
     if type_name in REGISTER_NAMES or type_name in REGISTER_TYPES:

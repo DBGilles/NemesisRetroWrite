@@ -1,13 +1,12 @@
 import copy
+import random
 from collections import defaultdict
 
-from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
-from rwtools.nemesis.graph.balance import balance_branching_point
-from rwtools.nemesis.graph.nemesis_node import NemesisNode
-import networkx as nx
-from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
 from networkx.algorithms.cycles import simple_cycles
-import random
+from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
+
+from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
+from rwtools.nemesis.graph.nemesis_node import NemesisNode
 
 random.seed(10)
 

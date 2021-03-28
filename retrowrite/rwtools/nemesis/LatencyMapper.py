@@ -1,14 +1,12 @@
 import copy
-import os
 import pickle
 import re
 
 from rwtools.nemesis.op_types import map_assembly_values, BaseType
 from rwtools.nemesis.string_matching import REGISTER_REGEX_STR, IMM_VALUES_REGEX_STR, \
-    LABELS_REGEX, LABELS_REGEX_STR, RELATIVE_FROM_REGISTER_REGEX_STR, \
+    LABELS_REGEX_STR, RELATIVE_FROM_REGISTER_REGEX_STR, \
     LABEL_RELATIVE_FROM_REGISTER_STR, COMPOUND_OP_STR, RELATIVE_FROM_COMPOUND_OP, \
     RELATIVE_FROM_COMPOUND_OP_STR, COMPOUND_OP, \
-    RELATIVE_FROM_REGISTER_REGEX, LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, REGISTER_REGEX, \
     JUMP_TARGET_STR
 
 # def split_operands(op_string): operands = list(filter(lambda x: len(x) > 0, map(lambda x:
