@@ -357,8 +357,11 @@ class ControlFlowGraph:
         paths = []
         for leaf in leaves:
             paths += [set(p) for p in all_simple_paths(self.graph, target_node, leaf)]
-        self.stopping_nodes = set.intersection(*paths)
-        self.stopping_nodes.remove(target_node)
+        if len(paths) == 0:
+            self.stopping_nodes = ()
+        else:
+            self.stopping_nodes = set.intersection(*paths)
+            self.stopping_nodes.remove(target_node)
 
     def is_stopping_node(self, node):
         if self.stopping_nodes is None:

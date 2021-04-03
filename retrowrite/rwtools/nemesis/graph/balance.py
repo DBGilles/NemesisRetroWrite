@@ -112,3 +112,17 @@ def balance_tree_latencies(cfg, tree1, tree2):
     replace_tree_latencies(cfg, tree1, balanced)
     replace_tree_latencies(cfg, tree2, balanced)
 
+
+def is_balanced(cfg, node):
+    succ = list(cfg.get_successors(node))
+    if len(succ) == 0:
+        return True  # leaf
+    elif len(succ) == 1:
+        if cfg.is_stopping_node(succ[0]):
+            return True
+        else:
+            return is_balanced(cfg, succ[0])
+    else:
+        return is_balanced(cfg, succ[0]) and is_balanced(cfg, succ[1]) and succ[
+            0].get_latencies() == succ[1].get_latencies()
+
