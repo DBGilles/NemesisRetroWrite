@@ -49,8 +49,9 @@ class ControlFlowGraph:
     """
 
     def __init__(self, nodes, graph):
-        self.nodes = nodes
+        # self.nodes = nodes # TODO: doe deze weg (do equivalent to self.graph.nodes)
         self.graph = graph
+        self.stopping_nodes = None
 
     def to_img(self):
         return to_img(self.graph)
@@ -97,7 +98,7 @@ class ControlFlowGraph:
 
                     # 3) remove node from graph (also removes edges) and from list of nodes
                     self.graph.remove_node(next_node)
-                    self.nodes.remove(next_node)
+                    # self.nodes.remove(next_node)
                     # marked.remove(next_node)
             elif out_d > 1:
                 branches += [n for n in self.graph.neighbors(current_node) if n not in marked]
@@ -162,7 +163,7 @@ class ControlFlowGraph:
 
                 # add it to graph
                 self.graph.add_node(new_node)
-                self.nodes.append(new_node)
+                # self.nodes.append(new_node)
 
                 # add edge from second to last node  new node, from new node to last in path
                 self.graph.add_edge(from_node, new_node)
@@ -249,7 +250,7 @@ class ControlFlowGraph:
                 assert len(node_successors) == 1  # should be true by construction
                 new_successor = node_successors[0]
                 self.graph.add_edge(current_node, new_successor)
-                self.nodes.remove(abstract_successor)
+                # self.nodes.remove(abstract_successor)
                 self.graph.remove_node(abstract_successor)
             else:
                 # add both successors to list of nodes we have to visit still
@@ -307,6 +308,7 @@ class ControlFlowGraph:
     def get_balanced_tree_latencies(self, subtree_root):
         # get the latencies of a balanced subtree starting at the root down to a leaf do a depth
         # first traversal of the root, keeping track of the node latencies, until you reach a leaf
+        # or until you reach a stopping node
         curr_node = subtree_root
         latencies = []
 
@@ -318,7 +320,7 @@ class ControlFlowGraph:
                 node_latencies += lats
             latencies.append(node_latencies)
             # latencies += curr_node.latencies
-            if is_leaf(self.graph, curr_node):
+            if is_leaf(self.graph, curr_node) or self.is_stopping_node(curr_node):
                 break
         return latencies
 
@@ -331,11 +333,11 @@ class ControlFlowGraph:
     def cleanup(self):
         # unused ?
         remove = []
-        for node in self.nodes:
+        for node in self.graph.nodes:
             if not isinstance(node, NemesisNode):
                 remove.append(node)
         for node in remove:
-            self.nodes.remove(node)
+            # self.nodes.remove(node)
             self.graph.remove_node(node)
 
     def insert_between_nodes(self, new_node, from_node, to_node):
@@ -345,4 +347,20 @@ class ControlFlowGraph:
         self.graph.add_edge(new_node, to_node)
 
         self.graph.remove_edge(from_node, to_node)
-        self.nodes.append(new_node)
+        # self.nodes.append(new_node)
+
+    def set_stopping_nodes(self, target_node):
+        leaves = [n for n in self.graph.nodes if self.is_leaf(n)]
+
+        # loop over all paths to all leaves, remove all nodes from the candidate that isn't
+        # present in the path
+        paths = []
+        for leaf in leaves:
+            paths += [set(p) for p in all_simple_paths(self.graph, target_node, leaf)]
+        self.stopping_nodes = set.intersection(*paths)
+        self.stopping_nodes.remove(target_node)
+
+    def is_stopping_node(self, node):
+        if self.stopping_nodes is None:
+            raise RuntimeError("Stopping nodes have not been calculate yet")
+        return node in self.stopping_nodes

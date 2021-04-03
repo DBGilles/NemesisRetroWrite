@@ -12,14 +12,15 @@ def balance_branching_point(cfg, node):
     if len(successors) == 0:
         return
     if len(successors) == 1:
-        # don't need to do anything?
-        # return
-        balance_branching_point(cfg, successors[0])  # TODO: check of dit klopt ??
-        return
+        if cfg.is_stopping_node(successors[0]):
+            return
+        else:
+            balance_branching_point(cfg, successors[0])
+            return
     assert (len(successors) == 2)  # if not two, do someting special
     child1, child2 = successors
 
-    # determine if the children are laeves or non-leaves (i.e. subtrees)
+    # determine if the children are leaves or non-leaves (i.e. subtrees)
     nodes_are_leaves = [cfg.is_leaf(n) for n in successors]
     if False not in nodes_are_leaves:
         # both nodes are leaves if all values are true <=> no values are false
@@ -108,7 +109,6 @@ def balance_tree_latencies(cfg, tree1, tree2):
     # (for determining a balanced latency list)
     balanced = balance_latency_lists(cfg.get_balanced_tree_latencies(tree1),
                                      cfg.get_balanced_tree_latencies(tree2))
-
     replace_tree_latencies(cfg, tree1, balanced)
     replace_tree_latencies(cfg, tree2, balanced)
 
