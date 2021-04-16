@@ -1,0 +1,9 @@
+voor balanceren
+1. unwind graph
+2. equalize branches (voeg nodes toe)
+3. insert nodes (voeg nodes toe)
+
+
+na balanceneren
+1. merge inserted nodes
+2. restore cycles

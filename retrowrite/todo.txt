@@ -1,0 +1,10 @@
+1) refactor code waar mogelijk
+2) maak tool om na te gaan of een code balanced is
+3) gebruik resultaat (2) om end-to-end test te maken (i.e. balance, write to assembly, reload assembly, check if balanced)
+
+4) testen, evaluaren code, refactoren, etc.
+
+Delen van de implementatie die ik moet nakijken, goed testen
+1) Heel het LatencyMapper gedeelte
+    - splitting operands, mapping to types, etc.
+2) balancing latencies (taking into account how instructions are inserted)

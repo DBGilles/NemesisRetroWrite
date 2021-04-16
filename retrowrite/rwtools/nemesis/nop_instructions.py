@@ -17,6 +17,8 @@ def get_nop_instruction(target_latency):
         # TODO: check of latency hier wel effectief 5 is
         return "sbbq $0, %rax", []
 
+    if target_latency == 0:
+        return "", []
     print(f"warning, no nop instruction found with latency {target_latency}")
     return "placeholder", []
 
@@ -47,6 +49,8 @@ def get_nop_sequence(target_latency):
     if target_latency == 5:
         # TODO: check of latency hier wel effectief 5 is
         return ["sbbq $0, %rax"]
+    if target_latency == 0:
+        return [""]
     raise ValueError(f"Can't map {target_latency} to nop sequence")
 
 

@@ -41,16 +41,21 @@ def balance_node_latencies(n1, n2):
     n1_latencies = n1.get_latencies()
     n2_latencies = n2.get_latencies()
     # determine the set of latencies for a balanced node
-    balanced_latencies = balance_node_latency_lists(n1_latencies, n2_latencies)
 
+    print(n1_latencies)
+    print(n2_latencies)
+
+    balanced_latencies = balance_node_latency_lists(n1_latencies, n2_latencies)
     # for both nodes, determine a new sequence of instructions and replace the current sequence
     new_instructions_n1 = create_new_instruction_sequence(instructions=n1.get_instructions_with_latencies(),
                                                           target_latencies=balanced_latencies)
+
     n1.replace_instructions(new_instructions_n1)
 
     new_instructions_n2 = create_new_instruction_sequence(instructions=n2.get_instructions_with_latencies(),
                                                           target_latencies=balanced_latencies)
     n2.replace_instructions(new_instructions_n2)
+
 
 def balance_node_tree_latencies(cfg, leaf, tree):
     # balance a subtree and a node

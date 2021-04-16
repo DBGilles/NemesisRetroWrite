@@ -70,7 +70,10 @@ class AbstractNemesisNode:
         self.latencies[i].insert(j, val)
 
     def get_instruction_sequence_length(self, index):
-        return len(self.instructions[index])
+        # TODO: is dit ok? in `pr`incipe zouden die altijd gelijk moeten zijn (tenzij
+        # abstract node enkel latencies  heeft
+        return len(self.latencies[index])
+        # return len(self.instructions[index])
 
     def get_nr_of_instruction_sequences(self):
         return len(self.instructions)
@@ -78,9 +81,29 @@ class AbstractNemesisNode:
     def get_instr_mnemonic(self, index):
         return flatten(self.instructions)[index]
 
+    def get_instr_latency(self, index):
+        return flatten(self.latencies)[index]
+
     def append_node(self, node):
         self.instructions += node.instruction
         self.latencies += node.latencies
+
+    def prepend_instructions(self, instructions, latencies):
+        i = 0
+        for instrs, lats in zip(instructions, latencies):
+            for instr, lat in zip(instrs, lats):
+                # add isntr, lat as last instruction, latenccy in the node
+                self.insert(i, instr, lat)
+                i += 1
+                # self.instruction_wrappers[-1].instrument_after(instr)
+                # self.latencies[-1].append(lat)
+
+    def append_instructions(self, instructions, latencies):
+        i = self.num_instructions()
+        for instrs, lats in zip(instructions, latencies):
+            for instr, lat in zip(instrs, lats):
+                self.insert(i, instr, lat)
+                i += 1
 
     def insert(self, index, instruction, latency):
         """
@@ -154,6 +177,7 @@ class AbstractNemesisNode:
             out = []
             for lats in self.latencies:
                 out += lats
+                # out += [l for l in lats if l != 0]
             return out
         else:
             return self.latencies
@@ -169,9 +193,23 @@ class AbstractNemesisNode:
         return all_instructions
 
     def replace_instructions(self, new_sequence):
-        for i, (instr, latency) in enumerate(new_sequence):
-            if i < self.num_instructions() and instr == self.get_instr_mnemonic(i):
-                continue
-            else:
-                # insert the instruction at index i
-                self.insert(i, instr, latency)
+        # if len(flatten(self.instructions)) != len(flatten(self.latencies)):
+        #     debug = True
+        # else:
+        #     debug = False
+
+        debug=False
+        if debug:
+            # look only at latencies
+            for i, (_, latency) in enumerate(new_sequence):
+                if i < self.num_instructions() and latency == self.get_instr_latency(i):
+                    continue
+                else:
+                    self.insert(i, "", latency)
+        else:
+            for i, (instr, latency) in enumerate(new_sequence):
+                if i < self.num_instructions() and instr == self.get_instr_mnemonic(i):
+                    continue
+                else:
+                    # insert the instruction at index i
+                    self.insert(i, instr, latency)

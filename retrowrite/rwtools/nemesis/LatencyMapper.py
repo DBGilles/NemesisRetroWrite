@@ -27,9 +27,11 @@ operand_regex = re.compile(operand_regex_str, re.VERBOSE)  # set verbose for spa
 
 one_op_regex_str = f"{operand_regex_str}"
 two_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str})"
+three_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str}), ({operand_regex_str})"
 
 one_op_regex = re.compile(operand_regex_str)
 two_ops_regex = re.compile(two_ops_regex_str)
+three_ops_regex = re.compile(three_ops_regex_str)
 
 def _strip_operand(operand):
     # strip any non alphannumeric characters that may occur at start of operand and trailing
@@ -82,6 +84,11 @@ def split_operands_v2(op_string):
         # first_ops = split_operands_v2(first_op)
         # second_ops = split_operands_v2(second_op)
         return [first_op,  second_op]
+    elif three_ops_regex.fullmatch(op_string):
+        # TODO: in the case of a compound op this will fail (we don't want to split on the
+        # commas within this compound op e.g. op1, (op2_a, op2_b, op2_c), op3
+        ops = [op.strip() for op in op_string.split(",")]
+        return ops
     else:
         print("unknown type:", op_string)
         raise ValueError(f"unkown type {op_string}")

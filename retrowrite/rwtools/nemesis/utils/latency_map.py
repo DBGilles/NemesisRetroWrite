@@ -84,6 +84,7 @@ def populate_latency_map(latency_map, latency_data):
         candidates = latency_data[latency_data['instruction'].str.contains(name, case=False)] #  find all rows that potentially contain this instruction
         if len(candidates) == 0:
             continue
+            continue
         # find the best match among these candidates
         best = best_candidate(key, candidates)
         best_latency = best[-1]

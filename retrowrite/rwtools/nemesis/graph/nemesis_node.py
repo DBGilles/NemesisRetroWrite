@@ -73,16 +73,21 @@ class NemesisNode(AbstractNemesisNode):
         else:
             return inst_wrapper.after[j - len(inst_wrapper.before) - 1]
 
+    def get_start_label(self):
+        first_instruction = self.instruction_wrappers[0]
+        label = f".L{hex(first_instruction.address)[2:]}"
+        return label
+
     def append_node(self, node):
         self.latencies += node.latencies
         self.instruction_wrappers += node.instruction_wrappers
 
-    def append_instructions(self, instructions, latencies):
+    def prepend_instruction(self, instructions, latencies):
         for instrs, lats in zip(instructions, latencies):
             for instr, lat in zip(instrs, lats):
                 # add isntr, lat as last instruction, latenccy in the node
-                self.instruction_wrappers[-1].instrument_after(instr)
-                self.latencies[-1].append(lat)
+                self.instruction_wrappers[0].instrument_before(instr)
+                self.latencies[0].insert(0, lat)
 
     def get_instructions_with_latencies(self, flatten=True):
         all_instructions = []

@@ -1,0 +1,62 @@
+###########
+# 7 APRIL #
+###########
+ 
+Sections: 
+ Introduction 
+ Related Work 
+ Design 
+ Implementation 
+ Evaluation 
+ conclusion 
+
+design 
+	1) oplossing bestaat uit binary rewriting 
+	2) hoe doen we dit. in 2 stappen 	a) zorg ervoor dat algorithm toepasbaar is (bepaalde property moet waar zijn)
+										b) gegeven dat property waar is, pas specifiek algoritme (dat nu mogelijk is) 
+	Dan uitleggen wat de property is, hoe het algorithme werkt etc. 
+
+implementation 
+1. what kind of framewok is used 
+2. "retrowrite for binary rewriting ..." 
+3. how many lines of code 
+4. which instruction are inserted for given latencies etc. 
+
+ook toevoegen in design
+	- wat er gebeurt wanneer je state moet opslagen 
+
+Related Work 
+main related works are nemesis and retrowrite -- see what thy 
+MSP static detection of side channels
+
+Evaluation 
+kijk naar MicroSBS of RetroWrite papers, of Nemesis paper om te zien op welke programma's zijn uittesten
+kijk naar 
+1) wat is de overhead 
+2) do you guarantee security -> aantonen dat Nemesis is mitigated 
+based on formal methods, guarantee the mitigation of nemesis in the code. 
+
+###########
+# 9 april #
+###########
+changes: 
+1) The term 'tree-like' is unclear because it isn't actually a tree -- find better terminology 
+2) change the definition of 'all nodes have 1 depth', because this isn't always the case 
+   find a definition so that if this property holds we can apply the balancing algorithm 
+   (moet combineren dat alle nodes 1 depth hebben en dat alle subtrees even lang zijn -- wilt ook zeggen dat er nodes moeten toegevoegd worden waar nodig) 
+3) pas dan ook de implementatie aan zodat ze altijd in 2 stappen werkt 
+	1) nodes toevoegen zodat de tree voldoet aan eigenschap (die we net gedefinieerd hebben) 
+	2) pas balancing algorithm toe 
+
+############
+# 16 april #
+############
+differences between paper and mine: 
+1) I do binary rewriting 
+2) I take into account fact that not all latencies have some NOP instruction, and that program state may change
+2) they clone blocks, I don't (except for in loops but this isn't really cloning
+3) strategy for inserting nodes is different (although result is similar. similar but not same) 
+4) I first insert empty nodes and then balance them 
+5) I don't take into account loops, function calls (yet) 
+Majid said that the differences should be enough, I do have some novelty 
+

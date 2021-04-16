@@ -5,6 +5,7 @@ from collections import defaultdict
 from networkx.algorithms.cycles import simple_cycles
 from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
 
+from librw.container import InstructionWrapper
 from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 
@@ -43,6 +44,13 @@ GCC_FUNCTIONS = [
 ]
 
 
+def find_branch_target(branch_instruction):
+    start = branch_instruction.find(".")
+    return branch_instruction[start:]
+
+def is_branching_instruction(instruction):
+    return True in [x in instruction for x in ["jmp", "je", "jne"]]
+
 class ControlFlowGraph:
     """
     Wrapper class for modifying and querying networkx graph
@@ -52,6 +60,7 @@ class ControlFlowGraph:
         # self.nodes = nodes # TODO: doe deze weg (do equivalent to self.graph.nodes)
         self.graph = graph
         self.stopping_nodes = None
+        self.removed_edges = []
 
     def to_img(self):
         return to_img(self.graph)
@@ -172,6 +181,42 @@ class ControlFlowGraph:
                 # remove edge from first in path to second in path
                 self.graph.remove_edge(from_node, to_node)
 
+                if isinstance(to_node, NemesisNode):
+
+                    # if the next node is a 'real node' add a jmp instruction
+                    # if the next node is not a 'real node' then you don't need to add jump
+                    # because they will later be merged anyway
+                    jmp_label = to_node.get_start_label()
+                    jmp_instruction = f"jmp {jmp_label}"
+
+                    # TODO: support for node labels, somehow
+                    # new_node.insert(0, f"{node_label}: ", 0)
+                    # new_node.insert(1, jmp_instruction, 1)
+
+                    # we also want to insert the jmp instruction in the sibling
+                    for node in self.graph.successors(from_node):
+                        if not isinstance(node, NemesisNode):
+                            continue
+                        else:
+                            # this node is a sibling that is not the newly created node, also
+                            # add the jump here
+                            node.append_instructions([[jmp_instruction]], [[1]])
+
+                    # check if last instruction in from_node
+                    # 1) is a jmp (which is always the case I think?)
+                    # 2) jumps to next node (which is no longer allowed)
+                    instruction_wrapper = from_node.instruction_wrappers[-1]
+
+                    def is_jmp(mnemonic):
+                        # TODO: dit moet 100 procent zeker true teruggeven if jmp
+                        return mnemonic in ["jmp", "je", "jn"]
+
+                    # if is_jmp(instruction_wrapper.mnemonic):
+                    #     jmp_target = instruction_wrapper.op_str
+                    #     if jmp_label in jmp_target:
+                    #         # modify the op string
+                    #         instruction_wrapper.op_str = node_label
+
                 # update second_to_last
                 for j in range(i + 1, len(paths)):
                     following_path = paths[j]
@@ -211,6 +256,9 @@ class ControlFlowGraph:
         for node in remove_nodes:
             self.graph.remove_node(node)
 
+        for from_node, to_node in self.removed_edges:
+            self.graph.add_edge(from_node, to_node)
+
     def insert_nodes(self):
         root = get_root(self.graph)
         longest_path_lengths = single_source_longest_dag_path_length(self.graph, root)
@@ -228,38 +276,49 @@ class ControlFlowGraph:
                 for larger_node in largest_d_nodes:
                     self.equalize_path_lengths(smaller_node, larger_node)
 
-    def merge_inserted_nodes(self):
-        current_node = get_root(self.graph)
-        branches = []
-        while True:
-            # walk over the tree
-            # when current ode has a successor that is an abstract node
-            # 1) merge it into the current node
-            # 2) update control flow graph
+    def merge_with_descendant(self, from_node, to_node):
+        # 1. check if the to_node has another ancestor
+        to_node_ancestors = list(self.graph.predecessors(to_node))
+        if len(to_node_ancestors) == 2:
+            other_ancestor = [node for node in to_node_ancestors if node != from_node][0]
+            last_instruction = other_ancestor.get_instr_mnemonic(-1)
+            if is_branching_instruction(last_instruction) and \
+                    find_branch_target(last_instruction) == to_node.get_start_label():
+                # the other ancestor has a branch to the start of the to_node.
+                # this branch has to be modified so that it points to a label inside the node
+                # so that control flow is correct after mergeing from node with to node
+                label_name = f".L{to_node.id}mid"
+                to_node.insert(0, f"{label_name}:", 0)
+                instruction_sequence = other_ancestor.get_instruction_sequence(-1)
+                if isinstance(instruction_sequence, list):
+                    # replace last instruction in the list
+                    instruction_sequence[-1] = f"jmp {label_name}"
+                elif isinstance(instruction_sequence, InstructionWrapper):
+                    # if after is not empty the instruction has been instrumented
+                    # if it hasn't been instrumented simply modify the op string
+                    if len(instruction_sequence.after) > 0:
+                        instruction_sequence.after[-1] = f"jmp {label_name}"
+                    else:
+                        instruction_sequence.op_str = f"{label_name}"
 
-            successors = list(self.graph.successors(current_node))
-            successor_is_abstract = [succ.is_abstract() for succ in successors]
-            if True in successor_is_abstract:
-                # if some successor is abstract, merge it into current node
-                # don't update current node, because it will have a new successor that might be
-                # abstract
-                abstract_successor = successors[successor_is_abstract.index(True)]
-                current_node.append_instructions(abstract_successor.instructions,
-                                                 abstract_successor.latencies)
-                node_successors = list(self.graph.successors(abstract_successor))
-                assert len(node_successors) == 1  # should be true by construction
-                new_successor = node_successors[0]
-                self.graph.add_edge(current_node, new_successor)
-                # self.nodes.remove(abstract_successor)
-                self.graph.remove_node(abstract_successor)
-            else:
-                # add both successors to list of nodes we have to visit still
-                branches += successors
-                if len(branches) == 0:
-                    break
-                # set current node equal to first node in branches
-                current_node = branches[0]
-                branches.remove(current_node)
+        # finally insert the instruction into the to_node
+        to_node.prepend_instructions(from_node.instructions, from_node.latencies)
+
+        # remove from_node from the graph
+        parent = list(self.graph.predecessors(from_node))[0]
+        self.graph.add_edge(parent, to_node)
+        self.graph.remove_node(from_node)
+
+    def merge_inserted_nodes(self):
+        targets = []
+        # determine which nodes need to be inserted
+        for node in self.graph.nodes:
+            if not isinstance(node, NemesisNode):
+                # merge this node with it successor
+                targets.append(node)
+        for node in targets:
+            succ = list(self.graph.successors(node))[0]
+            self.merge_with_descendant(node, succ)
 
     def unwind_graph(self, root=None):
         # 1) first determine which edges to remove (keep track of tuples of node)
@@ -289,14 +348,25 @@ class ControlFlowGraph:
             # remove the edge from the last node to the first node
             self.graph.remove_edge(last_node, first_node)
 
-            # add a copy of the first node as a child of the last node
-            # new_node = copy.deepcopy(first_node)
-            new_node = copy.copy(first_node)
-            new_node.id = new_node.id + f"_{random.randint(0, 100)}"
-            node_copies[first_node].append(new_node)
-            # new_node.mapped_node = first_node
-            self.graph.add_node(new_node)
-            self.graph.add_edge(last_node, new_node)
+            # add a copy of the first node as a child of the last node if the last node
+            # has anoteher descendant
+            if len(list(self.graph.successors(last_node))) == 0:
+                # if the node has no other descendants we can simply remove the edge
+                # there is no need for balancing here, so no reason to keep the successor
+                self.removed_edges.append((last_node, first_node))
+            else:
+                # here we do have to keep the successor (while removing the cycle) so we
+                # create a copy of the node and add it as a child (while also keeping the original
+                # we keep track of which nodes are 'mapped' in this way,
+                print(list(node.id for node in self.graph.successors(last_node)))
+
+                # new_node = copy.deepcopy(first_node)
+                new_node = copy.copy(first_node)
+                new_node.id = new_node.id + f"_{random.randint(0, 100)}"
+                node_copies[first_node].append(new_node)
+                # new_node.mapped_node = first_node
+                self.graph.add_node(new_node)
+                self.graph.add_edge(last_node, new_node)
 
         # add to each newly created node as as mapped node
         # 1) the original node it is a copy of
@@ -367,3 +437,48 @@ class ControlFlowGraph:
         if self.stopping_nodes is None:
             raise RuntimeError("Stopping nodes have not been calculate yet")
         return node in self.stopping_nodes
+
+    def equalize_branches(self):
+        root = get_root(self.graph)
+        depths = {}
+        successors = []
+        visited = []
+
+        current_node = root
+        depths[current_node] = 0
+
+        leaves = []
+
+        while True:
+            if current_node not in visited:
+                # add all of its successors to the list of nodes that need to be visited and
+                # set depth (if the target node hasnt )
+                for succ in self.graph.successors(current_node):
+                    if succ not in visited and succ not in successors:
+                        successors.append(succ)
+                        depths[succ] = depths[current_node] + 1
+            visited.append(current_node)
+
+            if len(successors) == 0:
+                break
+
+            current_node = successors[0]
+            successors.remove(current_node)
+            if self.graph.out_degree(current_node) == 0:
+                leaves.append(current_node)
+
+        target_depth = max(depths[l] for l in leaves)
+        for leaf in leaves:
+            if diff := target_depth - depths[leaf]:
+                # true if diff is not equal to 0
+                name_prefix = f"leaf_{leaf.id}"
+                current_node = leaf
+                for i in range(diff):
+                    new_node = AbstractNemesisNode([], f"{name_prefix}_{i}")
+                    # insert the node into the graph
+                    predecessors = list(self.graph.predecessors(current_node))
+                    for predecessor in predecessors:
+                        self.graph.add_edge(predecessor, new_node)
+                        self.graph.remove_edge(predecessor, current_node)
+
+                    self.graph.add_edge(new_node, current_node)

@@ -1,0 +1,11 @@
+Tegen zondag 11 april 
+1) modify definition (in plaats van 'all nodes have 1 depth' doe '...'
+2) modify algorithm so that it takes into account this definition (and it is more consistent -- first modify tree so that this propert holds, then balance) 
+3) write pseudocode (see MicroSBS paper) 
+4) modify tekst
+5) modify implementation to match the tekst 
+   (ook replacen van nodes -- nu gebeurt dit recursief, in de tekst level by level. Resultaat is hetzelfde maar code is nu niet consistent met tekst)  
+
+daarna 
+1) fix latency mapper (aan de hand van nieuwe resource) 
+2) 
