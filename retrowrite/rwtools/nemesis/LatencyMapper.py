@@ -1,37 +1,19 @@
 import copy
+import os
 import pickle
 import re
 
+from rwtools.nemesis.latency_map.create_latency_map import *
 from rwtools.nemesis.op_types import map_assembly_values, BaseType
 from rwtools.nemesis.string_matching import REGISTER_REGEX_STR, IMM_VALUES_REGEX_STR, \
     LABELS_REGEX_STR, RELATIVE_FROM_REGISTER_REGEX_STR, \
     LABEL_RELATIVE_FROM_REGISTER_STR, COMPOUND_OP_STR, RELATIVE_FROM_COMPOUND_OP, \
     RELATIVE_FROM_COMPOUND_OP_STR, COMPOUND_OP, \
-    JUMP_TARGET_STR
+    JUMP_TARGET_STR, two_ops_regex, one_op_regex, three_ops_regex
+
 
 # def split_operands(op_string): operands = list(filter(lambda x: len(x) > 0, map(lambda x:
 # x.strip(), op_string.split(",")))) return operands
-
-
-operand_regex_str = f"({REGISTER_REGEX_STR})|" \
-                    f"({IMM_VALUES_REGEX_STR})|" \
-                    f"({LABELS_REGEX_STR})|" \
-                    f"{RELATIVE_FROM_REGISTER_REGEX_STR}|" \
-                    f"{LABEL_RELATIVE_FROM_REGISTER_STR}|" \
-                    f"{RELATIVE_FROM_COMPOUND_OP_STR}|" \
-                    f"{COMPOUND_OP_STR}|" \
-                    f"{JUMP_TARGET_STR}"
-
-# \([%a-zA-Z0-9]+,[%a-zA-Z0-9]+(, [[%a-zA-Z0-9]+)? \)
-operand_regex = re.compile(operand_regex_str, re.VERBOSE)  # set verbose for spaces in pattern
-
-one_op_regex_str = f"{operand_regex_str}"
-two_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str})"
-three_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str}), ({operand_regex_str})"
-
-one_op_regex = re.compile(operand_regex_str)
-two_ops_regex = re.compile(two_ops_regex_str)
-three_ops_regex = re.compile(three_ops_regex_str)
 
 def _strip_operand(operand):
     # strip any non alphannumeric characters that may occur at start of operand and trailing
@@ -130,6 +112,7 @@ class LatencyMapper:
             k = key[1:]
             self.latency_map[instruction][k] = value
 
+
         # some special cases
         # (1) retq, equal to ret
         self.latency_map['retq'] = self.latency_map['ret']
@@ -175,6 +158,7 @@ class LatencyMapper:
             # candidate_op_types = list(map(construct_type, candidate_op_types))
 
             if all_present(operand_types, candidate_op_types):
+
                 return self.latency_map[instruction][candidate]
 
         print(f"Warning -- latency not found for instruction `{instruction}` "
@@ -182,8 +166,15 @@ class LatencyMapper:
         return 1
 
 def construct_latency_mapper(latency_if):
+    # latency_map = load_latency_map(latency_if)
     with open(latency_if, 'rb') as fp:
+
         latency_map = pickle.load(fp)
 
     mapper = LatencyMapper(latency_map)
     return mapper
+
+# if __name__ == '__main__':
+#     latency_mapper = construct_latency_mapper(os.path.abspath(
+#         "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/utils"
+#         "/pickled_latency_map.p"))

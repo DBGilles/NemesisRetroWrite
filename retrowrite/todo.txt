@@ -1,10 +1,21 @@
-1) refactor code waar mogelijk
-2) maak tool om na te gaan of een code balanced is
-3) gebruik resultaat (2) om end-to-end test te maken (i.e. balance, write to assembly, reload assembly, check if balanced)
+#########
+# lijst #
+#########
+[X] finalize latency map
+[ ] finalize balancing algorithm
+    [X] get suitable register
+    [X] if this register is clobber register, insert push and pops at start, end of function
+    [ ] if no suitable register, insert push and pop before/after instruction (at all nodes in level)
+[ ] Finishing touches balancing algorithm
+    [X] when inserting jumps at the end of a node, what to do when the edge to the successor was removed to deal with cycles?
+        If such an edge exists the last instruction must be a jump, so nothing would need to be done (I think)
+    [ ] What to do when next node is inserted node
+    [X] remove 'testlabel' in `control_flow_graph.py` line +-316
+    [ ] Enfore that the final pop instruction is always the final pop instruction somehow -- take this into account in balancing
+        ( Example 8.0-password_comparison: when balancing target_node  '1169')
 
-4) testen, evaluaren code, refactoren, etc.
+[ ] clean up code
+[X] deal with loops (don't support loops)
+[ ] deal with function calls
+[ ] write design section
 
-Delen van de implementatie die ik moet nakijken, goed testen
-1) Heel het LatencyMapper gedeelte
-    - splitting operands, mapping to types, etc.
-2) balancing latencies (taking into account how instructions are inserted)

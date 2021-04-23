@@ -11,8 +11,8 @@ int main(){
 		}
 	}
 	if (condition[0] == 420){
-	    return 1;
+	    return 100;
 	} else{
-	return 0;
+	return 12;
 	}
 }

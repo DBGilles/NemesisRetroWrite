@@ -5,10 +5,19 @@ from collections import defaultdict
 
 
 class Instruction:
-    def __init__(self, asm, operands, measurement):
+    def __init__(self, asm, operands, iaca_measurements, measurement, latencies):
         self.asm = asm
         self.operands = operands
+        self.iaca_measurements = iaca_measurements
         self.measurement = measurement
+        self.latencies = latencies
+
+    def __str__(self):
+        return f"{self.asm} {[str(op) for op in self.operands]}"
+
+    def __repr__(self):
+        return str(self)
+
 
 class Operand:
     def __init__(self, type, values):
@@ -23,7 +32,7 @@ class RegisterOperand:
         self.values = values
 
     def __str__(self):
-        return "reg"+str(self.width)
+        return "reg" + str(self.width)
 
 
 class MemoryOperand:
@@ -32,13 +41,16 @@ class MemoryOperand:
         self.xtype = xtype
 
     def __str__(self):
-        return "mem"+str(self.width)
-
+        return "mem" + str(self.width)
 
 
 class AgenOperand:
+    "Address generator operand?"
     def __init__(self, address):
         self.address = address
+
+    def __str__(self):
+        return "agen"
 
 
 class ImmOperand:
@@ -53,6 +65,9 @@ class RelbrOperand:
     def __init__(self):
         return
 
+    def __str__(self):
+        return "RelBranch"
+
 
 class Measurement:
     def __init__(self, tp_loop, tp_ports, tp_unrolled):
@@ -61,23 +76,14 @@ class Measurement:
         self.tp_unrolled = tp_unrolled
         self.latencies = []
 
-    def add_latency_measurement(self, start_op, target_op, latency):
-        self.latencies.append({
-            'start_op': start_op,
-            'target_op': target_op,
-            'latency': latency,
-        })
+    def add_latency_measurement(self, attributes):
+        self.latencies.append(attributes)
 
     def get_latency(self):
         if len(self.latencies) > 0:
             return self.latencies[0]['latency']
 
         return -1
-
-class LatencyMap:
-    def __init__(self, latency_dict):
-        self.latency_dict = latency_dict
-
 
 
 def get_attribute(node, attr_key):
@@ -134,11 +140,12 @@ def parse_operand(instr_node):
     return operands
 
 
-def main():
+def read_uops_xml():
     tree = ET.parse('/home/gilles/Downloads/instructions.xml')
     root = tree.getroot()
 
-    instructions = defaultdict(list)
+    # instructions = defaultdict(list)
+    instructions = []
     i = 0
     for instr_node in root.iter('instruction'):
         architecture_node = instr_node.find("./architecture[@name='SKL']")
@@ -151,52 +158,63 @@ def main():
             # parse operands
             operands = parse_operand(instr_node)
 
-            # parse latency information
-            measurement = None
-            for measurement_node in architecture_node.iter("measurement"):
-                try:
-                    tp_loop = float(architecture_node.attrib['tp_loop'])
-                except KeyError:
-                    tp_loop = None
-                try:
-                    tp_ports = float(architecture_node.attrib['tp_ports'])
-                except KeyError:
-                    tp_ports = None
-                try:
-                    tp_unrolled = float(architecture_node.attrib['tp_ports'])
-                except KeyError:
-                    tp_unrolled = None
-                measurement = Measurement(tp_loop, tp_ports, tp_unrolled)
+            # architecture node has children
+            # 1. IACA (1 or more)
+            # 2. measurement (where measurement has (1 or more) children 'latency')
+            iaca_measurements = []
+            for iaca_node in architecture_node.iter("IACA"):
+                iaca_measurements.append({key: value for key, value in iaca_node.attrib.items()})
+
+            measurement_node = architecture_node.findall("measurement")
+            measurement_attributes = None
+            latencies = []
+            if len(measurement_node) == 0:
+                pass
+            elif len(measurement_node) == 1:
+                measurement_node = measurement_node[0]
+                measurement_attributes = {key: value for key, value in
+                                          measurement_node.attrib.items()}
+
                 for latency_node in measurement_node.iter("latency"):
-                    try:
-                        cycles = int(latency_node.attrib['cycles'])
-                    except KeyError:
-                        cycles = None
-                    try:
-                        start_op = int(latency_node.attrib['start_op'])
-                    except KeyError:
-                        start_op = None
-                    try:
-                        target_op = int(latency_node.attrib['target_op'])
-                    except KeyError:
-                        target_op = None
-                    if cycles is None:
-                        print(f"{ET.tostring(latency_node)}")
-                    measurement.add_latency_measurement(start_op, target_op, cycles)
+                    # latency_attributes = {key: value for key, value in
+                    #                       measurement_node.attrib.items()}
+                    latencies.append({key: value for key, value in
+                                      latency_node.attrib.items()})
+            else:
+                raise RuntimeError(
+                    f"Unexpected additional measurement node. Expected 1, got {len(measurement_node)}")
+            instructions.append(
+                Instruction(asm, operands, iaca_measurements, measurement_attributes, latencies))
+    return instructions
 
-                # create instruction
-                instruction = Instruction(asm, operands, measurement)
-                instructions[asm].append(instruction)
 
-    latency_of = os.path.abspath("./latency_dict.p")
-    with open(latency_of, 'wb') as fp:
-        pickle.dump(instructions, fp, protocol=pickle.HIGHEST_PROTOCOL)
-
-def create_latency_map(dict_file):
-    with open(dict_file, "rb") as f:
-        latency_dict = pickle.load(f)
-    latency_map = LatencyMap(latency_dict)
+def create_latency_map(instructions):
+    # loop over the instructions, create latency map
+    latency_map = defaultdict(list)
+    for instruction in instructions:
+        all_latencies = []
+        for latency in instruction.latencies:
+            if 'cycles' in latency.keys():
+                all_latencies.append(latency['cycles'])
+        if len(all_latencies) > 0:
+            final_latency = max(all_latencies)
+            latency_map[instruction.asm].append((instruction.operands, final_latency))
     return latency_map
 
+
+def load_latency_map(input_file):
+    with open(input_file, 'rb') as handle:
+        latency_map = pickle.load(handle)
+    return latency_map
+
+
 if __name__ == '__main__':
-    main()
+    # read all of the information from the uops xml, parse into list of Instructions
+    instructions = read_uops_xml()
+
+    # create latency map
+    latency_map = create_latency_map(instructions)
+
+    with open("./latencies.p", 'wb') as handle:
+        pickle.dump(latency_map, handle, protocol=pickle.HIGHEST_PROTOCOL)
+

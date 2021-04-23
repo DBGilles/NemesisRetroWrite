@@ -156,12 +156,12 @@ main:
 .LC11d6:
 	jne .L11e8
 .LC11dc:
-	movl $1, -4(%rbp)
+	movl $0x64, -4(%rbp)
 .LC11e3:
 	jmp .L11ef
 .L11e8:
 .LC11e8:
-	movl $0, -4(%rbp)
+	movl $0xc, -4(%rbp)
 .L11ef:
 .LC11ef:
 	movl -4(%rbp), %eax

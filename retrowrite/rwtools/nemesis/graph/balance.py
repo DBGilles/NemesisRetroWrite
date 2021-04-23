@@ -37,24 +37,57 @@ def balance_branching_point(cfg, node):
             tree = child1
         balance_node_tree_latencies(cfg, leaf, tree)
 
+
+# def balance_node_latencies(n1, n2):
+#     n1_latencies = n1.get_latencies()
+#     n2_latencies = n2.get_latencies()
+#     # determine the set of latencies for a balanced node
+#
+#     print(n1_latencies)
+#     print(n2_latencies)
+#
+#     balanced_latencies = balance_node_latency_lists(n1_latencies, n2_latencies)
+#     # for both nodes, determine a new sequence of instructions and replace the current sequence
+#     new_instructions_n1 = create_new_instruction_sequence(instructions=n1.get_instructions_with_latencies(),
+#                                                           target_latencies=balanced_latencies)
+#
+#     n1.replace_instructions(new_instructions_n1)
+#
+#     new_instructions_n2 = create_new_instruction_sequence(instructions=n2.get_instructions_with_latencies(),
+#                                                           target_latencies=balanced_latencies)
+#     n2.replace_instructions(new_instructions_n2)
+
+def equalize_latencies(lats_a, lats_b):
+    if len(lats_a) == 0:
+        return lats_b
+    elif len(lats_b) == 0:
+        return lats_a
+
+    i = 0
+
+    while True:
+        longest = lats_a if len(lats_a) > len(lats_b) else lats_b
+        shortest = lats_a if longest == lats_b else lats_b
+
+        if i >= len(longest):
+            break
+
+        lat = longest[i]
+
+        if i >= len(shortest) or shortest[i] != lat:
+            shortest.insert(i, lat)
+
+        i += 1
+    assert lats_a == lats_b
+    return lats_a
+
+
 def balance_node_latencies(n1, n2):
-    n1_latencies = n1.get_latencies()
-    n2_latencies = n2.get_latencies()
-    # determine the set of latencies for a balanced node
-
-    print(n1_latencies)
-    print(n2_latencies)
-
-    balanced_latencies = balance_node_latency_lists(n1_latencies, n2_latencies)
-    # for both nodes, determine a new sequence of instructions and replace the current sequence
-    new_instructions_n1 = create_new_instruction_sequence(instructions=n1.get_instructions_with_latencies(),
-                                                          target_latencies=balanced_latencies)
-
-    n1.replace_instructions(new_instructions_n1)
-
-    new_instructions_n2 = create_new_instruction_sequence(instructions=n2.get_instructions_with_latencies(),
-                                                          target_latencies=balanced_latencies)
-    n2.replace_instructions(new_instructions_n2)
+    lats_a = copy.deepcopy(n1.get_latencies())
+    lats_b = copy.deepcopy(n2.get_latencies())
+    eq = equalize_latencies(lats_a, lats_b)
+    n1.instrument_node(eq)
+    n2.instrument_node(eq)
 
 
 def balance_node_tree_latencies(cfg, leaf, tree):
@@ -73,14 +106,17 @@ def balance_node_tree_latencies(cfg, leaf, tree):
     # now, insert the target latencies into new nodes that are descendants of the leaf
     cfg.add_latencies_as_descendants(leaf, target_latencies)
 
+
 def balance_latency_lists(tree1_lats, tree2_lats):
     latencies_1 = copy.deepcopy(tree1_lats)
     latencies_2 = copy.deepcopy(tree2_lats)
     target_latencies = []
     for a, b in zip(latencies_1, latencies_2):
-        balanced_latencies = balance_node_latency_lists(a, b)
+        # balanced_latencies = balance_node_latency_lists(a, b)
+        balanced_latencies = equalize_latencies(a, b)
         target_latencies.append(balanced_latencies)
     return target_latencies
+
 
 def replace_tree_latencies(cfg, subtree, target_latencies):
     if len(target_latencies) == 0:
@@ -92,11 +128,13 @@ def replace_tree_latencies(cfg, subtree, target_latencies):
     for s in successors:
         # for both nodes, determine a new sequence of instructions and replace the current
         # sequence
-        new_instructions = create_new_instruction_sequence(
-            instructions=s.get_instructions_with_latencies(),
-            target_latencies=latencies)
-        s.replace_instructions(new_instructions)
+        # new_instructions = create_new_instruction_sequence(
+        #     instructions=s.get_instructions_with_latencies(),
+        #     target_latencies=latencies)
+        # s.replace_instructions(new_instructions)
+        s.instrument_node(latencies)
         replace_tree_latencies(cfg, s, target_latencies[1:])
+
 
 def balance_tree_latencies(cfg, tree1, tree2):
     # First balance the roots
@@ -130,4 +168,3 @@ def is_balanced(cfg, node):
     else:
         return is_balanced(cfg, succ[0]) and is_balanced(cfg, succ[1]) and succ[
             0].get_latencies() == succ[1].get_latencies()
-

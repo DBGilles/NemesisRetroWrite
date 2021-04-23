@@ -15,8 +15,20 @@ class RegisterAnalysis(object):
         self.regmap = self._init_reg_pool()
         self.reg_pool = frozenset(self.regmap.keys())
 
+        # registers that can be safely used (i.e. their content is not used)
         self.free_regs = defaultdict(set)
+
+        # registers whose content is actively in use (
         self.used_regs = defaultdict(lambda: copy.copy(self.reg_pool))
+
+        # registers who are not actively used in the current function
+        # these are safe to use if they are pushed/popped at beginning/end of function
+        # clobber = overwrite content
+        # initially, these are all registers
+        self.clobber_registers = set([
+            "rbx", "rsp", "rbp", "r12", "r13", "r14", "r15",
+            "rax", "rdx", "r10", "r11", "r8", "r9", "rcx", "rdi", "rsi"])
+
         self.subregs = dict()
 
         self._init_subregisters()
@@ -43,7 +55,7 @@ class RegisterAnalysis(object):
         del regmap["rip"]
         del regmap["rsp"]
 
-        # Add a fake register for rflags
+        # Add a fake register   for rflags
         rflags = Register("rflags", 64)
         regmap["rflags"] = rflags
 
@@ -122,6 +134,8 @@ class RegisterAnalysis(object):
             ra = RegisterAnalysis()
             ra.analyze_function(function)
             function.analysis[RegisterAnalysis.KEY] = ra.free_regs
+            function.analysis['clobber_registers'] = ra.clobber_registers
+            function.analysis['used_registers'] = ra.used_regs
 
     def analyze_function(self, function):
         change = True
@@ -135,6 +149,11 @@ class RegisterAnalysis(object):
 
     def analyze_instruction(self, function, instruction_idx):
         current_instruction = function.cache[instruction_idx]
+
+        # if a register is written or read at some point it is no longer a clobber register
+        self.clobber_registers.difference_update(set(current_instruction.reg_reads()))
+        self.clobber_registers.difference_update(set(current_instruction.reg_writes()))
+
         nexts = function.next_of(instruction_idx)
 
         reguses = self.reg_pool.intersection(
@@ -148,9 +167,7 @@ class RegisterAnalysis(object):
         for nexti in nexts:
             reguses = reguses.union(
                 self.used_regs[nexti].difference(regwrites))
-
         reguses = self.compute_reg_set_closure(reguses)
-
         if reguses != self.used_regs[instruction_idx]:
             self.used_regs[instruction_idx] = reguses
             return True

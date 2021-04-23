@@ -1,15 +1,22 @@
 #####################################
 # Definition of a NemesisNode class #
 #####################################
-from rwtools.nemesis.LatencyMapper import construct_latency_mapper
+from rwtools.nemesis.LatencyMapper import construct_latency_mapper, load_latency_map
 import os
-
 from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode, flatten
-from rwtools.nemesis.nop_instructions import get_nop_instruction
 
-latency_mapper = construct_latency_mapper(os.path.abspath(
-    "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/utils"
-    "/pickled_latency_map.p"))
+
+# latency_mapper = construct_latency_mapper(os.path.abspath(
+#     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map/latencies.p"))
+
+# latency_mapper = construct_latency_mapper(os.path.abspath(
+#     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/utils"
+#     "/pickled_latency_map.p"))
+# from rwtools.nemesis.latency_map.create_latency_map import LatencyMapV2
+
+# latency_mapper = LatencyMapV2(load_latency_map(
+#     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map/latencies.p"))
+
 
 
 class NemesisNode(AbstractNemesisNode):
@@ -17,8 +24,12 @@ class NemesisNode(AbstractNemesisNode):
     Concrete node, actually contains a code sequence with instructions
     """
 
-    def __init__(self, instruction):
-        latencies = [latency_mapper.get_latency(instruction.mnemonic, instruction.op_str)]
+    def __init__(self, instruction, latency=-99):
+        # if is_branching_instruction(instruction.mnemonic):
+        #     latencies = [4]
+        # else:
+        #     latencies = [latency]
+        latencies = [latency]
         name = "%x" % instruction.address  # convert address to hex for consistency with RW
         super().__init__(latencies, name)
         self.instruction_wrappers = [instruction]
@@ -100,3 +111,7 @@ class NemesisNode(AbstractNemesisNode):
             else:
                 all_instructions.append(instructions)
         return all_instructions
+
+    def set_instruction_i(self, i, instruction, latency):
+        # replace the i'th instruction with this new instruction
+        raise NotImplementedError

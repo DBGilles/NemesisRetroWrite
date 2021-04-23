@@ -2,7 +2,7 @@ import re
 
 # register can have a name of length 2 or length 3, preceded by modulo sign.
 # Can have parenthesis in some cases
-REGISTER_REGEX_STR = "\\(?%[a-zA-Z]{2,3}\\)?"
+REGISTER_REGEX_STR = "\\(?%[a-zA-Z1-9]{2,3}\\)?"
 REGISTER_REGEX = re.compile(REGISTER_REGEX_STR)
 
 # immediate value is a dollar signed followed by optional '-' followed by either decimal or
@@ -34,3 +34,22 @@ RELATIVE_FROM_COMPOUND_OP = re.compile(RELATIVE_FROM_COMPOUND_OP_STR)
 JUMP_TARGET_STR = ".+@PLT"
 JUMP_TARGET_REGEX = re.compile(JUMP_TARGET_STR)
 
+operand_regex_str = f"({REGISTER_REGEX_STR})|" \
+                    f"({IMM_VALUES_REGEX_STR})|" \
+                    f"({LABELS_REGEX_STR})|" \
+                    f"{RELATIVE_FROM_REGISTER_REGEX_STR}|" \
+                    f"{LABEL_RELATIVE_FROM_REGISTER_STR}|" \
+                    f"{RELATIVE_FROM_COMPOUND_OP_STR}|" \
+                    f"{COMPOUND_OP_STR}|" \
+                    f"{JUMP_TARGET_STR}"
+
+# \([%a-zA-Z0-9]+,[%a-zA-Z0-9]+(, [[%a-zA-Z0-9]+)? \)
+operand_regex = re.compile(operand_regex_str, re.VERBOSE)  # set verbose for spaces in pattern
+
+one_op_regex_str = f"{operand_regex_str}"
+two_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str})"
+three_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str}), ({operand_regex_str})"
+
+one_op_regex = re.compile(operand_regex_str)
+two_ops_regex = re.compile(two_ops_regex_str)
+three_ops_regex = re.compile(three_ops_regex_str)

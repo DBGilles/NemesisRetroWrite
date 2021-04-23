@@ -2,6 +2,7 @@ import copy
 import random
 from collections import defaultdict
 
+import networkx as nx
 from networkx.algorithms.cycles import simple_cycles
 from networkx.algorithms.simple_paths import all_simple_paths, all_simple_edge_paths
 
@@ -48,8 +49,10 @@ def find_branch_target(branch_instruction):
     start = branch_instruction.find(".")
     return branch_instruction[start:]
 
+
 def is_branching_instruction(instruction):
     return True in [x in instruction for x in ["jmp", "je", "jne"]]
+
 
 class ControlFlowGraph:
     """
@@ -64,6 +67,18 @@ class ControlFlowGraph:
 
     def to_img(self):
         return to_img(self.graph)
+
+    def get_root(self):
+        return get_root(self.graph)
+
+    def get_leaves(self):
+        return [node for node in self.graph.nodes if is_leaf(self.graph, node)]
+
+    def level_iter(self):
+        root = get_root(self.graph)
+        tree_depths = nx.shortest_path_length(self.graph, root)
+        for i in range(max(tree_depths.values()) + 1):
+            yield [node for node in self.graph.nodes if tree_depths[node] == i]
 
     def merge_consecutive_nodes(self):
         # get in and out degrees for all nodes that belong to this function
@@ -200,22 +215,7 @@ class ControlFlowGraph:
                         else:
                             # this node is a sibling that is not the newly created node, also
                             # add the jump here
-                            node.append_instructions([[jmp_instruction]], [[1]])
-
-                    # check if last instruction in from_node
-                    # 1) is a jmp (which is always the case I think?)
-                    # 2) jumps to next node (which is no longer allowed)
-                    instruction_wrapper = from_node.instruction_wrappers[-1]
-
-                    def is_jmp(mnemonic):
-                        # TODO: dit moet 100 procent zeker true teruggeven if jmp
-                        return mnemonic in ["jmp", "je", "jn"]
-
-                    # if is_jmp(instruction_wrapper.mnemonic):
-                    #     jmp_target = instruction_wrapper.op_str
-                    #     if jmp_label in jmp_target:
-                    #         # modify the op string
-                    #         instruction_wrapper.op_str = node_label
+                            node.append_instructions([[jmp_instruction]], [[-1]])
 
                 # update second_to_last
                 for j in range(i + 1, len(paths)):
@@ -277,6 +277,7 @@ class ControlFlowGraph:
                     self.equalize_path_lengths(smaller_node, larger_node)
 
     def merge_with_descendant(self, from_node, to_node):
+        # TODO: cleanup
         # 1. check if the to_node has another ancestor
         to_node_ancestors = list(self.graph.predecessors(to_node))
         if len(to_node_ancestors) == 2:
@@ -300,6 +301,21 @@ class ControlFlowGraph:
                         instruction_sequence.after[-1] = f"jmp {label_name}"
                     else:
                         instruction_sequence.op_str = f"{label_name}"
+
+        if "jmp" in from_node.get_instr_mnemonic(-1):
+            label_name = f".S{to_node.id}"
+            # modify last istruction in from_node so that it jumps to newly created label
+            # insert newly created label in to node
+            instruction_sequence = from_node.get_instruction_sequence(-1)
+            if isinstance(instruction_sequence, InstructionWrapper):
+                if len(instruction_sequence.after) > 0:
+                    instruction_sequence.after[-1] = f"jmp {label_name}"
+                else:
+                    instruction_sequence.op_str = f"{label_name}:"
+            elif isinstance(instruction_sequence, list):
+                instruction_sequence[-1] = f"jmp {label_name}"
+
+            to_node.insert(0, f"{label_name}:", 0)
 
         # finally insert the instruction into the to_node
         to_node.prepend_instructions(from_node.instructions, from_node.latencies)
@@ -482,3 +498,34 @@ class ControlFlowGraph:
                         self.graph.remove_edge(predecessor, current_node)
 
                     self.graph.add_edge(new_node, current_node)
+
+    def subgraph(self, node):
+        # do a breadth first traversal starting at the node
+        subgraph_nodes = [node]
+        next_nodes = []
+        # curr_node = node
+        for succ in self.graph.successors(node):
+            next_nodes.append(succ)
+
+        while True:
+            # consume first node in the list
+            curr_node = next_nodes[0]
+            next_nodes.remove(curr_node)
+
+            # add it to the subgraph
+            subgraph_nodes.append(curr_node)
+
+            # to all nodes
+            if len(next_nodes) == 0:
+                break
+                return subgraph_nodes
+            # otherwise continue with the depth first search, adding successors to next nodes
+
+            for succ in self.graph.successors(curr_node):
+
+                if succ not in next_nodes:
+                    next_nodes.append(succ)
+
+            if len(next_nodes) == 0:
+                break
+        return self.graph.subgraph(subgraph_nodes)

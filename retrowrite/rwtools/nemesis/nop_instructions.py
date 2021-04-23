@@ -5,22 +5,25 @@
 def get_nop_instruction(target_latency):
     # return 1) the instruction itself, 2) registers that need to be pushed and popped
     if target_latency == 1:
-        return "addl $0, %eax", []
+        return "movq %rax, %rax", None
+        # return "movq %rax, %rax", None
+        # return "addl $0, %eax", '%rax'
 
     if target_latency == 2:
-        return "movq %xmm0, %xmm0", []
+        return "movq %xmm0, %xmm0", None
 
     if target_latency == 3:
-        return "mulq %rax", ['%rax']
+        return "mulq %rax", '%rax'
 
     if target_latency == 5:
         # TODO: check of latency hier wel effectief 5 is
-        return "sbbq $0, %rax", []
+        return "sbbq $0, %rax"
 
     if target_latency == 0:
         return "", []
     print(f"warning, no nop instruction found with latency {target_latency}")
     return "placeholder", []
+
 
 def get_added_instructions(target_latency):
     #

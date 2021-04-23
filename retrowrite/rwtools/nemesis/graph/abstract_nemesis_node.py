@@ -1,6 +1,10 @@
 ############################################
 # Definition of Abstract NemesisNode class #
 ############################################
+from collections import defaultdict
+
+from rwtools.nemesis.nop_instructions import get_nop_instruction
+
 
 def flatten(nested_list):
     ret = []
@@ -27,6 +31,7 @@ class AbstractNemesisNode:
         self.frozen = False
         self.id = name
         self.mapped_nodes = None  # reference to original node - acts as a pointer of sorts
+        self.register_modifications = defaultdict(lambda: None)
 
     def __repr__(self):
         out_str = ""
@@ -59,6 +64,10 @@ class AbstractNemesisNode:
 
     def get_instruction_sequence(self, i):
         return self.instructions[i]
+
+    def get_sequence_of_instruction(self, index):
+        i, j = self.get_instruction_index(index)
+        return self.get_instruction_sequence(i)
 
     def get_latency_sequence(self, i):
         return self.latencies[i]
@@ -193,12 +202,7 @@ class AbstractNemesisNode:
         return all_instructions
 
     def replace_instructions(self, new_sequence):
-        # if len(flatten(self.instructions)) != len(flatten(self.latencies)):
-        #     debug = True
-        # else:
-        #     debug = False
-
-        debug=False
+        debug = False
         if debug:
             # look only at latencies
             for i, (_, latency) in enumerate(new_sequence):
@@ -213,3 +217,15 @@ class AbstractNemesisNode:
                 else:
                     # insert the instruction at index i
                     self.insert(i, instr, latency)
+
+    def instrument_node(self, target_latencies):
+        # new
+        node_latencies = self.get_latencies()
+
+        for i, l in enumerate(target_latencies):
+            if i >= len(node_latencies) or node_latencies[i] != l:
+                # insert new instruction
+                instruction, mod_reg = get_nop_instruction(l)
+                self.insert(i, instruction, l)
+                node_latencies.insert(i, l)
+                self.register_modifications[i] = mod_reg
