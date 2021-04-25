@@ -157,7 +157,7 @@ class ControlFlowGraph:
             i += 1
 
     def equalize_path_lengths(self, root, node):
-        # equalize all path lenghts to the given node
+        # equalize all path lengths to the given node
         # path length is defined as the number of nodes from the root to the target node
         paths = list(all_simple_edge_paths(self.graph, root, node))
 
@@ -230,6 +230,45 @@ class ControlFlowGraph:
                         following_path.remove((from_node, to_node))
                 from_node = new_node
 
+    def insert_nodes(self, target_node):
+        subgraph = self.subgraph(target_node)
+        longest_path_lengths = single_source_longest_dag_path_length(subgraph, target_node)
+
+        # loop over all edges in the subgraph. If an edge goes between nodes where the diffeence
+        # in lengths is more than 1 then there is a problem
+        target_edges = []
+        for from_node, to_node in nx.edges(subgraph):
+            diff = abs(longest_path_lengths[to_node] - longest_path_lengths[from_node])
+            if diff > 1:
+                target_edges.append((from_node, to_node, diff))
+
+        for from_node, to_node, diff in target_edges:
+            for i in range(diff-1):
+                # create a new node
+                new_node = AbstractNemesisNode([], f"{from_node.id}{to_node.id}")
+                # insert 'inside' edge
+                self.insert_between_nodes(new_node, from_node, to_node)
+
+                if isinstance(to_node, NemesisNode):
+                    print("here")
+                    # if the next node is a 'real node' add a jmp instruction
+                    # if the next node is not a 'real node' then you don't need to add jump
+                    # because they will later be merged anyway
+                    jmp_label = to_node.get_start_label()
+                    jmp_instruction = f"jmp {jmp_label}"
+
+                    # we also want to insert the jmp instruction in the sibling
+                    for node in self.graph.successors(from_node):
+                        if not isinstance(node, NemesisNode):
+                            continue
+                        else:
+                            # this node is a sibling that is not the newly created node, also
+                            # add the jump here
+                            node.append_instructions([[jmp_instruction]], [[-1]])
+
+                # new node becomes to_node so that other nodes are inserted before the new node
+                to_node = new_node
+
     def restore_cycles(self):
         mapped_nodes = []
         root = get_root(self.graph)
@@ -259,22 +298,28 @@ class ControlFlowGraph:
         for from_node, to_node in self.removed_edges:
             self.graph.add_edge(from_node, to_node)
 
-    def insert_nodes(self):
-        root = get_root(self.graph)
-        longest_path_lengths = single_source_longest_dag_path_length(self.graph, root)
+    # original
+    # def insert_nodes(self):
+    #     root = get_root(self.graph)
+    #     longest_path_lengths = single_source_longest_dag_path_length(self.graph, root)
+    #
+    #     for node, length in longest_path_lengths.items():
+    #         print(node.id, length)
+    #     # print(longest_path_lengths)
+    #
+    #     all_distances = sorted(list(set(longest_path_lengths.values())), reverse=True)
+    #     largest_d = all_distances[0]
+    #     largest_d_nodes = [n for n in self.graph.nodes if longest_path_lengths[n] == largest_d]
+    #
+    #     for d in all_distances:
+    #         if d == largest_d:
+    #             continue
+    #         d_smaller_nodes = [n for n in self.graph.nodes if longest_path_lengths[n] == d]
+    #
+    #         for smaller_node in d_smaller_nodes:
+    #             for larger_node in largest_d_nodes:
+    #                 self.equalize_path_lengths(smaller_node, larger_node)
 
-        all_distances = sorted(list(set(longest_path_lengths.values())), reverse=True)
-        largest_d = all_distances[0]
-        largest_d_nodes = [n for n in self.graph.nodes if longest_path_lengths[n] == largest_d]
-
-        for d in all_distances:
-            if d == largest_d:
-                continue
-            d_smaller_nodes = [n for n in self.graph.nodes if longest_path_lengths[n] == d]
-
-            for smaller_node in d_smaller_nodes:
-                for larger_node in largest_d_nodes:
-                    self.equalize_path_lengths(smaller_node, larger_node)
 
     def merge_with_descendant(self, from_node, to_node):
         # TODO: cleanup

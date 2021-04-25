@@ -300,7 +300,7 @@ class NemesisInstrument:
 
         # 2. insert nodes and equalize branches so that all
         #   paths to all leaves are same length -- stratified
-        self.cfg.insert_nodes()
+        self.cfg.insert_nodes(target_node)
         self.cfg.equalize_branches()
 
         # 4. align the nodes

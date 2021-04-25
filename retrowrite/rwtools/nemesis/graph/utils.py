@@ -52,7 +52,7 @@ def sort_edge(e1, e2):
 
 
 def single_source_longest_dag_path_length(graph, s):
-    assert (graph.in_degree(s) == 0)
+    # assert (graph.in_degree(s) == 0)
     dist = defaultdict(lambda: -1)
     dist[s] = 0
     topo_order = nx.topological_sort(graph)
