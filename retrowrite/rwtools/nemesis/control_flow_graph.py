@@ -238,19 +238,18 @@ class ControlFlowGraph:
         # in lengths is more than 1 then there is a problem
         target_edges = []
         for from_node, to_node in nx.edges(subgraph):
-            diff = abs(longest_path_lengths[to_node] - longest_path_lengths[from_node])
+            diff = longest_path_lengths[to_node] - longest_path_lengths[from_node]
             if diff > 1:
                 target_edges.append((from_node, to_node, diff))
 
         for from_node, to_node, diff in target_edges:
-            for i in range(diff-1):
+            for i in range(diff - 1):
                 # create a new node
                 new_node = AbstractNemesisNode([], f"{from_node.id}{to_node.id}")
                 # insert 'inside' edge
                 self.insert_between_nodes(new_node, from_node, to_node)
 
                 if isinstance(to_node, NemesisNode):
-                    print("here")
                     # if the next node is a 'real node' add a jmp instruction
                     # if the next node is not a 'real node' then you don't need to add jump
                     # because they will later be merged anyway
@@ -268,6 +267,28 @@ class ControlFlowGraph:
 
                 # new node becomes to_node so that other nodes are inserted before the new node
                 to_node = new_node
+
+    def equalize_branches(self, target_node):
+        # root = get_root(self.graph)
+        subgraph = self.subgraph(target_node)
+
+        longest_path_lengths = single_source_longest_dag_path_length(subgraph, target_node)
+        leaves = [node for node in subgraph if subgraph.out_degree(node) == 0]
+        leaf_depth = max(longest_path_lengths[l] for l in leaves)
+        for leaf in leaves:
+            if diff := leaf_depth - longest_path_lengths[leaf]:
+                # true if diff is not equal to 0
+                name_prefix = f"leaf_{leaf.id}"
+                current_node = leaf
+                for i in range(diff):
+                    new_node = AbstractNemesisNode([], f"{name_prefix}_{i}")
+                    # insert the node into the graph
+                    predecessors = list(self.graph.predecessors(current_node))
+                    for predecessor in predecessors:
+                        self.graph.add_edge(predecessor, new_node)
+                        self.graph.remove_edge(predecessor, current_node)
+
+                    self.graph.add_edge(new_node, current_node)
 
     def restore_cycles(self):
         mapped_nodes = []
@@ -297,29 +318,6 @@ class ControlFlowGraph:
 
         for from_node, to_node in self.removed_edges:
             self.graph.add_edge(from_node, to_node)
-
-    # original
-    # def insert_nodes(self):
-    #     root = get_root(self.graph)
-    #     longest_path_lengths = single_source_longest_dag_path_length(self.graph, root)
-    #
-    #     for node, length in longest_path_lengths.items():
-    #         print(node.id, length)
-    #     # print(longest_path_lengths)
-    #
-    #     all_distances = sorted(list(set(longest_path_lengths.values())), reverse=True)
-    #     largest_d = all_distances[0]
-    #     largest_d_nodes = [n for n in self.graph.nodes if longest_path_lengths[n] == largest_d]
-    #
-    #     for d in all_distances:
-    #         if d == largest_d:
-    #             continue
-    #         d_smaller_nodes = [n for n in self.graph.nodes if longest_path_lengths[n] == d]
-    #
-    #         for smaller_node in d_smaller_nodes:
-    #             for larger_node in largest_d_nodes:
-    #                 self.equalize_path_lengths(smaller_node, larger_node)
-
 
     def merge_with_descendant(self, from_node, to_node):
         # TODO: cleanup
@@ -499,78 +497,33 @@ class ControlFlowGraph:
             raise RuntimeError("Stopping nodes have not been calculate yet")
         return node in self.stopping_nodes
 
-    def equalize_branches(self):
-        root = get_root(self.graph)
-        depths = {}
-        successors = []
-        visited = []
-
-        current_node = root
-        depths[current_node] = 0
-
-        leaves = []
-
-        while True:
-            if current_node not in visited:
-                # add all of its successors to the list of nodes that need to be visited and
-                # set depth (if the target node hasnt )
-                for succ in self.graph.successors(current_node):
-                    if succ not in visited and succ not in successors:
-                        successors.append(succ)
-                        depths[succ] = depths[current_node] + 1
-            visited.append(current_node)
-
-            if len(successors) == 0:
-                break
-
-            current_node = successors[0]
-            successors.remove(current_node)
-            if self.graph.out_degree(current_node) == 0:
-                leaves.append(current_node)
-
-        target_depth = max(depths[l] for l in leaves)
-        for leaf in leaves:
-            if diff := target_depth - depths[leaf]:
-                # true if diff is not equal to 0
-                name_prefix = f"leaf_{leaf.id}"
-                current_node = leaf
-                for i in range(diff):
-                    new_node = AbstractNemesisNode([], f"{name_prefix}_{i}")
-                    # insert the node into the graph
-                    predecessors = list(self.graph.predecessors(current_node))
-                    for predecessor in predecessors:
-                        self.graph.add_edge(predecessor, new_node)
-                        self.graph.remove_edge(predecessor, current_node)
-
-                    self.graph.add_edge(new_node, current_node)
-
     def subgraph(self, node):
-        # do a breadth first traversal starting at the node
-        subgraph_nodes = [node]
-        next_nodes = []
-        # curr_node = node
-        for succ in self.graph.successors(node):
-            next_nodes.append(succ)
+        # first find a node that dominates all leaves
+        dominator = None
+        immediate_dominators = nx.immediate_dominators(self.graph, node)
+        leaves = [node for node in self.graph.nodes if self.graph.out_degree(node) == 0]
+        leaf_dominators = set(immediate_dominators[leaf] for leaf in leaves if leaf in immediate_dominators.keys())
+        if len(leaf_dominators) == 1:
+            dominator = leaf_dominators.pop()
+            if dominator == node:
+                dominator = None
+
+        # do a breadth-first search of the graph, starting at node, stopping when the dominator
+        # is added
+        subgraph_nodes = []
+        adjacent_nodes = [node]
 
         while True:
             # consume first node in the list
-            curr_node = next_nodes[0]
-            next_nodes.remove(curr_node)
-
-            # add it to the subgraph
+            curr_node = adjacent_nodes[0]
+            adjacent_nodes.remove(curr_node)
             subgraph_nodes.append(curr_node)
 
-            # to all nodes
-            if len(next_nodes) == 0:
-                break
-                return subgraph_nodes
-            # otherwise continue with the depth first search, adding successors to next nodes
+            if dominator is not None and curr_node == dominator:
+                return self.graph.subgraph(subgraph_nodes)
 
             for succ in self.graph.successors(curr_node):
-
-                if succ not in next_nodes:
-                    next_nodes.append(succ)
-
-            if len(next_nodes) == 0:
-                break
-        return self.graph.subgraph(subgraph_nodes)
+                if succ not in adjacent_nodes:
+                    adjacent_nodes.append(succ)
+            if len(adjacent_nodes) == 0:
+                return self.graph.subgraph(subgraph_nodes)
