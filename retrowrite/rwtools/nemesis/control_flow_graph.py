@@ -59,7 +59,7 @@ class ControlFlowGraph:
     Wrapper class for modifying and querying networkx graph
     """
 
-    def __init__(self, nodes, graph):
+    def __init__(self, graph):
         # self.nodes = nodes # TODO: doe deze weg (do equivalent to self.graph.nodes)
         self.graph = graph
         self.stopping_nodes = None

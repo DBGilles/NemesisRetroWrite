@@ -15,7 +15,7 @@
         ( Example 8.0-password_comparison: when balancing target_node  '1169')
 
 [ ] clean up code
-[X] deal with loops (don't support loops)
+[ ] deal with loops (don't support loops)
 [ ] deal with function calls
-[ ] write design section
-
+[ ] write/improve design section
+[ ] find suitable instructions for each latency

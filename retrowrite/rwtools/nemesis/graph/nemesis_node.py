@@ -1,23 +1,7 @@
 #####################################
 # Definition of a NemesisNode class #
 #####################################
-from rwtools.nemesis.LatencyMapper import construct_latency_mapper, load_latency_map
-import os
 from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode, flatten
-
-
-# latency_mapper = construct_latency_mapper(os.path.abspath(
-#     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map/latencies.p"))
-
-# latency_mapper = construct_latency_mapper(os.path.abspath(
-#     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/utils"
-#     "/pickled_latency_map.p"))
-# from rwtools.nemesis.latency_map.create_latency_map import LatencyMapV2
-
-# latency_mapper = LatencyMapV2(load_latency_map(
-#     "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map/latencies.p"))
-
-
 
 class NemesisNode(AbstractNemesisNode):
     """

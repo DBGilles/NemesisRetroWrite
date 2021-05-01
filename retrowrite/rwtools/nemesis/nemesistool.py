@@ -8,7 +8,6 @@ from librw.loader import Loader
 from librw.rw import Rewriter
 from rwtools.nemesis.control_flow_graph import ControlFlowGraph
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
-from rwtools.nemesis.graph.utils import create_graph_structure, get_root
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
 from rwtools.nemesis.utils.latency_map import load_latency_map
 
@@ -155,7 +154,8 @@ class NemesisInstrument:
                     next_node = nodes[i]
                     graph.add_edge(node, next_node)
 
-        self.cfg = ControlFlowGraph(nodes=nodes, graph=graph)
+        self.cfg = ControlFlowGraph(graph=graph)
+        self.cfg.merge_consecutive_nodes()
         self.cfg.merge_consecutive_nodes()
         self.leaves = self.cfg.get_leaves()
 

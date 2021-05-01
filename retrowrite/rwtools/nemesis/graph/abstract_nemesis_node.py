@@ -3,8 +3,6 @@
 ############################################
 from collections import defaultdict
 
-from rwtools.nemesis.nop_instructions import get_nop_instruction
-
 
 def flatten(nested_list):
     ret = []
@@ -79,10 +77,7 @@ class AbstractNemesisNode:
         self.latencies[i].insert(j, val)
 
     def get_instruction_sequence_length(self, index):
-        # TODO: is dit ok? in `pr`incipe zouden die altijd gelijk moeten zijn (tenzij
-        # abstract node enkel latencies  heeft
         return len(self.latencies[index])
-        # return len(self.instructions[index])
 
     def get_nr_of_instruction_sequences(self):
         return len(self.instructions)
@@ -218,14 +213,14 @@ class AbstractNemesisNode:
                     # insert the instruction at index i
                     self.insert(i, instr, latency)
 
-    def instrument_node(self, target_latencies):
-        # new
-        node_latencies = self.get_latencies()
-
-        for i, l in enumerate(target_latencies):
-            if i >= len(node_latencies) or node_latencies[i] != l:
-                # insert new instruction
-                instruction, mod_reg = get_nop_instruction(l)
-                self.insert(i, instruction, l)
-                node_latencies.insert(i, l)
-                self.register_modifications[i] = mod_reg
+    # def instrument_node(self, target_latencies):
+    #     # new
+    #     node_latencies = self.get_latencies()
+    #
+    #     for i, l in enumerate(target_latencies):
+    #         if i >= len(node_latencies) or node_latencies[i] != l:
+    #             # insert new instruction
+    #             instruction, mod_reg = get_nop_instruction(l)
+    #             self.insert(i, instruction, l)
+    #             node_latencies.insert(i, l)
+    #             self.register_modifications[i] = mod_reg
