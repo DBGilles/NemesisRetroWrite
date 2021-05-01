@@ -226,6 +226,7 @@ class NemesisInstrument:
                 for c in candidates:
                     if c.get_instr_latency(it) != -1:
                         reference_node = c
+                        break
             if reference_node is None:
                 reference_node = candidates[0]
 
@@ -287,11 +288,12 @@ class NemesisInstrument:
             it += 1
 
     def align(self, node):
-        subraph = self.cfg.subgraph(node)
-        root = get_root(subraph)
-        tree_depths = nx.shortest_path_length(subraph, root)
+        subgraph = self.cfg.subgraph(node)
+        # root = get_root(subraph)
+        # tree_depths = nx.shortest_path_length(subraph, root)
+        tree_depths = nx.shortest_path_length(subgraph, node)
         for i in range(max(tree_depths.values()) + 1):
-            level_nodes = [node for node in subraph.nodes if tree_depths[node] == i]
+            level_nodes = [node for node in subgraph.nodes if tree_depths[node] == i]
             self._align_nodes(level_nodes)
 
     def instrument(self, target_node):
