@@ -1,3 +1,4 @@
+import pickle
 from enum import Enum
 
 import networkx as nx
@@ -9,7 +10,8 @@ from librw.rw import Rewriter
 from rwtools.nemesis.control_flow_graph import ControlFlowGraph
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
-from rwtools.nemesis.utils.latency_map import load_latency_map
+
+# from rwtools.nemesis.utils.latency_map import load_latency_map
 
 GCC_FUNCTIONS = [
     "_start",
@@ -67,6 +69,12 @@ def register_filter(reg):
 def is_branch(mnemonic):
     branch_insn = ["jmp", "je", "jne"]
     return True in [inst in mnemonic for inst in branch_insn]
+
+
+def load_latency_map(latency_file):
+    with open(latency_file, 'rb') as fp:
+        l_map = pickle.load(fp)
+    return l_map
 
 
 class NemesisInstrument:
@@ -271,7 +279,8 @@ class NemesisInstrument:
                         # register
                         root = self.cfg.get_root()
                         push_instruction = f"pushq %{selected_register}"
-                        latency = self.latency_mapper.get_latency("pushq", f"%{selected_register}")
+                        latency = self.latency_mapper.get_latency("pushq",
+                                                                  f"%{selected_register}")
                         root.insert(0, push_instruction, latency)
                         if root in node_lengths.keys():
                             node_lengths[root] += 1
@@ -279,7 +288,8 @@ class NemesisInstrument:
                         for leaf in self.leaves:
                             n = leaf.num_instructions()
                             pop_instruction = f"popq %{selected_register}"
-                            latency = self.latency_mapper.get_latency("popq", f"%{selected_register}")
+                            latency = self.latency_mapper.get_latency("popq",
+                                                                      f"%{selected_register}")
                             leaf.insert(n - 1, pop_instruction, latency)
                             if leaf in node_lengths.keys():
                                 node_lengths[leaf] += 1
@@ -308,7 +318,7 @@ class NemesisInstrument:
         # 4. align the nodes
         self.align(target_node)
 
-        # # # 5. merge inserted nodes
+        # 5. merge inserted nodes
         self.cfg.merge_inserted_nodes()
-        #
+
         # self.cfg.restore_cycles()
