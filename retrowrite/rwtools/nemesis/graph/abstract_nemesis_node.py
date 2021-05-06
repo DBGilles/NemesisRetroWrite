@@ -213,14 +213,9 @@ class AbstractNemesisNode:
                     # insert the instruction at index i
                     self.insert(i, instr, latency)
 
-    # def instrument_node(self, target_latencies):
-    #     # new
-    #     node_latencies = self.get_latencies()
-    #
-    #     for i, l in enumerate(target_latencies):
-    #         if i >= len(node_latencies) or node_latencies[i] != l:
-    #             # insert new instruction
-    #             instruction, mod_reg = get_nop_instruction(l)
-    #             self.insert(i, instruction, l)
-    #             node_latencies.insert(i, l)
-    #             self.register_modifications[i] = mod_reg
+    def get_start_label(self):
+        label = f".L{self.id}"
+        return label
+
+    def set_branching_target(self, target):
+        raise NotImplementedError

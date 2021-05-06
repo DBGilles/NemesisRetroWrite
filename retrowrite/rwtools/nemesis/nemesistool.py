@@ -52,12 +52,21 @@ def get_nop_v2(target_lat):
     if target_lat == -1:
         return "jmp {}", 1
     if target_lat == 1:
-        return "movq {}, {}", 2
+        return "add $0, %rax", 0
+    elif target_lat == 2:
+        return "xadd {}, {}", 2
     elif target_lat == 3:
         return "imul {}, {}", 2
+    elif target_lat == 4:
+        return "mul {}, {}", 2
+    elif target_lat == 5:
+        return "movq -0x4(%rbp), {}", 1
+    elif target_lat == 6:
+        return "or -0x4(%rbp), {}", 1
+    elif target_lat == 7:
+        return "adc -0x4(%rbp), {}", 1
     else:
-        return "imul {}, {}", 2
-
+        raise RuntimeError
 
 def register_filter(reg):
     if reg in ["rsp", "rbp", "rflags", "rsp"]:
@@ -65,9 +74,8 @@ def register_filter(reg):
     else:
         return True
 
-
 def is_branch(mnemonic):
-    branch_insn = ["jmp", "je", "jne"]
+    branch_insn = ["jmp", "je", "jne", "jge"]
     return True in [inst in mnemonic for inst in branch_insn]
 
 
@@ -164,7 +172,6 @@ class NemesisInstrument:
 
         self.cfg = ControlFlowGraph(graph=graph)
         self.cfg.merge_consecutive_nodes()
-        self.cfg.merge_consecutive_nodes()
         self.leaves = self.cfg.get_leaves()
 
     def do_analysis(self):
@@ -194,50 +201,70 @@ class NemesisInstrument:
         self.rw.dump()
 
     def _get_clobber_register(self):
+        # If no register is selected yet, select one and insert push and pop instructions into
+        # root, leaves
         if self.selected_clobber is None:
             self.selected_clobber = self.clobber_registers[0]
+
+            # insert instruction at the start of the function that push the clobber
+            # register
+            root = self.cfg.get_root()
+            push_instruction = f"pushq %{self.selected_clobber}"
+            latency = self.latency_mapper.get_latency("pushq",
+                                                      f"%{self.selected_clobber}")
+            root.insert(0, push_instruction, latency)
+
+            # insert instructions at function end that pop it
+            # TODO: this won't work if cycles are removed (?)
+            for leaf in self.leaves:
+                n = leaf.num_instructions()
+                pop_instruction = f"popq %{self.selected_clobber}"
+                latency = self.latency_mapper.get_latency("popq",
+                                                          f"%{self.selected_clobber}")
+                leaf.insert(n - 1, pop_instruction, latency)
+
+            self.clobber_instrumented = True
+
         return self.selected_clobber
 
     def _select_register(self, node, instruction_index):
-        # return self._get_clobber_register(), RegType.CLOBBER
-        if instruction_index >= node.num_instructions():
-            # select clobber register
-            return self._get_clobber_register(), RegType.CLOBBER
-        else:
+        if instruction_index < node.num_instructions():
             instr_seq = node.get_sequence_of_instruction(instruction_index)
             if isinstance(instr_seq, InstructionWrapper):
                 free_regs = list(filter(register_filter, self.free_registers[instr_seq]))
                 if len(free_regs) > 0:
                     return free_regs[0], RegType.FREE
-                else:
-                    return self._get_clobber_register(), RegType.CLOBBER
-            else:
-                return self._get_clobber_register(), RegType.CLOBBER
+        return self._get_clobber_register(), RegType.CLOBBER
+
+    def _select_candidate(self, candidates, it):
+        reference_node = None
+        if len(candidates) == 1:
+            reference_node = candidates[0]
+        else:
+            for c in candidates:
+                if c.get_instr_latency(it) != -1:
+                    reference_node = c
+                    break
+        if reference_node is None:
+            reference_node = candidates[0]
+        return reference_node
 
     def _align_nodes(self, nodes):
         it = 0
 
         # keep track of the number of instructions in each node, update as the nodes are modified
-        node_lengths = {node: node.num_instructions() for node in nodes}
         while True:
-            # select the node that is the longest if multiple nodes are the longest, select the
-            # one without a jump as its current isntructoin
-            candidates = [node for node in nodes if
-                          node_lengths[node] == max(node_lengths.values())]
-            if it >= candidates[0].num_instructions():
+            node_lengths = {node: node.num_instructions() for node in nodes}
+
+            if it >= max(node_lengths.values()):
                 break
 
-            reference_node = None
-            if len(candidates) == 1:
-                reference_node = candidates[0]
-            else:
-                for c in candidates:
-                    if c.get_instr_latency(it) != -1:
-                        reference_node = c
-                        break
-            if reference_node is None:
-                reference_node = candidates[0]
+            # get all candidates nodes, select reference node from them
+            candidates = [node for node in nodes if
+                          node_lengths[node] == max(node_lengths.values())]
+            reference_node = self._select_candidate(candidates, it)
 
+            # get target latency from reference node
             target_lat = reference_node.get_instr_latency(it)
             dummy_instruction, n_args = get_nop_v2(target_lat)
             for node in [n for n in nodes if n != reference_node]:
@@ -247,54 +274,23 @@ class NemesisInstrument:
                     continue
 
                 if target_lat == -1:
-                    # special case, instruction is a jump -- balance with another jump
-                    # instruction
+                    # instruction is a jump -- balance with another jump
                     node_successors = list(self.cfg.graph.successors(node))
-                    if len(node_successors) > 1:
-                        raise RuntimeError("Node shouldn't have more than 1 successor in this "
-                                           "case")
-                    if len(node_successors) == 0:
-                        jmp_label = f".{node.id}{it}"
-                        node.insert(it, f"jmp {jmp_label} \n {jmp_label}:", -1)
-                        node_lengths[node] += 1
-
-                    else:
-                        # TODO: what if the next instruction is an inserted node (i.e. abstract node)
-                        jump_target = node_successors[0].get_start_label()
-                        node.insert(it, dummy_instruction.format(jump_target), target_lat)
-                        node_lengths[node] += 1
-
+                    # shouldn't be 0 , and if len(successors) > 2 there should already be a
+                    # brancing instruction
+                    if len(node_successors) != 1:
+                        print(node.id)
+                    assert len(node_successors) == 1
+                    jump_target = node_successors[0].get_start_label()
+                    node.insert(it, dummy_instruction.format(jump_target), target_lat)
                 else:
                     # otherwise determine what to do
                     selected_register, reg_type = self._select_register(node, it)
 
                     reg = n_args * [f"%{selected_register}"]
-                    # dummy_instruction = dummy_instruction.format(*reg)
 
+                    # insert instruction into node
                     node.insert(it, dummy_instruction.format(*reg), target_lat)
-                    node_lengths[node] += 1
-
-                    if reg_type == RegType.CLOBBER and not self.clobber_instrumented:
-                        # insert instruction at the start of the function that push the clobber
-                        # register
-                        root = self.cfg.get_root()
-                        push_instruction = f"pushq %{selected_register}"
-                        latency = self.latency_mapper.get_latency("pushq",
-                                                                  f"%{selected_register}")
-                        root.insert(0, push_instruction, latency)
-                        if root in node_lengths.keys():
-                            node_lengths[root] += 1
-                        # insert instructions at function end that pop it
-                        for leaf in self.leaves:
-                            n = leaf.num_instructions()
-                            pop_instruction = f"popq %{selected_register}"
-                            latency = self.latency_mapper.get_latency("popq",
-                                                                      f"%{selected_register}")
-                            leaf.insert(n - 1, pop_instruction, latency)
-                            if leaf in node_lengths.keys():
-                                node_lengths[leaf] += 1
-                        self.clobber_instrumented = True
-
             it += 1
 
     def align(self, node):
@@ -318,7 +314,10 @@ class NemesisInstrument:
         # 4. align the nodes
         self.align(target_node)
 
+        # insert labels into newly created nodes that are branching targets
+        self.cfg.insert_labels()
+
         # 5. merge inserted nodes
         self.cfg.merge_inserted_nodes()
 
-        # self.cfg.restore_cycles()
+        self.cfg.restore_cycles()

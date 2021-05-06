@@ -216,17 +216,18 @@ class LatencyMapV2:
             return -1
         # if all latencies are the same, don't bother selecting best candidate
         latencies = [latency for _, latency in candidates]
-
         if len(set(latencies)) == 1:
             return latencies[0]
         # otherwise select the candidate that is the best match
         max_match = 0
+        best_ops = None
         best_lat = None
         for candidate_ops, latency in candidates:
             match_count = count_matches(instruction, candidate_ops, operands)
             if match_count > max_match:
                 max_match = match_count
                 best_lat = latency
+                best_ops = candidate_ops
         if best_lat is None:
             print("warning, no latency found for instruction")
         return best_lat

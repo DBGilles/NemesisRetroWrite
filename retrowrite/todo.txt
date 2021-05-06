@@ -1,21 +1,19 @@
-#########
-# lijst #
-#########
-[X] finalize latency map
-[ ] finalize balancing algorithm
-    [X] get suitable register
-    [X] if this register is clobber register, insert push and pops at start, end of function
-    [ ] if no suitable register, insert push and pop before/after instruction (at all nodes in level)
-[ ] Finishing touches balancing algorithm
-    [X] when inserting jumps at the end of a node, what to do when the edge to the successor was removed to deal with cycles?
-        If such an edge exists the last instruction must be a jump, so nothing would need to be done (I think)
-    [ ] What to do when next node is inserted node
-    [X] remove 'testlabel' in `control_flow_graph.py` line +-316
-    [ ] Enfore that the final pop instruction is always the final pop instruction somehow -- take this into account in balancing
-        ( Example 8.0-password_comparison: when balancing target_node  '1169')
+########
+# TODO #
+########
+[X] finish first version evaluation script -- initial version completed -- works only for single function   
+2.  fix code so that it works for any/all functions in a program
+3.  support for function calls (?)
+4.  figure out when/where cycles should be removed/replaced etc.
+4.  clean up code -- ook zeker file structure, notebooks etc.
+5.  insert push and pop before/after instruction (at all nodes in level)
+6.  improve design section writing + implementation section
+7.  finish evaluation, create set of test programs, run evaluation etc.
 
-[ ] clean up code
-[ ] deal with loops (don't support loops)
-[ ] deal with function calls
-[ ] write/improve design section
-[ ] find suitable instructions for each latency
+
+Planning
+Week 03/05 - start evaluation (write evaluation script, create evaluatin programs, run evaluation)
+Week 10/05 - Finish writing evaluation section, conclusion section
+Week 17/05 - Finish introduction, related work
+week 24/05 - complete final draft
+week 31/05 - complete final draft, submit thesis (vrijdag)

@@ -62,8 +62,8 @@ class ControlFlowGraph:
     def __init__(self, graph):
         # self.nodes = nodes # TODO: doe deze weg (do equivalent to self.graph.nodes)
         self.graph = graph
-        self.stopping_nodes = None
         self.removed_edges = []
+        self.inserted_node_counter = 0
 
     def to_img(self):
         return to_img(self.graph)
@@ -74,63 +74,60 @@ class ControlFlowGraph:
     def get_leaves(self):
         return [node for node in self.graph.nodes if is_leaf(self.graph, node)]
 
-    def level_iter(self):
-        root = get_root(self.graph)
-        tree_depths = nx.shortest_path_length(self.graph, root)
-        for i in range(max(tree_depths.values()) + 1):
-            yield [node for node in self.graph.nodes if tree_depths[node] == i]
-
     def merge_consecutive_nodes(self):
         # get in and out degrees for all nodes that belong to this function
         current_node = get_root(self.graph)
         marked = []  # keep track of the ndoes we have already visited
         branches = []
+
+        def next_node():
+            # go to next node, return false if no next node
+            if len(branches) == 0:
+                return None
+            current_node = branches[0]
+            branches.remove(current_node)
+            marked.append(current_node)
+            return current_node
+
         while True:
             # get out degree current nodes
             out_d = self.graph.out_degree[current_node]
             if out_d == 0:
-                # current node is leaf
-                if len(branches) == 0:
+                # current node is leaf -- go to next
+                current_node = next_node()
+                if current_node is None:
                     break
-                else:
-                    current_node = branches[0]
-                    branches.remove(current_node)
-                    marked.append(current_node)
             if out_d == 1:
-                # we can merge this node into the next node
-                # iff the next node has in degree == 1 and the node has not been visited yet(?)
-                next_node = next(self.graph.neighbors(current_node))
-                if next_node in marked:
-                    if len(branches) == 0:
-                        break
-                    current_node = branches[0]
-                    branches.remove(current_node)
-                    marked.append(current_node)
-                elif self.graph.in_degree[next_node] > 1:
-                    branches.append(next_node)
-                    current_node = branches[0]
-                    branches.remove(current_node)
-                    marked.append(current_node)
-                else:
-                    # actually merge the two nodes
-                    # 1) add instructions
-                    current_node.append_node(next_node)
+                # if out degree is 1 we merge if
+                # 1) current node last instruction is not a jump
+                # 2) succ in degree is equal to 1
+                succ = next(self.graph.successors(current_node))
+                assert succ is not None
+                if current_node.get_instr_latency(-1) != -1 and \
+                        self.graph.in_degree[succ] == 1 \
+                        and succ not in marked:
+                    # merge the node
+                    current_node.append_node(succ)
 
                     # 2) add edge from all neighbors of next_node
-                    for neighbor in self.graph.neighbors(next_node):
+                    for neighbor in self.graph.neighbors(succ):
                         self.graph.add_edge(current_node, neighbor)
 
                     # 3) remove node from graph (also removes edges) and from list of nodes
-                    self.graph.remove_node(next_node)
-                    # self.nodes.remove(next_node)
-                    # marked.remove(next_node)
+                    self.graph.remove_node(succ)
+                    if succ in branches:
+                        branches.remove(succ)
+                else:
+                    # do not merge the node -- go to next node if it is not marked ?
+                    branches.append(succ)
+                    current_node = next_node()
+                    if current_node is None:
+                        break
             elif out_d > 1:
                 branches += [n for n in self.graph.neighbors(current_node) if n not in marked]
-                if len(branches) == 0:
+                current_node = next_node()
+                if current_node is None:
                     break
-                current_node = branches[0]
-                branches.remove(current_node)
-                marked.append(current_node)
 
     def get_node(self, label):
         target_node = None
@@ -139,22 +136,6 @@ class ControlFlowGraph:
                 target_node = node
                 break
         return target_node
-
-    def add_latencies_as_descendants(self, leaf, latencies):
-        # wordt voorlopig niet gebruikt
-        # TODO: moet ook werken voor concrete nodes
-        parent_node = leaf
-        i = 0
-        for lat in latencies:
-            # lat is a list of latencies that belong in a single node
-            # create a new node, add it to the graph, add edge from prev node to this node
-
-            new_node = AbstractNemesisNode(lat, f"{parent_node.id}{i}")
-            self.graph.add_node(new_node)
-            self.graph.add_edge(parent_node, new_node)
-
-            parent_node = new_node
-            i += 1
 
     def equalize_path_lengths(self, root, node):
         # equalize all path lengths to the given node
@@ -245,7 +226,8 @@ class ControlFlowGraph:
         for from_node, to_node, diff in target_edges:
             for i in range(diff - 1):
                 # create a new node
-                new_node = AbstractNemesisNode([], f"{from_node.id}{to_node.id}")
+                new_node = AbstractNemesisNode([], f"{self.inserted_node_counter}")
+                self.inserted_node_counter += 1
                 # insert 'inside' edge
                 self.insert_between_nodes(new_node, from_node, to_node)
 
@@ -278,16 +260,20 @@ class ControlFlowGraph:
         for leaf in leaves:
             if diff := leaf_depth - longest_path_lengths[leaf]:
                 # true if diff is not equal to 0
-                name_prefix = f"leaf_{leaf.id}"
+                # name_prefix = f"leaf_{leaf.id}"
                 current_node = leaf
                 for i in range(diff):
-                    new_node = AbstractNemesisNode([], f"{name_prefix}_{i}")
+                    # TODO: use function insert_as_parent()
+                    new_node = AbstractNemesisNode([], f"{self.inserted_node_counter}")
+                    self.inserted_node_counter += 1
                     # insert the node into the graph
                     predecessors = list(self.graph.predecessors(current_node))
                     for predecessor in predecessors:
                         self.graph.add_edge(predecessor, new_node)
                         self.graph.remove_edge(predecessor, current_node)
-
+                        if predecessor.num_instructions() >= 1 and is_branching_instruction(
+                                predecessor.get_instr_mnemonic(-1)):
+                            predecessor.set_branching_target(new_node.get_start_label())
                     self.graph.add_edge(new_node, current_node)
 
     def restore_cycles(self):
@@ -364,6 +350,7 @@ class ControlFlowGraph:
         to_node.prepend_instructions(from_node.instructions, from_node.latencies)
 
         # remove from_node from the graph
+        print(from_node.id)
         parent = list(self.graph.predecessors(from_node))[0]
         self.graph.add_edge(parent, to_node)
         self.graph.remove_node(from_node)
@@ -434,75 +421,43 @@ class ControlFlowGraph:
             for c in copies:
                 c.mapped_nodes = [node] + copies
 
-    def get_balanced_tree_latencies(self, subtree_root):
-        # get the latencies of a balanced subtree starting at the root down to a leaf do a depth
-        # first traversal of the root, keeping track of the node latencies, until you reach a leaf
-        # or until you reach a stopping node
-        curr_node = subtree_root
-        latencies = []
+    # def is_leaf(self, node):
+    #     return is_leaf(self.graph, node)
 
-        while True:
-            # get the first child of the current node
-            curr_node = list(self.graph.successors(curr_node))[0]
-            node_latencies = []
-            for lats in curr_node.latencies:
-                node_latencies += lats
-            latencies.append(node_latencies)
-            # latencies += curr_node.latencies
-            if is_leaf(self.graph, curr_node) or self.is_stopping_node(curr_node):
-                break
-        return latencies
-
-    def is_leaf(self, node):
-        return is_leaf(self.graph, node)
-
-    def get_successors(self, node):
-        return list(self.graph.successors(node))
-
-    def cleanup(self):
-        # unused ?
-        remove = []
-        for node in self.graph.nodes:
-            if not isinstance(node, NemesisNode):
-                remove.append(node)
-        for node in remove:
-            # self.nodes.remove(node)
-            self.graph.remove_node(node)
+    # def get_successors(self, node):
+    #     return list(self.graph.successors(node))
 
     def insert_between_nodes(self, new_node, from_node, to_node):
-        # used for testing purposes mostly
         self.graph.add_node(new_node)
         self.graph.add_edge(from_node, new_node)
         self.graph.add_edge(new_node, to_node)
-
         self.graph.remove_edge(from_node, to_node)
-        # self.nodes.append(new_node)
 
-    def set_stopping_nodes(self, target_node):
-        leaves = [n for n in self.graph.nodes if self.is_leaf(n)]
+    def insert_as_parent(self, new_node, target_node):
+        # insert the new node as a parent of the target node
+        self.graph.add_node(new_node)
+        for pred in list(self.graph.predecessors(target_node)):
+            self.graph.add_edge(pred, new_node)
+            self.graph.remove_edge(pred, target_node)
+            if pred.num_instructions() > 0 and is_branching_instruction(
+                    pred.get_instr_mnemonic(-1)):
+                pred.set_branching_target(new_node.get_start_label())
+        self.graph.add_edge(new_node, target_node)
 
-        # loop over all paths to all leaves, remove all nodes from the candidate that isn't
-        # present in the path
-        paths = []
-        for leaf in leaves:
-            paths += [set(p) for p in all_simple_paths(self.graph, target_node, leaf)]
-        if len(paths) == 0:
-            self.stopping_nodes = ()
-        else:
-            self.stopping_nodes = set.intersection(*paths)
-            self.stopping_nodes.remove(target_node)
-
-    def is_stopping_node(self, node):
-        if self.stopping_nodes is None:
-            raise RuntimeError("Stopping nodes have not been calculate yet")
-        return node in self.stopping_nodes
+    def remove_node(self, target_node):
+        assert self.graph.in_degree(target_node) == 1 and self.graph.out_degree(target_node) == 1
+        parent = next(self.graph.predecessors(target_node))
+        child = next(self.graph.successors(target_node))
+        self.graph.remove_node(target_node)
+        self.graph.add_edge(parent, child)
 
     def subgraph(self, node):
         # first find a node that dominates all leaves
         dominator = None
         immediate_dominators = nx.immediate_dominators(self.graph, node)
         leaves = [node for node in self.graph.nodes if self.graph.out_degree(node) == 0]
-        leaf_dominators = set(immediate_dominators[leaf] for leaf in leaves if leaf in immediate_dominators.keys())
+        leaf_dominators = set(
+            immediate_dominators[leaf] for leaf in leaves if leaf in immediate_dominators.keys())
         if len(leaf_dominators) == 1:
             dominator = leaf_dominators.pop()
             if dominator == node:
@@ -527,3 +482,17 @@ class ControlFlowGraph:
                     adjacent_nodes.append(succ)
             if len(adjacent_nodes) == 0:
                 return self.graph.subgraph(subgraph_nodes)
+
+    def insert_labels(self):
+        # for each abstract node, if its successors has a branching instruction to it and
+        for node in self.graph.nodes:
+            if isinstance(node, NemesisNode):
+                continue
+            for pred in self.graph.predecessors(node):
+                instr = pred.get_instr_mnemonic(-1)
+                if is_branching_instruction(instr) and node.get_start_label() in instr:
+                    if node.get_instr_latency(0) != 0:
+                        node.insert(0, f"{node.get_start_label()}:", 0)
+
+    def get_branching_nodes(self):
+        return [node for node in self.graph.nodes if self.graph.out_degree(node) > 1]

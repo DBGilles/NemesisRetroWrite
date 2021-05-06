@@ -2,7 +2,7 @@ import re
 
 # register can have a name of length 2 or length 3, preceded by modulo sign.
 # Can have parenthesis in some cases
-REGISTER_REGEX_STR = "\\(?%[a-zA-Z1-9]{2,3}\\)?"
+REGISTER_REGEX_STR = "\\(?%[a-zA-Z0-9]{2,3}\\)?"
 REGISTER_REGEX = re.compile(REGISTER_REGEX_STR)
 
 # immediate value is a dollar signed followed by optional '-' followed by either decimal or
@@ -53,3 +53,7 @@ three_ops_regex_str = f"({operand_regex_str}), ({operand_regex_str}), ({operand_
 one_op_regex = re.compile(operand_regex_str)
 two_ops_regex = re.compile(two_ops_regex_str)
 three_ops_regex = re.compile(three_ops_regex_str)
+
+if __name__ == '__main__':
+    test = "%r10"
+    print(REGISTER_REGEX.fullmatch(test))

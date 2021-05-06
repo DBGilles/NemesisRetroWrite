@@ -5,11 +5,9 @@ from collections import defaultdict
 
 
 class Instruction:
-    def __init__(self, asm, operands, iaca_measurements, measurement, latencies):
+    def __init__(self, asm, operands, latencies):
         self.asm = asm
         self.operands = operands
-        self.iaca_measurements = iaca_measurements
-        self.measurement = measurement
         self.latencies = latencies
 
     def __str__(self):
@@ -24,6 +22,9 @@ class Operand:
         self.type = type
         self.values = values
 
+    def __eq__(self, other):
+        raise NotImplementedError
+
 
 class RegisterOperand:
     def __init__(self, width, xtype, values):
@@ -34,6 +35,11 @@ class RegisterOperand:
     def __str__(self):
         return "reg" + str(self.width)
 
+    def __eq__(self, other):
+        if isinstance(other, RegisterOperand) and self.width == other.width:
+            return True
+        return False
+
 
 class MemoryOperand:
     def __init__(self, width, xtype):
@@ -43,14 +49,23 @@ class MemoryOperand:
     def __str__(self):
         return "mem" + str(self.width)
 
+    def __eq__(self, other):
+        if isinstance(other, MemoryOperand) and self.width == other.width:
+            return True
+        return False
+
 
 class AgenOperand:
-    "Address generator operand?"
+    """Address generator operand?"""
+
     def __init__(self, address):
         self.address = address
 
     def __str__(self):
         return "agen"
+
+    def __eq__(self, other):
+        return isinstance(other, AgenOperand)
 
 
 class ImmOperand:
@@ -60,6 +75,9 @@ class ImmOperand:
     def __str__(self):
         return "Imm" + self.width
 
+    def __eq__(self, other):
+        return isinstance(other, ImmOperand)
+
 
 class RelbrOperand:
     def __init__(self):
@@ -67,6 +85,10 @@ class RelbrOperand:
 
     def __str__(self):
         return "RelBranch"
+
+    def __eq__(self, other):
+        return isinstance(other, ImmOperand)
+        return True
 
 
 class Measurement:
@@ -141,12 +163,11 @@ def parse_operand(instr_node):
 
 
 def read_uops_xml():
-    tree = ET.parse('/home/gilles/Downloads/instructions.xml')
+    tree = ET.parse(
+        '/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/data/instructions.xml')
     root = tree.getroot()
 
-    # instructions = defaultdict(list)
     instructions = []
-    i = 0
     for instr_node in root.iter('instruction'):
         architecture_node = instr_node.find("./architecture[@name='SKL']")
         if architecture_node is None:
@@ -154,51 +175,76 @@ def read_uops_xml():
         else:
             # get instruction asm
             asm = instr_node.attrib['asm']
-
             # parse operands
             operands = parse_operand(instr_node)
 
-            # architecture node has children
-            # 1. IACA (1 or more)
-            # 2. measurement (where measurement has (1 or more) children 'latency')
-            iaca_measurements = []
-            for iaca_node in architecture_node.iter("IACA"):
-                iaca_measurements.append({key: value for key, value in iaca_node.attrib.items()})
-
             measurement_node = architecture_node.findall("measurement")
-            measurement_attributes = None
             latencies = []
+
             if len(measurement_node) == 0:
                 pass
             elif len(measurement_node) == 1:
                 measurement_node = measurement_node[0]
-                measurement_attributes = {key: value for key, value in
-                                          measurement_node.attrib.items()}
-
                 for latency_node in measurement_node.iter("latency"):
-                    # latency_attributes = {key: value for key, value in
-                    #                       measurement_node.attrib.items()}
-                    latencies.append({key: value for key, value in
-                                      latency_node.attrib.items()})
+                    latency_keys = [key for key in latency_node.attrib.keys() if
+                                    'cycles' in key and "is_upper_bound" not in key]
+                    for key in latency_keys:
+                        latency = int(latency_node.attrib[key])
+                        if f"{key}_is_upper_bound" in latency_node.attrib:
+                            is_upper_bound = (latency_node.attrib[f"{key}_is_upper_bound"] == "1")
+                        else:
+                            is_upper_bound = False
+                        latencies.append((key, latency, is_upper_bound))
             else:
                 raise RuntimeError(
                     f"Unexpected additional measurement node. Expected 1, got {len(measurement_node)}")
             instructions.append(
-                Instruction(asm, operands, iaca_measurements, measurement_attributes, latencies))
+                Instruction(asm, operands, latencies))
     return instructions
+
+
+def same_ops(ops_a, ops_b):
+    if len(ops_a) != len(ops_b):
+        return False
+
+    matched = []
+    for a in ops_a:
+        for b in ops_b:
+            if b not in matched and a == b:
+                matched.append(b)
+                continue
+    # same ops if all elems in ops_b are matched with some elem in ops_a
+    return len(matched) == len(ops_b)
 
 
 def create_latency_map(instructions):
     # loop over the instructions, create latency map
     latency_map = defaultdict(list)
+    existing_operands = defaultdict(list)
+    count = 0
+    total_count = 0
     for instruction in instructions:
+        total_count += 1
+        # check existing operands, if duplicate then skip
+        matched = False
+        for ops in existing_operands[instruction.asm]:
+            if same_ops(instruction.operands, ops):
+                matched = True
+                count += 1
+                break
+        if matched:
+            continue
         all_latencies = []
-        for latency in instruction.latencies:
-            if 'cycles' in latency.keys():
-                all_latencies.append(latency['cycles'])
+        for latency_type, value, is_upper_bound in instruction.latencies:
+            # strategy, add all latencies regardless of whether or not they are upper bounds
+            if not is_upper_bound:
+                all_latencies.append(value)
         if len(all_latencies) > 0:
             final_latency = max(all_latencies)
             latency_map[instruction.asm].append((instruction.operands, final_latency))
+            existing_operands[instruction.asm].append(instruction.operands)
+    latency_map["PUSH"].append(([], 3))       # source: Agner Fog
+    latency_map["PUSHQ"].append(([], 3))      # source: Agner Fog
     return latency_map
 
 
@@ -217,4 +263,3 @@ if __name__ == '__main__':
 
     with open("./latencies.p", 'wb') as handle:
         pickle.dump(latency_map, handle, protocol=pickle.HIGHEST_PROTOCOL)
-

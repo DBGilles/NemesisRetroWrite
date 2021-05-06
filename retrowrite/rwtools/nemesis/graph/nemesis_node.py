@@ -99,3 +99,11 @@ class NemesisNode(AbstractNemesisNode):
     def set_instruction_i(self, i, instruction, latency):
         # replace the i'th instruction with this new instruction
         raise NotImplementedError
+
+    def set_branching_target(self, target):
+        branching_instruction = self.instruction_wrappers[-1]
+        if len(branching_instruction.after) == 0:
+            # instruction has not been instrumented
+            branching_instruction.op_str = target
+        else:
+            raise NotImplementedError
