@@ -49,6 +49,8 @@ class RegType(Enum):
 
 
 def get_nop_v2(target_lat):
+    if target_lat == -2:
+        return "", 0
     if target_lat == -1:
         return "jmp {}", 1
     if target_lat == 1:
@@ -282,6 +284,10 @@ class NemesisInstrument:
                     assert len(node_successors) == 1
                     jump_target = node_successors[0].get_start_label()
                     node.insert(it, dummy_instruction.format(jump_target), target_lat)
+                elif target_lat == -2:
+                    # instruction is a call -- simply copy over (i.e. call same function)
+                    instr = reference_node.get_instr_mnemonic(it)
+                    node.insert(it, instr, -2)
                 else:
                     # otherwise determine what to do
                     selected_register, reg_type = self._select_register(node, it)

@@ -202,6 +202,9 @@ class LatencyMapV2:
         if instruction == "enrbs64":
             return 0
 
+        if "call" in instruction:
+            return -2
+
         if is_branching_instruction(instruction):
             return -1
 
