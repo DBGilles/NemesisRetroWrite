@@ -86,7 +86,7 @@ def load_latency_map(latency_file):
 
 
 class NemesisInstrument:
-    def __init__(self, binary, outputfile):
+    def __init__(self, binary, outputfile, target_function="main"):
         self.binary = binary
         self.outputfile = outputfile
         self.loader = None
@@ -101,7 +101,7 @@ class NemesisInstrument:
         self.latency_mapper = LatencyMapV2(load_latency_map(
             "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map"
             "/latencies.p"))
-
+        self.target_function = target_function
         self._setup()
 
     def _setup(self):
@@ -143,14 +143,13 @@ class NemesisInstrument:
         nodes = []
         graph = nx.DiGraph()
 
-        func_name = "main"
         target_fn = None
         for _, fn in self.loader.container.functions.items():
-            if fn.name == func_name:
+            if fn.name == self.target_function:
                 target_fn = fn
 
         if target_fn is None:
-            raise ValueError(f"Funtion with name {func_name} not found")
+            raise ValueError(f"Funtion with name {self.target_function} not found")
 
         # the cache contains a number of InstructionWrappers. these contain an instruction
         # as well as some extra information (mnemonic, location ,etc. ) create the initial

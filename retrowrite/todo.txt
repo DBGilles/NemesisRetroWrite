@@ -1,8 +1,8 @@
 ########
 # TODO #
 ########
-[X] finish first version evaluation script -- initial version completed -- works only for single function   
-2.  fix code so that it works for any/all functions in a program
+[X] finish first version evaluation script -- initial version completed -- works only for single function
+[X] fix code so that it works for any/all functions in a program
 3.  support for function calls (?)
 4.  figure out when/where cycles should be removed/replaced etc.
 4.  clean up code -- ook zeker file structure, notebooks etc.
