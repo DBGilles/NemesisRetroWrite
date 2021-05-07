@@ -25,23 +25,6 @@ def to_img(graph, out_dir="image", name="temp"):
     img = mpimg.imread(f"{name}.png")
     return img
 
-
-def is_leaf(graph, node):
-    return graph.out_degree(node) == 0
-
-
-def get_root(graph):
-    # return the first nodes that has in degree 0 (assuming that there is only one such node,
-    # this is the root
-    for node in graph.nodes:
-        if graph.in_degree[node] == 0:
-            return node
-
-
-def get_candidate_edges(path, longest_path):
-    return set(path).difference(longest_path)
-
-
 def sort_edge(e1, e2):
     from1, to1 = e1
     from2, to2 = e2

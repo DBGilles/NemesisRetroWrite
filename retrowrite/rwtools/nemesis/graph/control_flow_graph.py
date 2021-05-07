@@ -10,40 +10,9 @@ from librw.container import InstructionWrapper
 from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 
+from rwtools.nemesis.graph.utils import single_source_longest_dag_path_length, get_node_depth, to_img
+
 random.seed(10)
-
-from rwtools.nemesis.graph.utils import get_root, get_candidate_edges, \
-    single_source_longest_dag_path_length, get_node_depth, to_img, is_leaf
-
-GCC_FUNCTIONS = [
-    "_start",
-    "__libc_start_main",
-    "__libc_csu_fini",
-    "__libc_csu_init",
-    "__lib_csu_fini",
-    "_init",
-    "__libc_init_first",
-    "_fini",
-    "_rtld_fini",
-    "_exit",
-    "__get_pc_think_bx",
-    "__do_global_dtors_aux",
-    "__gmon_start",
-    "frame_dummy",
-    "__do_global_ctors_aux",
-    "__register_frame_info",
-    "deregister_tm_clones",
-    "register_tm_clones",
-    "__do_global_dtors_aux",
-    "__frame_dummy_init_array_entry",
-    "__init_array_start",
-    "__do_global_dtors_aux_fini_array_entry",
-    "__init_array_end",
-    "__stack_chk_fail",
-    "__cxa_atexit",
-    "__cxa_finalize",
-]
-
 
 def find_branch_target(branch_instruction):
     start = branch_instruction.find(".")
@@ -69,14 +38,16 @@ class ControlFlowGraph:
         return to_img(self.graph)
 
     def get_root(self):
-        return get_root(self.graph)
+        for node in self.graph.nodes:
+            if self.graph.in_degree[node] == 0:
+                return node
 
     def get_leaves(self):
-        return [node for node in self.graph.nodes if is_leaf(self.graph, node)]
+        return [node for node in self.graph.nodes if self.graph.out_degree(node) == 0]
 
     def merge_consecutive_nodes(self):
         # get in and out degrees for all nodes that belong to this function
-        current_node = get_root(self.graph)
+        current_node = self.get_root()
         marked = []  # keep track of the ndoes we have already visited
         branches = []
 
@@ -155,8 +126,9 @@ class ControlFlowGraph:
             diff = max_len - len(p)
             if diff == 0:
                 continue
-            candidates = sorted(get_candidate_edges(p, longest_path),
-                                key=lambda x: str(x[0].id) + str(x[1].id))
+            candidates = set(p).difference(longest_path)
+            candidates = sorted(candidates, key=lambda x: str(x[0].id) + str(x[1].id))
+
             unique_edge = candidates[0]
             from_node = unique_edge[0]
             to_node = unique_edge[1]
@@ -278,7 +250,7 @@ class ControlFlowGraph:
 
     def restore_cycles(self):
         mapped_nodes = []
-        root = get_root(self.graph)
+        root = self.get_root()
         for node in self.graph.nodes:
             # get the nodes children
             children = self.graph.successors(node)
@@ -372,7 +344,7 @@ class ControlFlowGraph:
 
         cyclic_edges = []
         if root is None:
-            root = get_root(self.graph)
+            root = self.get_root()
         # step 1: determine which edges to remove by first finding cycles and then removing the
         # edge that goes from the deepest node to the most shallow node
         cycles = simple_cycles(self.graph)
