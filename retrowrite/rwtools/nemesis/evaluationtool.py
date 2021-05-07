@@ -10,7 +10,7 @@ from librw.analysis.register import RegisterAnalysis
 from librw.container import InstructionWrapper
 from librw.loader import Loader
 from librw.rw import Rewriter
-from rwtools.nemesis.control_flow_graph import ControlFlowGraph
+from rwtools.nemesis.graph.control_flow_graph import ControlFlowGraph
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
 from rwtools.nemesis.nemesistool import load_latency_map
