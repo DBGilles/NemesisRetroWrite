@@ -11,35 +11,6 @@ from rwtools.nemesis.graph.control_flow_graph import ControlFlowGraph
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
 
-GCC_FUNCTIONS = [
-    "_start",
-    "__libc_start_main",
-    "__libc_csu_fini",
-    "__libc_csu_init",
-    "__lib_csu_fini",
-    "_init",
-    "__libc_init_first",
-    "_fini",
-    "_rtld_fini",
-    "_exit",
-    "__get_pc_think_bx",
-    "__do_global_dtors_aux",
-    "__gmon_start",
-    "frame_dummy",
-    "__do_global_ctors_aux",
-    "__register_frame_info",
-    "deregister_tm_clones",
-    "register_tm_clones",
-    "__do_global_dtors_aux",
-    "__frame_dummy_init_array_entry",
-    "__init_array_start",
-    "__do_global_dtors_aux_fini_array_entry",
-    "__init_array_end",
-    "__stack_chk_fail",
-    "__cxa_atexit",
-    "__cxa_finalize",
-]
-
 
 class RegType(Enum):
     FREE = 1
