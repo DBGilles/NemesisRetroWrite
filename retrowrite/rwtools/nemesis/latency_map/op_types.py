@@ -250,9 +250,3 @@ def map_assembly_values(asm_value):
         return Memory(asm_value)
 
     raise ValueError(f"warning, unable to map unknown value {asm_value} to type")
-    # print(f"warning, unable to map unknown value {asm_value} to type")
-    # return Unknown(asm_value)
-
-
-if __name__ == '__main__':
-    test_string = ".LC200c(%rip)"

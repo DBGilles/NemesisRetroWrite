@@ -2,7 +2,7 @@ import copy
 
 from rwtools.nemesis.latency_map.create_latency_map import RegisterOperand, ImmOperand, \
     MemoryOperand, AgenOperand
-from rwtools.nemesis.op_types import Immediate, Memory, Register, Label, BaseType
+from rwtools.nemesis.latency_map.op_types import Immediate, Memory, Register, Label, BaseType
 from rwtools.nemesis.string_matching import one_op_regex, RELATIVE_FROM_COMPOUND_OP, COMPOUND_OP, \
     two_ops_regex, three_ops_regex, REGISTER_REGEX, RELATIVE_FROM_REGISTER_REGEX, \
     LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, LABELS_REGEX
