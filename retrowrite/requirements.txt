@@ -1,7 +1,12 @@
-archinfo
-pyelftools
-capstone
-intervaltree
-pandas
+archinfo~=9.0.5739
+pyelftools~=0.27
+capstone~=4.0.2
+intervaltree~=3.1.0
+pandas~=1.2.1
 opcodes
 odfpy
+
+numpy~=1.20.0
+matplotlib~=3.3.4
+networkx~=2.5
+setuptools~=53.0.0

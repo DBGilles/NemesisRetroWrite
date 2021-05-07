@@ -1,6 +1,3 @@
-############################################
-# Definition of Abstract NemesisNode class #
-############################################
 from collections import defaultdict
 
 

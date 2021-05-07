@@ -1,7 +1,4 @@
-#####################################
-# Definition of a NemesisNode class #
-#####################################
-from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode, flatten
+from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
 
 class NemesisNode(AbstractNemesisNode):
     """

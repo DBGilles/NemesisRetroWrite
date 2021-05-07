@@ -1,8 +1,8 @@
 from archinfo.arch_x86 import ArchX86
 
-from rwtools.nemesis.string_matching import REGISTER_REGEX, RELATIVE_FROM_REGISTER_REGEX, \
-    LABEL_RELATIVE_FROM_REGISTER, IMM_VALUES_REGEX, LABELS_REGEX, RELATIVE_FROM_COMPOUND_OP, \
-    COMPOUND_OP
+from rwtools.nemesis.latency_map.string_matching import register_regex, \
+    relative_from_register_regex, imm_values_regex, labels_regex, \
+    relative_from_compound_op_regex, compound_op_regex, label_relative_from_register_regex
 
 REGISTER_TYPES = ["r"] + [f"r{x}" for x in [8, 16, 32, 64, 128, 256]] + [f"{x}mm" for x in
                                                                          ["", "x", "y", "z"]]
@@ -224,24 +224,24 @@ def map_assembly_values(asm_value):
     except TypeError:
         pass
 
-    if COMPOUND_OP.fullmatch(asm_value):
+    if compound_op_regex.fullmatch(asm_value):
         return Memory(asm_value)
 
-    if RELATIVE_FROM_COMPOUND_OP.fullmatch(asm_value):
+    if relative_from_compound_op_regex.fullmatch(asm_value):
         return Memory(asm_value)
 
-    if REGISTER_REGEX.match(asm_value):
+    if register_regex.match(asm_value):
         return Register(asm_value)
 
-    if RELATIVE_FROM_REGISTER_REGEX.match(asm_value) or LABEL_RELATIVE_FROM_REGISTER.match(
+    if relative_from_register_regex.match(asm_value) or label_relative_from_register_regex.match(
             asm_value):
         # TODO: is dit correct? heb je in dit geval een memory address?
         return Memory(asm_value)
 
-    if IMM_VALUES_REGEX.match(asm_value):
+    if imm_values_regex.match(asm_value):
         return Immediate(asm_value)
 
-    if LABELS_REGEX.match(asm_value):
+    if labels_regex.match(asm_value):
         return Label(asm_value)
 
     if "@PLT" in asm_value or "@plt" in asm_value:

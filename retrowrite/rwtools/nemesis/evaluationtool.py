@@ -2,12 +2,9 @@ from collections import defaultdict
 
 from rwtools.nemesis.graph.utils import single_source_longest_dag_path_length
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
-from enum import Enum
 
 import networkx as nx
 
-from librw.analysis.register import RegisterAnalysis
-from librw.container import InstructionWrapper
 from librw.loader import Loader
 from librw.rw import Rewriter
 from rwtools.nemesis.graph.control_flow_graph import ControlFlowGraph

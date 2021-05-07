@@ -1,7 +1,3 @@
-######################################
-# Utility functions functions graphs #
-######################################
-
 import os
 import random
 from collections import defaultdict
