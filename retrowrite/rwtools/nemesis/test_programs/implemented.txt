@@ -1,0 +1,5 @@
+1. call 
+2. diamond 
+3. fork 
+4. ifcompound 
+5. triangle 
