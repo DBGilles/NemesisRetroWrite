@@ -334,8 +334,6 @@ class NemesisInstrumentFunction:
                 target_nodes.append(node)
         if len(target_nodes) == 0:
             return
-        # elif len(target_nodes) > 1:
-        #     raise NotImplementedError("not sure what to do here")
         self.cfg.unwind_graph()
 
         for target_node in target_nodes:
@@ -347,3 +345,4 @@ class NemesisInstrumentFunction:
 
         self.cfg.insert_labels()
         self.cfg.restore_cycles()
+        self.cfg.merge_inserted_nodes()

@@ -187,9 +187,17 @@ or -0x4(%rbp), %r8
 jmp .L1191
 .L1191:
 .LC1191:
-	jmp .L1196
+	jmp .R36
 .L1196:
 .LC1196:
+.L1:
+movq -0x4(%rbp), %r8
+jmp .S502
+.S502:
+.L0:
+jmp .S534
+.S534:
+.R36:
 	cmpl $0xa, -8(%rbp)
 .LC119a:
 	jne .L11a9

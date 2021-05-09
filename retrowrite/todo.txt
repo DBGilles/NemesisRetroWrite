@@ -20,7 +20,7 @@
 #########
 - subraph function is has been modified -- adjust text
 - _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
-
+- balancing with multiple targets -- adjust text (for each targer, first insert nodes, then align for each node, etc. ..)
 ############
 # planning #
 ############
