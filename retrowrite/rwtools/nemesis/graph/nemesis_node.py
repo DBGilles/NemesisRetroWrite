@@ -6,10 +6,6 @@ class NemesisNode(AbstractNemesisNode):
     """
 
     def __init__(self, instruction, latency=-99):
-        # if is_branching_instruction(instruction.mnemonic):
-        #     latencies = [4]
-        # else:
-        #     latencies = [latency]
         latencies = [latency]
         name = "%x" % instruction.address  # convert address to hex for consistency with RW
         super().__init__(latencies, name)

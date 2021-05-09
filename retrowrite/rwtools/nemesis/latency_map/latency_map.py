@@ -189,8 +189,6 @@ class LatencyMapV2:
 
     def get_latency(self, *args):
         instruction = args[0]
-        # size_modifier = instruction[-1] if instruction[-1] in ['q', 'l', 'w', 'b'] else None
-
         # in some cases syntax is not exactly the same -- specific
         # instructions need to be mapped to more general versions
         # TODO: use the size information stored in the mnemonic instead of simply converting to
@@ -216,7 +214,6 @@ class LatencyMapV2:
 
         candidates = self.get_candidates(instruction)
         if len(candidates) == 0:
-            print(f"no latency information found for instruction: {instruction} ")
             return -1
         # if all latencies are the same, don't bother selecting best candidate
         latencies = [latency for _, latency in candidates]

@@ -10,9 +10,11 @@ from librw.container import InstructionWrapper
 from rwtools.nemesis.graph.abstract_nemesis_node import AbstractNemesisNode
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 
-from rwtools.nemesis.graph.utils import single_source_longest_dag_path_length, get_node_depth, to_img
-
+from rwtools.nemesis.graph.utils import single_source_longest_dag_path_length, get_node_depth, \
+    to_img
 random.seed(10)
+
+random_numbers = random.sample(range(1, 1000), 100) # sampling without replacement
 
 def find_branch_target(branch_instruction):
     start = branch_instruction.find(".")
@@ -108,6 +110,13 @@ class ControlFlowGraph:
                 break
         return target_node
 
+    def get_instruction_node(self, address):
+        # return the node that contains instruction with address
+        for node in self.graph.nodes:
+            for instr in node.instruction_wrappers:
+                if hex(instr.address)[2:] == address:
+                    return node
+
     def equalize_path_lengths(self, root, node):
         # equalize all path lengths to the given node
         # path length is defined as the number of nodes from the root to the target node
@@ -157,10 +166,6 @@ class ControlFlowGraph:
                     jmp_label = to_node.get_start_label()
                     jmp_instruction = f"jmp {jmp_label}"
 
-                    # TODO: support for node labels, somehow
-                    # new_node.insert(0, f"{node_label}: ", 0)
-                    # new_node.insert(1, jmp_instruction, 1)
-
                     # we also want to insert the jmp instruction in the sibling
                     for node in self.graph.successors(from_node):
                         if not isinstance(node, NemesisNode):
@@ -185,6 +190,8 @@ class ControlFlowGraph:
 
     def insert_nodes(self, target_node):
         subgraph = self.subgraph(target_node)
+        for node in subgraph:
+            print(node.id)
         longest_path_lengths = single_source_longest_dag_path_length(subgraph, target_node)
 
         # loop over all edges in the subgraph. If an edge goes between nodes where the diffeence
@@ -289,7 +296,10 @@ class ControlFlowGraph:
                 # the other ancestor has a branch to the start of the to_node.
                 # this branch has to be modified so that it points to a label inside the node
                 # so that control flow is correct after mergeing from node with to node
-                label_name = f".L{to_node.id}mid"
+                label_id = random_numbers[0]
+                random_numbers.remove(label_id)
+
+                label_name = f".R{label_id}"
                 to_node.insert(0, f"{label_name}:", 0)
                 instruction_sequence = other_ancestor.get_instruction_sequence(-1)
                 if isinstance(instruction_sequence, list):
@@ -304,7 +314,9 @@ class ControlFlowGraph:
                         instruction_sequence.op_str = f"{label_name}"
 
         if "jmp" in from_node.get_instr_mnemonic(-1):
-            label_name = f".S{to_node.id}"
+            node_id = random_numbers[0]
+            random_numbers.remove(node_id)
+            label_name = f".S{node_id}"
             # modify last istruction in from_node so that it jumps to newly created label
             # insert newly created label in to node
             instruction_sequence = from_node.get_instruction_sequence(-1)
@@ -322,7 +334,6 @@ class ControlFlowGraph:
         to_node.prepend_instructions(from_node.instructions, from_node.latencies)
 
         # remove from_node from the graph
-        print(from_node.id)
         parent = list(self.graph.predecessors(from_node))[0]
         self.graph.add_edge(parent, to_node)
         self.graph.remove_node(from_node)
@@ -393,17 +404,14 @@ class ControlFlowGraph:
             for c in copies:
                 c.mapped_nodes = [node] + copies
 
-    # def is_leaf(self, node):
-    #     return is_leaf(self.graph, node)
-
-    # def get_successors(self, node):
-    #     return list(self.graph.successors(node))
 
     def insert_between_nodes(self, new_node, from_node, to_node):
         self.graph.add_node(new_node)
         self.graph.add_edge(from_node, new_node)
         self.graph.add_edge(new_node, to_node)
         self.graph.remove_edge(from_node, to_node)
+        if from_node.num_instructions() > 0 and is_branching_instruction(from_node.get_instr_mnemonic(-1)):
+            from_node.set_branching_target(new_node.get_start_label())
 
     def insert_as_parent(self, new_node, target_node):
         # insert the new node as a parent of the target node
@@ -432,28 +440,27 @@ class ControlFlowGraph:
             immediate_dominators[leaf] for leaf in leaves if leaf in immediate_dominators.keys())
         if len(leaf_dominators) == 1:
             dominator = leaf_dominators.pop()
+            # if dominator is the node itself then there is no suitable dominator
             if dominator == node:
                 dominator = None
 
-        # do a breadth-first search of the graph, starting at node, stopping when the dominator
-        # is added
-        subgraph_nodes = []
-        adjacent_nodes = [node]
-
-        while True:
-            # consume first node in the list
-            curr_node = adjacent_nodes[0]
-            adjacent_nodes.remove(curr_node)
-            subgraph_nodes.append(curr_node)
-
-            if dominator is not None and curr_node == dominator:
-                return self.graph.subgraph(subgraph_nodes)
-
-            for succ in self.graph.successors(curr_node):
-                if succ not in adjacent_nodes:
-                    adjacent_nodes.append(succ)
-            if len(adjacent_nodes) == 0:
-                return self.graph.subgraph(subgraph_nodes)
+        if dominator is None:
+            subgraph_nodes = []
+            for l in leaves:
+                for p in all_simple_paths(self.graph, source=node, target=l):
+                    for n in p:
+                        if n not in subgraph_nodes:
+                            subgraph_nodes.append(n)
+            return self.graph.subgraph(subgraph_nodes)
+        else:
+            # TODO: find better way of doing this?
+            subgraph_nodes = []
+            paths = all_simple_paths(self.graph, source=node, target=dominator)
+            for p in paths:
+                for n in p:
+                    if n not in subgraph_nodes:
+                        subgraph_nodes.append(n)
+            return self.graph.subgraph(subgraph_nodes)
 
     def insert_labels(self):
         # for each abstract node, if its successors has a branching instruction to it and

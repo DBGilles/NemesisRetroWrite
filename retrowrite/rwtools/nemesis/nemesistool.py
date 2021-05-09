@@ -11,6 +11,35 @@ from rwtools.nemesis.graph.control_flow_graph import ControlFlowGraph
 from rwtools.nemesis.graph.nemesis_node import NemesisNode
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
 
+GCC_FUNCTIONS = [
+    "_start",
+    "__libc_start_main",
+    "__libc_csu_fini",
+    "__libc_csu_init",
+    "__lib_csu_fini",
+    "_init",
+    "__libc_init_first",
+    "_fini",
+    "_rtld_fini",
+    "_exit",
+    "__get_pc_think_bx",
+    "__do_global_dtors_aux",
+    "__gmon_start",
+    "frame_dummy",
+    "__do_global_ctors_aux",
+    "__register_frame_info",
+    "deregister_tm_clones",
+    "register_tm_clones",
+    "__do_global_dtors_aux",
+    "__frame_dummy_init_array_entry",
+    "__init_array_start",
+    "__do_global_dtors_aux_fini_array_entry",
+    "__init_array_end",
+    "__stack_chk_fail",
+    "__cxa_atexit",
+    "__cxa_finalize",
+]
+
 
 class RegType(Enum):
     FREE = 1
@@ -37,13 +66,15 @@ def get_nop_v2(target_lat):
     elif target_lat == 7:
         return "adc -0x4(%rbp), {}", 1
     else:
-        raise RuntimeError
+        raise RuntimeError(f"unkown latency {target_lat}")
+
 
 def register_filter(reg):
     if reg in ["rsp", "rbp", "rflags", "rsp"]:
         return False
     else:
         return True
+
 
 def is_branch(mnemonic):
     branch_insn = ["jmp", "je", "jne", "jge"]
@@ -56,26 +87,13 @@ def load_latency_map(latency_file):
     return l_map
 
 
-class NemesisInstrument:
-    def __init__(self, binary, outputfile, target_function="main"):
+class NemesisInstrumentProgram:
+    def __init__(self, binary, outputfile):
         self.binary = binary
         self.outputfile = outputfile
         self.loader = None
-        self.rw = None
-        self.cfg = None
-        # load the binary, create writer etc.
-        self.free_registers = {}
-        self.clobber_registers = []
-        self.selected_clobber = None
-        self.clobber_instrumented = False
-        self.leaves = None
-        self.latency_mapper = LatencyMapV2(load_latency_map(
-            "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map"
-            "/latencies.p"))
-        self.target_function = target_function
-        self._setup()
+        self.functions = {}
 
-    def _setup(self):
         # setup
         self.loader = Loader(self.binary)
         assert (self.loader.is_pie() and not self.loader.is_stripped())
@@ -100,7 +118,40 @@ class NemesisInstrument:
         # information about the various sections)
         self.rw = Rewriter(self.loader.container, self.outputfile)
         self.rw.symbolize()
+        flist = Loader(binary).flist_from_symtab()
+        self.function_names = [value['name'] for key, value in flist.items() if
+                               value['name'] not in GCC_FUNCTIONS]
+        for fn in self.function_names:
+            function_instrumenter = NemesisInstrumentFunction(self.loader, fn)
+            self.functions[fn] = function_instrumenter
 
+    def instrument_program(self, target_instructions):
+        # for each function, create NemesisInstrument isntance, check if instruction is present
+        # in any of the nodes, if so, balance that node
+        for fn in self.function_names:
+            print(fn)
+            function_instrumenter = self.functions[fn]
+            function_instrumenter.instrument(target_instructions)
+
+    def dump(self):
+        self.rw.dump()
+
+class NemesisInstrumentFunction:
+    def __init__(self, loader, target_function):
+        self.loader = loader
+        self.target_function = target_function
+        self.cfg = None
+        self.free_registers = {}
+        self.clobber_registers = []
+        self.selected_clobber = None
+        self.clobber_instrumented = False
+        self.leaves = None
+        self.latency_mapper = LatencyMapV2(load_latency_map(
+            "/home/gilles/git-repos/NemesisRetroWrite/retrowrite/rwtools/nemesis/latency_map"
+            "/latencies.p"))
+        self._setup()
+
+    def _setup(self):
         # create control flow graph
         self.create_cfg()
 
@@ -167,9 +218,6 @@ class NemesisInstrument:
     def render_cfg(self):
         return self.cfg.to_img()
 
-    def dump(self):
-        self.rw.dump()
-
     def _get_clobber_register(self):
         # If no register is selected yet, select one and insert push and pop instructions into
         # root, leaves
@@ -201,9 +249,10 @@ class NemesisInstrument:
         if instruction_index < node.num_instructions():
             instr_seq = node.get_sequence_of_instruction(instruction_index)
             if isinstance(instr_seq, InstructionWrapper):
-                free_regs = list(filter(register_filter, self.free_registers[instr_seq]))
-                if len(free_regs) > 0:
-                    return free_regs[0], RegType.FREE
+                if instr_seq in self.free_registers.keys():
+                    free_regs = list(filter(register_filter, self.free_registers[instr_seq]))
+                    if len(free_regs) > 0:
+                        return free_regs[0], RegType.FREE
         return self._get_clobber_register(), RegType.CLOBBER
 
     def _select_candidate(self, candidates, it):
@@ -276,22 +325,25 @@ class NemesisInstrument:
             level_nodes = [node for node in subgraph.nodes if tree_depths[node] == i]
             self._align_nodes(level_nodes)
 
-    def instrument(self, target_node):
-        # 1. get rid of any cycles in the graph
+    def instrument(self, target_instructions):
+        # first get the target nodes (if any)
+        target_nodes = []
+        for instr in target_instructions:
+            node = self.cfg.get_instruction_node(str(instr))
+            if node is not None:
+                target_nodes.append(node)
+        if len(target_nodes) == 0:
+            return
+        # elif len(target_nodes) > 1:
+        #     raise NotImplementedError("not sure what to do here")
         self.cfg.unwind_graph()
 
-        # 2. insert nodes and equalize branches so that all
-        #   paths to all leaves are same length -- stratified
-        self.cfg.insert_nodes(target_node)
-        self.cfg.equalize_branches(target_node)
+        for target_node in target_nodes:
+            self.cfg.insert_nodes(target_node)
+            self.cfg.equalize_branches(target_node)
 
-        # 4. align the nodes
-        self.align(target_node)
+        for target_node in target_nodes:
+            self.align(target_node)
 
-        # insert labels into newly created nodes that are branching targets
         self.cfg.insert_labels()
-
-        # 5. merge inserted nodes
-        self.cfg.merge_inserted_nodes()
-
         self.cfg.restore_cycles()

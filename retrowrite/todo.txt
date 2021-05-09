@@ -4,15 +4,27 @@
 [X] finish first version evaluation script -- initial version completed -- works only for single function
 [X] fix code so that it works for any/all functions in a program
 [X] support for function calls (?)
-4.  figure out when/where cycles should be removed/replaced etc.
-4.  clean up code -- ook zeker file structure, notebooks etc.
+[X]  figure out when/where cycles should be removed/replaced etc.
+[X] clean up code -- ook zeker file structure, notebooks etc.
 5.  insert push and pop before/after instruction (at all nodes in level)
 6.  improve design section writing + implementation section
+    - something about function calls
+    - something about graph needing to be acyclic (or the subgraph at least) or not being able to support loops or something ... (and explain why in a good way)
 7.  finish evaluation, create set of test programs, run evaluation etc.
+8.  Clean up (Abstract)NemesisNode
 
 
-Planning
-Week 03/05 - start evaluation (write evaluation script, create evaluatin programs, run evaluation)
+
+#########
+# extra #
+#########
+- subraph function is has been modified -- adjust text
+- _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
+
+############
+# planning #
+############
+Week 03/05 - start evaluation (write evaluation script, create evaluation programs, run evaluation)
 Week 10/05 - Finish writing evaluation section, conclusion section
 Week 17/05 - Finish introduction, related work
 week 24/05 - complete final draft
