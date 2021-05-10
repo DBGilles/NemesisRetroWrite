@@ -182,7 +182,7 @@ foo:
 call:
 .L1180:
 .LC1180:
-pushq %rbx
+pushq %r15
 	pushq %rbp
 .LC1181:
 	movq %rsp, %rbp
@@ -208,7 +208,7 @@ pushq %rbx
 .LC11a8:
 	movl $0, -4(%rbp)
 callq .L1150
-movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %r15
 jmp .L11af
 .L11af:
 .LC11af:
@@ -217,7 +217,7 @@ jmp .L11af
 	addq $0x10, %rsp
 .LC11b6:
 	popq %rbp
-popq %rbx
+popq %r15
 .LC11b7:
 	retq 
 .size call,.-call

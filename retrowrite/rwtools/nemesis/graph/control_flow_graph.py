@@ -12,9 +12,11 @@ from rwtools.nemesis.graph.nemesis_node import NemesisNode
 
 from rwtools.nemesis.graph.utils import single_source_longest_dag_path_length, get_node_depth, \
     to_img
+
 random.seed(10)
 
-random_numbers = random.sample(range(1, 1000), 100) # sampling without replacement
+random_numbers = random.sample(range(1, 1000), 100)  # sampling without replacement
+
 
 def find_branch_target(branch_instruction):
     start = branch_instruction.find(".")
@@ -22,7 +24,7 @@ def find_branch_target(branch_instruction):
 
 
 def is_branching_instruction(instruction):
-    return True in [x in instruction for x in ["jmp", "je", "jne"]]
+    return True in [x in instruction for x in ["jmp", "je", "jne", "jge"]]
 
 
 class ControlFlowGraph:
@@ -190,8 +192,6 @@ class ControlFlowGraph:
 
     def insert_nodes(self, target_node):
         subgraph = self.subgraph(target_node)
-        for node in subgraph:
-            print(node.id)
         longest_path_lengths = single_source_longest_dag_path_length(subgraph, target_node)
 
         # loop over all edges in the subgraph. If an edge goes between nodes where the diffeence
@@ -210,21 +210,17 @@ class ControlFlowGraph:
                 # insert 'inside' edge
                 self.insert_between_nodes(new_node, from_node, to_node)
 
-                if isinstance(to_node, NemesisNode):
-                    # if the next node is a 'real node' add a jmp instruction
-                    # if the next node is not a 'real node' then you don't need to add jump
-                    # because they will later be merged anyway
-                    jmp_label = to_node.get_start_label()
-                    jmp_instruction = f"jmp {jmp_label}"
-
-                    # we also want to insert the jmp instruction in the sibling
-                    for node in self.graph.successors(from_node):
-                        if not isinstance(node, NemesisNode):
-                            continue
-                        else:
-                            # this node is a sibling that is not the newly created node, also
-                            # add the jump here
-                            node.append_instructions([[jmp_instruction]], [[-1]])
+                # a newly inserted node will later need to be merged with its successor (i.e.
+                # to_node). If to node has other predecessors, then this node needs to have a
+                # branching instruction to the current start of to_node, so that when the
+                # new node is merged the flow is still correct
+                # if a predecessor of to_node does not have a branching instruction, add it
+                for node in self.graph.predecessors(to_node):
+                    if node.num_instructions() == 0 or not is_branching_instruction(
+                            node.get_instr_mnemonic(-1)):
+                        jmp_label = to_node.get_start_label()
+                        jmp_instruction = f"jmp {jmp_label}"
+                        node.append_instructions([[jmp_instruction]], [[-1]])
 
                 # new node becomes to_node so that other nodes are inserted before the new node
                 to_node = new_node
@@ -288,30 +284,31 @@ class ControlFlowGraph:
         # TODO: cleanup
         # 1. check if the to_node has another ancestor
         to_node_ancestors = list(self.graph.predecessors(to_node))
-        if len(to_node_ancestors) == 2:
-            other_ancestor = [node for node in to_node_ancestors if node != from_node][0]
-            last_instruction = other_ancestor.get_instr_mnemonic(-1)
-            if is_branching_instruction(last_instruction) and \
-                    find_branch_target(last_instruction) == to_node.get_start_label():
-                # the other ancestor has a branch to the start of the to_node.
-                # this branch has to be modified so that it points to a label inside the node
-                # so that control flow is correct after mergeing from node with to node
-                label_id = random_numbers[0]
-                random_numbers.remove(label_id)
+        if len(to_node_ancestors) >= 2:
+            for other_ancestor in [node for node in to_node_ancestors if node != from_node]:
+                # other_ancestor = [node for node in to_node_ancestors if node != from_node]
+                last_instruction = other_ancestor.get_instr_mnemonic(-1)
+                if is_branching_instruction(last_instruction) and \
+                        find_branch_target(last_instruction) == to_node.get_start_label():
+                    # the other ancestor has a branch to the start of the to_node.
+                    # this branch has to be modified so that it points to a label inside the node
+                    # so that control flow is correct after mergeing from node with to node
+                    label_id = random_numbers[0]
+                    random_numbers.remove(label_id)
 
-                label_name = f".R{label_id}"
-                to_node.insert(0, f"{label_name}:", 0)
-                instruction_sequence = other_ancestor.get_instruction_sequence(-1)
-                if isinstance(instruction_sequence, list):
-                    # replace last instruction in the list
-                    instruction_sequence[-1] = f"jmp {label_name}"
-                elif isinstance(instruction_sequence, InstructionWrapper):
-                    # if after is not empty the instruction has been instrumented
-                    # if it hasn't been instrumented simply modify the op string
-                    if len(instruction_sequence.after) > 0:
-                        instruction_sequence.after[-1] = f"jmp {label_name}"
-                    else:
-                        instruction_sequence.op_str = f"{label_name}"
+                    label_name = f".R{label_id}"
+                    to_node.insert(0, f"{label_name}:", 0)
+                    instruction_sequence = other_ancestor.get_instruction_sequence(-1)
+                    if isinstance(instruction_sequence, list):
+                        # replace last instruction in the list
+                        instruction_sequence[-1] = f"jmp {label_name}"
+                    elif isinstance(instruction_sequence, InstructionWrapper):
+                        # if after is not empty the instruction has been instrumented
+                        # if it hasn't been instrumented simply modify the op string
+                        if len(instruction_sequence.after) > 0:
+                            instruction_sequence.after[-1] = f"jmp {label_name}"
+                        else:
+                            instruction_sequence.op_str = f"{label_name}"
 
         if "jmp" in from_node.get_instr_mnemonic(-1):
             node_id = random_numbers[0]
@@ -341,7 +338,8 @@ class ControlFlowGraph:
     def merge_inserted_nodes(self):
         targets = []
         # determine which nodes need to be inserted
-        for node in self.graph.nodes:
+        # for node in self.graph.nodes:
+        for node in nx.algorithms.dag.topological_sort(self.graph):
             if not isinstance(node, NemesisNode):
                 # merge this node with it successor
                 targets.append(node)
@@ -404,13 +402,13 @@ class ControlFlowGraph:
             for c in copies:
                 c.mapped_nodes = [node] + copies
 
-
     def insert_between_nodes(self, new_node, from_node, to_node):
         self.graph.add_node(new_node)
         self.graph.add_edge(from_node, new_node)
         self.graph.add_edge(new_node, to_node)
         self.graph.remove_edge(from_node, to_node)
-        if from_node.num_instructions() > 0 and is_branching_instruction(from_node.get_instr_mnemonic(-1)):
+        if from_node.num_instructions() > 0 and is_branching_instruction(
+                from_node.get_instr_mnemonic(-1)):
             from_node.set_branching_target(new_node.get_start_label())
 
     def insert_as_parent(self, new_node, target_node):

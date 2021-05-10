@@ -58,7 +58,6 @@ class NemesisEvaluateProgram:
             evaluator.run_evaluation(target_instructions)
 
 
-
 class NemesisEvaluateFunction:
     def __init__(self, loader, target_function):
         self.loader = loader
@@ -146,52 +145,48 @@ class NemesisEvaluateFunction:
                 target_nodes.append(node)
         if len(target_nodes) == 0:
             return
-        elif len(target_nodes) > 1:
-            raise NotImplementedError("not sure what to do here")
-        target_node = target_nodes[0]
-
         self.cfg.unwind_graph()
 
-        subgraph = self.cfg.subgraph(target_node)
-        successors = list(subgraph.successors(target_node))
-        path_lengths = shortest_path_length(subgraph, target_node)
+        for target_node in target_nodes:
+            subgraph = self.cfg.subgraph(target_node)
+            successors = list(subgraph.successors(target_node))
+            path_lengths = shortest_path_length(subgraph, target_node)
 
-        then_region = sorted(
-            list(nx.descendants(subgraph, successors[0]) | {successors[0]}),
-            key=lambda x: path_lengths[x],
-            reverse=True)
+            then_region = sorted(
+                list(nx.descendants(subgraph, successors[0]) | {successors[0]}),
+                key=lambda x: path_lengths[x],
+                reverse=True)
 
-        else_region = sorted(
-            list(nx.descendants(subgraph, successors[1]) | {successors[1]}),
-            key=lambda x: path_lengths[x],
-            reverse=True)
+            else_region = sorted(
+                list(nx.descendants(subgraph, successors[1]) | {successors[1]}),
+                key=lambda x: path_lengths[x],
+                reverse=True)
 
-        then_region_depth = max(
-            single_source_longest_dag_path_length(subgraph.subgraph(then_region),
-                                                  successors[0]).values())
-        else_region_depth = max(
-            single_source_longest_dag_path_length(subgraph.subgraph(else_region),
-                                                  successors[1]).values())
+            then_region_depth = max(
+                single_source_longest_dag_path_length(subgraph.subgraph(then_region),
+                                                      successors[0]).values())
+            else_region_depth = max(
+                single_source_longest_dag_path_length(subgraph.subgraph(else_region),
+                                                      successors[1]).values())
 
-        if then_region_depth != else_region_depth:
-            ok = False
-            print("WARNING -- not valanced bla bla bla")
-
-        then_instruction = self.depth_mapping(subgraph.subgraph(then_region), successors[0])
-        else_instruction = self.depth_mapping(subgraph.subgraph(else_region), successors[1])
-        for i in range(max(then_instruction.keys() | else_instruction.keys())):
-            if len(then_instruction[i]) == 0 or len(else_instruction[i]) == 0:
-                print(f"not balanced at f{i}")
+            if then_region_depth != else_region_depth:
                 ok = False
+                print("WARNING -- not valanced bla bla bla")
 
-            else:
-                instructions = then_instruction[i] + else_instruction[i]
-                latencies = [lat for _, lat in instructions]
-                if len(set(latencies)) > 1:
-                    print("not balanced ")
-                    print(instructions)
+            then_instruction = self.depth_mapping(subgraph.subgraph(then_region), successors[0])
+            else_instruction = self.depth_mapping(subgraph.subgraph(else_region), successors[1])
+            for i in range(max(then_instruction.keys() | else_instruction.keys())):
+                if len(then_instruction[i]) == 0 or len(else_instruction[i]) == 0:
+                    print(f"not balanced at f{i}")
                     ok = False
+                else:
+                    instructions = then_instruction[i] + else_instruction[i]
+                    latencies = [lat for _, lat in instructions]
+                    if len(set(latencies)) > 1:
+                        print("not balanced ")
+                        print(instructions)
+                        ok = False
 
-        self.cfg.restore_cycles()
-        if ok:
-            print("no issues found")
+            self.cfg.restore_cycles()
+            if ok:
+                print("no issues found")
