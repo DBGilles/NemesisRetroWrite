@@ -22,10 +22,26 @@ def find_branch_target(branch_instruction):
     start = branch_instruction.find(".")
     return branch_instruction[start:]
 
+def set_branch_target(instruction_sequence, label):
+    if isinstance(instruction_sequence, list):
+        # replace last instruction in the list
+        instruction_sequence[-1] = f"jmp {label}"
+    elif isinstance(instruction_sequence, InstructionWrapper):
+        # if after is not empty the instruction has been instrumented
+        # if it hasn't been instrumented simply modify the op string
+        if len(instruction_sequence.after) > 0:
+            instruction_sequence.after[-1] = f"jmp {label}"
+        else:
+            instruction_sequence.op_str = f"{label}"
+
 
 def is_branching_instruction(instruction):
     return True in [x in instruction for x in ["jmp", "je", "jne", "jge"]]
 
+def get_node_id():
+    node_id = random_numbers[0]
+    random_numbers.remove(node_id)
+    return node_id
 
 class ControlFlowGraph:
     """
@@ -281,56 +297,45 @@ class ControlFlowGraph:
             self.graph.add_edge(from_node, to_node)
 
     def merge_with_descendant(self, from_node, to_node):
-        # TODO: cleanup
-        # 1. check if the to_node has another ancestor
-        to_node_ancestors = list(self.graph.predecessors(to_node))
-        if len(to_node_ancestors) >= 2:
-            for other_ancestor in [node for node in to_node_ancestors if node != from_node]:
-                # other_ancestor = [node for node in to_node_ancestors if node != from_node]
-                last_instruction = other_ancestor.get_instr_mnemonic(-1)
-                if is_branching_instruction(last_instruction) and \
-                        find_branch_target(last_instruction) == to_node.get_start_label():
-                    # the other ancestor has a branch to the start of the to_node.
-                    # this branch has to be modified so that it points to a label inside the node
-                    # so that control flow is correct after mergeing from node with to node
-                    label_id = random_numbers[0]
-                    random_numbers.remove(label_id)
+        to_node_predecessors = set(self.graph.predecessors(to_node))
+        # step 1:
+        # we will be inserting instructions into the start of the node
+        # all other predecessors of the to_node need to have a jump to the (currently) first
+        # instruction
+        to_node_label = None
+        for node in to_node_predecessors - {from_node}:
+            # by construction all other descendants of to_node will have a jump (inserted when
+            # from node was first inserted)
+            last_instr = node.get_instr_mnemonic(-1)
+            assert(is_branching_instruction(last_instr))
+            branch_target = find_branch_target(last_instr)
+            # if this branch target is equal to the node i
+            if isinstance(to_node, NemesisNode) and branch_target == to_node.get_start_label():
+                if to_node_label is None:
+                    node_id = get_node_id()
+                    to_node_label = f".R{node_id}"
+                    to_node.insert(0, f"{to_node_label}:", 0)
+                instruction_sequence = node.get_instruction_sequence(-1)
+                set_branch_target(instruction_sequence, to_node_label)
 
-                    label_name = f".R{label_id}"
-                    to_node.insert(0, f"{label_name}:", 0)
-                    instruction_sequence = other_ancestor.get_instruction_sequence(-1)
-                    if isinstance(instruction_sequence, list):
-                        # replace last instruction in the list
-                        instruction_sequence[-1] = f"jmp {label_name}"
-                    elif isinstance(instruction_sequence, InstructionWrapper):
-                        # if after is not empty the instruction has been instrumented
-                        # if it hasn't been instrumented simply modify the op string
-                        if len(instruction_sequence.after) > 0:
-                            instruction_sequence.after[-1] = f"jmp {label_name}"
-                        else:
-                            instruction_sequence.op_str = f"{label_name}"
+        # step 2: prepend the instruction of from node into to_node if from_node has a
+        # branching instruction and the target is equal to to_node's start label then insert a
+        # new label and modify
+        last_instr = from_node.get_instr_mnemonic(-1)
+        if "jmp" in last_instr:
+            branch_target = find_branch_target(last_instr)
+            if branch_target == to_node.get_start_label():
+                node_id = get_node_id()
+                label_name = f".R{node_id}"
+                to_node.insert(0, f"{label_name}:", 0)
 
-        if "jmp" in from_node.get_instr_mnemonic(-1):
-            node_id = random_numbers[0]
-            random_numbers.remove(node_id)
-            label_name = f".S{node_id}"
-            # modify last istruction in from_node so that it jumps to newly created label
-            # insert newly created label in to node
-            instruction_sequence = from_node.get_instruction_sequence(-1)
-            if isinstance(instruction_sequence, InstructionWrapper):
-                if len(instruction_sequence.after) > 0:
-                    instruction_sequence.after[-1] = f"jmp {label_name}"
-                else:
-                    instruction_sequence.op_str = f"{label_name}:"
-            elif isinstance(instruction_sequence, list):
-                instruction_sequence[-1] = f"jmp {label_name}"
+                # modify last istruction in from_node so that it jumps to newly created label
+                # insert newly created label in to node
+                instruction_sequence = from_node.get_instruction_sequence(-1)
+                set_branch_target(instruction_sequence, label_name)
 
-            to_node.insert(0, f"{label_name}:", 0)
-
-        # finally insert the instruction into the to_node
+        # step 3: finally insert instructions into to_node, remove from graph
         to_node.prepend_instructions(from_node.instructions, from_node.latencies)
-
-        # remove from_node from the graph
         parent = list(self.graph.predecessors(from_node))[0]
         self.graph.add_edge(parent, to_node)
         self.graph.remove_node(from_node)
