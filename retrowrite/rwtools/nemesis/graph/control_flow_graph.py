@@ -23,6 +23,7 @@ def find_branch_target(branch_instruction):
     return branch_instruction[start:]
 
 def set_branch_target(instruction_sequence, label):
+    # TODO: use NemesisNode.setBranchingtarget()
     if isinstance(instruction_sequence, list):
         # replace last instruction in the list
         instruction_sequence[-1] = f"jmp {label}"

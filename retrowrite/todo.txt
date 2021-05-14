@@ -22,7 +22,12 @@
 - subraph function is has been modified -- adjust text
 - _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
 - balancing with multiple targets -- adjust text (for each targer, first insert nodes, then align for each node, etc. ..)
-
+- iets over feit dat vinden van secret depdendent branches out of scope is
+- static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
+    if depths are not the same then some set will be
+- introduce consistent wording -- use it everywhere in the text
+    balanced program or aligned program or modified program or .... (kies 1, wees consistent)
+- bij alle test inputs verifieren dat alle paths in control flow covered zijn
 
 ############
 # planning #
@@ -32,3 +37,19 @@ Week 10/05 - Finish writing evaluation section, conclusion section
 Week 17/05 - Finish introduction, related work
 week 24/05 - complete final draft
 week 31/05 - complete final draft, submit thesis (vrijdag)
+
+
+###########
+# vandaag #
+###########
+- toevoegen aan benchmark suite:
+    - programma met function call dat state aanpast
+    - programma met 1 kortere branch dan andere
+    - programma waarbij alle registers gebruikt zijn (op 1 of andere manier)
+- aanpassen tests BSL en keypad zodat die werken met verschillende inputs
+- verzamelen evaluation data
+- write up experiment setup, some discussion of results
+- toevoegen aan design
+    - cant support cycles
+    - something about function calls
+    - determining which branches are secret-dependent is out of scope -- we asume this is supplied as input

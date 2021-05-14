@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from rwtools.nemesis.graph.abstract_nemesis_node import flatten
 from rwtools.nemesis.graph.utils import single_source_longest_dag_path_length
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
 
@@ -12,6 +13,85 @@ from rwtools.nemesis.graph.nemesis_node import NemesisNode
 from rwtools.nemesis.latency_map.latency_map import LatencyMapV2
 from rwtools.nemesis.nemesistool import load_latency_map, GCC_FUNCTIONS
 from networkx.algorithms.shortest_paths.generic import shortest_path_length
+
+
+def mapping(cfg_a, cfg_b):
+    visited_nodes = []
+    next_nodes = []
+
+    assert nx.is_isomorphic(cfg_a.graph, cfg_b.graph)
+    mapping = {}
+
+    node_a = cfg_a.get_root()
+    node_b = cfg_b.get_root()
+
+    mapping[node_a] = node_b
+
+    while True:
+        visited_nodes.append(node_a)
+        succ_a = list(cfg_a.graph.successors(node_a))
+        succ_b = list(cfg_b.graph.successors(node_b))
+        assert len(succ_a) == len(succ_b)
+
+        if len(succ_a) == 1:
+            # both nodes only have one successor -- these need to be mapped to each other
+            mapping[succ_a[0]] = succ_b[0]
+            if succ_a[0] not in visited_nodes and succ_a[0] not in next_nodes:
+                next_nodes.append(succ_a[0])
+        elif len(succ_a) == 2:
+            instr_a = node_a.instruction_wrappers[-1]
+            instr_b = node_b.instruction_wrappers[-1]
+            assert instr_a.mnemonic == instr_b.mnemonic
+            target_a = instr_a.op_str
+            target_b = instr_b.op_str
+
+            # map the nodes that corresopnd to the targets of the branch
+            node_a = list(filter(lambda n: n.get_start_label() == target_a, succ_a))[0]
+            node_b = list(filter(lambda n: n.get_start_label() == target_b, succ_b))[0]
+            mapping[node_a] = node_b
+
+            # map the other nodes
+            node_a = list(filter(lambda n: n.get_start_label() != target_a, succ_a))[0]
+            node_b = list(filter(lambda n: n.get_start_label() != target_b, succ_b))[0]
+            mapping[node_a] = node_b
+
+            for s in succ_a:
+                if s not in visited_nodes and s not in next_nodes:
+                    next_nodes.append(s)
+        if len(next_nodes) == 0:
+            break
+        node_a = next_nodes[0]
+        next_nodes.remove(node_a)
+        node_b = mapping[node_a]
+        # go to next node, do the same (TODO)
+    return mapping
+
+
+def evaluate_runtime(orig_func, mod_func, target_node=None):
+    if target_node is None:
+        graph = orig_func.cfg.graph
+    else:
+        graph = orig_func.cfg.subgraph(target_node)
+
+    # get mapping between nodes of the graphs
+    node_mapping = mapping(orig_func.cfg, mod_func.cfg)
+
+    results = []
+
+    root = [node for node in graph.nodes if graph.in_degree[node] == 0][0]
+    leaves = [node for node in graph.nodes if graph.out_degree[node] == 0]
+    for leaf in leaves:
+        # get all paths to the leaf, use the mapping to get corresponding paths in modified
+        # program calculated difference between the two
+        for path in nx.all_simple_paths(graph, root, leaf):
+            corresponding_path = [node_mapping[node] for node in path]
+            # filter out any latencies that are smaller than 0 (jumps and calls)
+            orig_latencies = filter(lambda x: x > 0,
+                                    flatten([node.get_latencies() for node in path]))
+            mod_latencies = filter(lambda x: x > 0,
+                                   flatten([node.get_latencies() for node in corresponding_path]))
+            results.append((path, sum(orig_latencies), sum(mod_latencies)))
+    return results
 
 
 class NemesisEvaluateProgram:
@@ -49,7 +129,6 @@ class NemesisEvaluateProgram:
         self.function_names = [value['name'] for key, value in flist.items() if
                                value['name'] not in GCC_FUNCTIONS]
         for fn in self.function_names:
-            print(fn)
             self.functions[fn] = NemesisEvaluateFunction(self.loader, fn)
 
     def evaluate_program(self, target_instructions):

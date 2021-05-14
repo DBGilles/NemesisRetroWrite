@@ -151,7 +151,7 @@ completed.8060_4038: # 4038 -- 4039
 diamond:
 .L1150:
 .LC1150:
-pushq %r12
+pushq %rdx
 	pushq %rbp
 .LC1151:
 	movq %rsp, %rbp
@@ -167,7 +167,7 @@ pushq %r12
 	jne .L1172
 .LC1166:
 	movl $0, -0xc(%rbp)
-or -0x4(%rbp), %r12
+or -0x4(%rbp), %rdx
 .LC116d:
 	jmp .L1
 .L1172:
@@ -191,7 +191,7 @@ jmp .L1191
 .L1196:
 .LC1196:
 .L1:
-movq -0x4(%rbp), %r12
+movq -0x4(%rbp), %rdx
 jmp .R586
 .R586:
 .L0:
@@ -212,7 +212,7 @@ jmp .R440
 	movl -0xc(%rbp), %eax
 .LC11ac:
 	popq %rbp
-popq %r12
+popq %rdx
 .LC11ad:
 	retq 
 .size diamond,.-diamond

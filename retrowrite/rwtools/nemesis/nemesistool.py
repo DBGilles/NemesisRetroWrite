@@ -76,11 +76,6 @@ def register_filter(reg):
         return True
 
 
-def is_branch(mnemonic):
-    branch_insn = ["jmp", "je", "jne", "jge"]
-    return True in [inst in mnemonic for inst in branch_insn]
-
-
 def load_latency_map(latency_file):
     with open(latency_file, 'rb') as fp:
         l_map = pickle.load(fp)
@@ -344,5 +339,5 @@ class NemesisInstrumentFunction:
             self.align(target_node)
 
         self.cfg.insert_labels()
-        self.cfg.restore_cycles()
         self.cfg.merge_inserted_nodes()
+        self.cfg.restore_cycles()

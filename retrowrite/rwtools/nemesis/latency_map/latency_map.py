@@ -198,6 +198,10 @@ class LatencyMapV2:
         if 'movz' in instruction:
             instruction = "movzq"
 
+        if "cltd" in instruction:
+            # see: https://sourceware.org/binutils/docs/as/i386_002dMnemonics.html
+            instruction = "cdq"
+
         if instruction == "enrbs64":
             return 0
 

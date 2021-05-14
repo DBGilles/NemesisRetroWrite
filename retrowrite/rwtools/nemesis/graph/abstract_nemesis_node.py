@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+from rwtools.nemesis.utils import is_branch
+
 
 def flatten(nested_list):
     ret = []
@@ -215,4 +217,7 @@ class AbstractNemesisNode:
         return label
 
     def set_branching_target(self, target):
-        raise NotImplementedError
+        branching_instruction = self.instructions[-1][-1]
+        assert is_branch(branching_instruction)
+        instr = branching_instruction.split(".")[0].strip()
+        self.instructions[-1][-1] = f"{instr} {target}"
