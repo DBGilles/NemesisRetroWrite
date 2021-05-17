@@ -1,0 +1,4 @@
+1. run `pdflatex thesis` to generate some auxiliary file (needed for step 2) 
+2. run `bibtex thesis` to generate the `bbl` file. 
+3. run pdflatex twice  
+

@@ -1,264 +1,71 @@
 
-\documentclass{article}
-\usepackage[margin=1in]{geometry}
+\documentclass[master=cws,masteroption=ai, english]{kulemt}
+
+
+
+\setup{% Remove the "%" on the next line when using UTF-8 character encoding
+inputenc=utf8,
+title={The best master’s thesis ever},
+author={Gilles De Borger},
+promotor={Prof.\,dr.\,ir.\ Knows Better},
+assessor={Ir.\,Kn. Owsmuch\and K. Nowsrest},
+assistant={Ir.\ An~Assistent \and A.~Friend}}
+
+\setup{font=lm}
+
+
+\usepackage{amssymb} % for \smallsetminus
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[ruled,vlined, linesnumbered]{algorithm2e}
 \usepackage{amsmath}
-\graphicspath{ {./images/} }
-\author{Gilles De Borger}
 
-\title{Thesis}
-
-\usepackage{listings}
-\usepackage{xcolor}
-
-%New colors defined below
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-
-%Code listing style named "mystyle"
-\lstdefinestyle{mystyle}{
-  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
-  keywordstyle=\color{magenta},
-  numberstyle=\tiny\color{codegray},
-  stringstyle=\color{codepurple},
-  basicstyle=\ttfamily\footnotesize,
-  breakatwhitespace=false,         
-  breaklines=true,                 
-  captionpos=b,                    
-  keepspaces=true,                 
-  numbers=left,                    
-  numbersep=3pt,                  
-  showspaces=false,                
-  showstringspaces=false,
-  showtabs=false,                  
-  tabsize=2
-}
-
-%"mystyle" code listing set
-\lstset{style=mystyle}
 
 \begin{document}
 
+\begin{preface}
+PLACEHOLDER
+I would like to thank everybody who kept me busy the last year,
+especially my promoter and my assistants. I would also like to thank the
+jury for reading the text. My sincere gratitude also goes to my wive and
+the rest of my family.
+PLACEHOLDER
+\end{preface}
 
-\maketitle
- 
+\tableofcontents
 
+\begin{abstract}
+The \texttt{abstract} environment contains a more extensive overview of
+the work. But it should be limited to one page. \cite{ahu61}
+"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
+\end{abstract}
 
-
-\section{Introduction}
-I am writing a tool to mitigate Nemesis attacks. To mitigate attacks a specific condition has to hold, that for any i, the i'th instruction in the if 
-and in the else branch have the same latency.  In order to ensure this property holds I instrument the binary code with new instructions to ensure that
-this property holds for all secret dependent branches without modifying the program execution (i.e. all instruction should have no effect)
-
-
-\section{Design}		
-\subsection{Introduction}
-The tool aims to mitigate Nemesis style attacks. It will do so by inserting additional instructions where needed to make sure there are no more side-channels. 
-The tool keeps track of the program control flow using a data structure called the Control Flow Graph (CFG). This graph is created in such a way as to allow reconstructing
-the binary from the CFG later on. The tool instruments the binary code by manipulating this control flow graph, ensuring that its nodes are balanced.
-
-Under certain conditions a recursive strategy can be applied to balance the control flow graph. Before applying this strategy the control flow graph has to be modified to ensure
-these conditions hold. 
-
-\subsection{Binary Rewriting} 
-The cause of the vulnerability that Nemesis exploits is a difference in instruction latencies following some secret dependent branch. To address this the tool will apply binary instrumentation, inserting instructions where needed to ensure 
-there are no more difference in latencies. (Rest of this will depend concrete implementation)
-
-%The tool applies two modes of binary instrumentation. The first mode instruments the binary code directly by inserting instruction before or after an existing instruction. The second mode instruments the code indirectly by creating a new 
-%sequence of instruction somewhere in the program text and inserting branches to and from this sequence. The first mode is applicable in case where it 	is not necessary to change the control flow of the program
-
-\subsection{Control Flow graph}
-The Control Flow Graph (CFG) is a data structure that represents the control flow of a program. A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a contiguous sequence of instructions. Associated with each node 
-in $V$ is a sequence of latencies equal to the latencies of the node's instructions. An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ when following 
-program control flow. 
-
-Two nodes are said to be balanced if they have the same number of instructions and if they corresponding instruction has the same latency. This is equivalent to saying that their latency sequences are the same. 
-
-A node is said to be at depth $n$ if there is a path from the root to the node of length $n$. Because it is possible that there are multiple paths to a node of different lengths a node can be at multiple depths. 
-
-A node satisfies the Nemesis property if for each pairs of descendants at depth $i$ it holds that the nodes are balanced.  
-
-\subsection{Algorithm}
-Ensuring the Nemesis propery holds for a given node is relatively straightforward under certain conditions. If the following condition holds 
-	$$\text{For all paths $p$ from the root to a leaf it holds that the length of this path is equal to some $d$ for some $d$}$$
-a recursive algorithm can be applied to ensure the Nemesis property holds for a given node. 
+\begin{abstract*}
+In dit \texttt{abstract} environment wordt een al dan niet uitgebreide
+Nederlandse samenvatting van het werk gegeven.
+Wanneer de tekst voor een Nederlandstalige master in het Engels wordt
+geschreven, wordt hier normaal een uitgebreide samenvatting verwacht,
+bijvoorbeeld een tiental bladzijden.
+\end{abstract*}
 
 
-
-\subsection{Condition}
-The recursive strategy is only applicable to a CFG if the following condition holds: 
-	$$\text{For all paths $p$ from the root to a leaf it holds that the length of this path is equal to some $d$ for some $d$}$$
-Figure \ref{problem_cfg} illustrates why it is important that this property holds.  The firs case arises when some sequence of instructions 
-is only executed if some condition is true. the second case arises when the control flow jumps to an earlier instruction. This is the case anytime a loop is used inside a program. 
-The third case arises if the program or function returns early under some conditions. 
-
-In the case of a conditional node the issue stems from the fact that there are paths of different lengths going to a node (the node labeled '3' in the example). Such nodes are by definition both at a depth $n$ and 
-a depth $n+k$, where $k$ depends on the difference between the path lengths. The following node will be at depth $n+1$ and $n+k+1$ and so. This increases the number of nodes that need to be balanced with respect to each other.
-As is the case in the example, each node below node '3' will have to be balanced with its immediate successor. This is undesirable because balancing is commutative. The node '3' would have to be balanced with all of its descendants.
-
-In the case of loops in the control flow graph make it impossible to apply a recursive algorithm, since the recursion will go on indefinitely. Additionally any node in a loop will be at infinitely many depths, since there are infinitely many paths to it,
-which introduces the same aforementioned problems. In order to balance such a CFG the graph is first unwound, removing any cycles present. 
-For a given loop, let the first node in the loop be the node closest to the root, and the last node the node furthest from the root. A new node is created identical to the first node in the loop. 
-The edge that connects the last and the first edge is removed and replaced by a new edge from the last node to the newly created copy of the first node. Figure \ref{unwinding_cycles} illustrates how this works. 
-After the graph has been balance the same procedure is executed in reverse in order to recreate the cycle. During balancing, any operation performed on the original node is also performed on the copy to ensure they are identical at all times.
-
-In the case of an early return a recursive balancing strategy cannot be applied because at some point two subtrees will not have the same depth. 
+\listoffiguresandtables
 
 
-\section{Implementation V1}
+\mainmatter 
 
-\subsection{Introduction}
-The tool instruments a program's binary by manipulating the program's Control Flow Graph (CFG). The CFG is a datasructure constructed from the binary in such a way 
-as to allow reconstructing the binary from the CFG later on. 
+\include{introduction}
+\include{design}
+\include{implementation}
+\include{evaluation}
+% ... % 
 
-\subsection{control flow graph}
-The Control Flow Graph (CFG) is a data structure that represents the control flow of a program. A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a contiguous sequence of instructions. Associated with each node 
-in $V$ is a sequence of latencies equal to the latencies of the node's instructions. An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ when following 
-program control flow. 
+\include{conclusion}
 
-Two nodes are said to be balanced if they have the same number of instructions and if they corresponding instruction has the same latency. This is equivalent to saying that their latency sequences are the same. 
+\backmatter 
 
-A node is said to be at depth $n$ if there is a path from the root to the node of length $n$. Because it is possible that there are multiple paths to a node of different lengths a node can be at multiple depths. 
-
-A node satisfies the Nemesis property if for each pairs of descendants at depth $i$ it holds that the nodes are balanced.  
-
-\subsection{Balancing a tree-like CFG}
-Ensuring the Nemesis property holds for a given node is relatively straightforward under certain conditions. If the CFG has a tree-like structure a recursive 
-strategy is possible to ensure the Nemesis property holds for a given node. A CFG is said to have a tree-like structure when all nodes are at exactly one depth. 
-
-If the CFG has a tree-like structure a recursive strategy can be applied to ensure the Nemesis property holds for any given node; to ensure the Nemesis property holds
-first ensure it holds for its descendants. 
-
-The basic case of this recursive procedure is is to balance two leaves (i.e. to balance two nodes). Figure \ref{node_balancing} illustrates how this is done.
-First a target latency sequence is determined. This sequence is calculated from the latency sequences of the nodes that are being balanced. 
-Implicit in this calculation are the constraints that are imposed on inserting instructions into a program. In some cases it is not possible to insert a single 
-instruction without altering the program state. In these cases additional instructions need to be inserted to store and restore the program state. This inserting 
-of additional instructions is reflected in the calculated target latency sequence. This ensure that in the following step it is possible to generate a new 
-instruction sequence such that the following conditions hold:
-\begin{enumerate}
-	\itemsep0em
-	\item all instructions that are present in the original sequence are also present in the new sequence 
-	\item the latencies of the new instruction sequence are equal to the target latencies 
-	\item the original and the new instruction sequence have the same effects on the program state and output
-\end{enumerate}
-Once these instruction sequences have been generated it is trivial to replace the original instruction sequences. 
-
-The recursive procedure for ensuring the Nemesis property holds for a given node is as follows. First ensure it holds for its immediate successors by balancing their descendants. 
-To balance both of the subtrees, first balance the roots of the subtrees. Then determine for each depth $i$ below the target node a target latency sequence. 
-Because both of the subtrees are balanced they will each have one well defined latency sequence at each depth $i$. The target latency sequence can be calculated 
-in the same way as it was calculated for individual nodes. Then for each node at depth $i$, generate a new instruction sequence 
-and insert it into the node.   This process is illustrated in figure \ref{tree_balancing}. 
-
-\subsection{Balancing non-tree-like CFG}
-The recursive strategy is not applicable to all control flow graphs. Figure \ref{problem_cfg} illustrates two cases where the it is not possibly to recursively balance nodes. The firs case arises when 
-some sequence of instructions is only executed if some condition is true. the second case arises when the control flow jumps to an earlier instruction. This is the case anytime a loop is used inside a program. 
-
-In the case of a conditional node the issue stems from the fact that there are paths of different lengths going to a node (the node labeled '1' in the example). Such nodes are by definition both at a depth $n$ and 
-a depth $n+k$, where $k$ depends on the difference between the path lengths. The following node will be at depth $n+1$ and $n+k+1$ and so. This increases the number of nodes that need to be balanced with respect to each other.
-As is the case in the example, each node below node '3' will have to be balanced with its immediate successor. This is undesirable because balancing is commutative. The node '3' would have to be balanced with all of its descendants.
-
-To prevent this from happening empty nodes are inserted into the graph to ensure that all paths to any given node are always of the same length. The balancing operation for two nodes is well 
-defined even if one of the nodes is empty so this poses no issues. 
-
-Loops in the control flow graph make it impossible to apply a recursive algorithm, since the recursion will go on indefinitely. Additionally any node in a loop will be at infinitely many depths, since there are infinitely many paths to it,
-which introduces the same aforementioned problems. In order to balance such a CFG the graph is first unwound, removing any cycles present. 
-For a given loop, let the first node in the loop be the node closest to the root, and the last node the node furthest from the root. A new node is created identical to the first node in the loop. 
-The edge that connects the last and the first edge is removed and replaced by a new edge from the last node to the newly created copy of the first node. Figure \ref{unwinding_cycles} illustrates how this works. 
-After the graph has been balance the same procedure is executed in reverse in order to recreate the cycle. 
-
-During balancing, any operation performed on the original node is also performed on the copy to ensure they are identical at all times.
-
-
-%%%%%%%%%%%%%%%%%%
-% NODE BALANCING %
-%%%%%%%%%%%%%%%%%%
-\begin{figure}
-	\begin{lstlisting}[language=Python]
-	def balance_nodes(n1, n2):
-    target_latencies = balance_node_latencies(n1.latencies, n2.latencies)
-
-    new_instructions_n1 = create_new_instruction_sequence(n1.instructions, target_latencies)
-    n1.replace_instructions(new_instructions_n1)
-
-    new_instructions_n2 = create_new_instruction_sequence(n1.instructions, target_latencies)
-    n2.replace_instructions(new_instructions_n2)
-\end{lstlisting}
-\caption{node balancing algorithm}
-\label{node_balancing}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%
-% TREE BALANCING %
-%%%%%%%%%%%%%%%%%%
-
-\begin{figure}
-	\begin{lstlisting}[language=Python]
-	def balance_trees(tree1, tree2):
-	
-		balance_branching_point(tree1)
-		balance_branching_point(tree2)
-	
-		target_sequences = balance_tree_latencies(tree1, tree2)
-
-		for each depth d: 
-			for each node v at depth d:
-				new_instructions =     create_new_instruction_sequence(v.instructions, target_sequences[d])
-    			v.replace_instructions(new_instructions)
-\end{lstlisting}
-\caption{tree balancing algorithm}
-\label{tree_balancing}
-\end{figure}
-
-\begin{algorithm}[H]
-\SetAlgoLined
-\KwResult{Write here the result }
- initialization\;
- \While{While condition}{
-  instructions\;
-  \eIf{condition}{
-   instructions1\;
-   instructions2\;
-   }{
-   instructions3\;
-  }
- }
- \caption{How to write algorithms}
-\end{algorithm}
-%%%%%%%%%%%%%%%
-% PROBLEM CFG %
-%%%%%%%%%%%%%%%
-
-\begin{figure}
-\begin{center}
-\subfloat[conditional]{\includegraphics[width = 0.1\linewidth]{opt_code.png}} 
-\subfloat[loop]{\includegraphics[width = 0.1\linewidth]{loop.png}}
-\subfloat[unequal]{\includegraphics[width = 0.2\linewidth]{unequal.png}}
-
-\end{center}
-
-\caption{problem CFGS}
-\label{problem_cfg}
-\end{figure}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%
-% UNWINDING CYCLES CFG %
-%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}
-\begin{center}
-\includegraphics[width = 0.6\linewidth]{unwinding.png}
-\end{center}
-\caption{unwinding cycles}
-\label{unwinding_cycles}
-\end{figure}
-
-
-
+\bibliographystyle{abbrv}
+\bibliography{references}
 
 \end{document}

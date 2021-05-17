@@ -1,0 +1,101 @@
+
+\chapter{Evaluation}
+\section{Benchmark Suite}
+Winderix et. al. have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
+collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources [2]. 
+To evaluate the proposed algorithm a subset of this benchmark suite was selected. 
+
+All programs that contain loops inside vulnerable branches were discarded from the synthetic programs in the benchmark suite, 
+since they are not supported by the proposed algorithm. 
+The original authors of the Nemesis attack provide two case studies to demonstrate their attack. 
+The first case study is a password comparison routine from the Texas Instruments MSP430 Bootstrap Loader (BSL). 
+The second case study is secure keypad application that guarantees secrecy of its PIN code [3].
+Both of these are included in the benchmark suite created by Winderix et. al and are also selected as a benchmark for the proposed algorithm. 
+
+The implementation of Nemesis and the benchmark suite created by Winderix et. al are implemented for the Sancus environment. Any pieces of code specific to this
+environment have been removed from the benchmark programs. The semantics of the programs remain unchanged. 
+
+One additional synthetic programs was added to the benchmark suite to evaluate a case that was not yet covered. This program contains a call to a function that 
+modifies a non-local variable though a pointer. This function is only called in one branch of a secret-dependent branch. 
+
+\section{Experiment Setup}
+The algorithm is evaluated using three metrics. The first metric aims to measure the effectiveness of the algorithm. A static analysis tool was developed to verify 
+for a given program whether or not the program satisfies the Nemesis-sensitive property as specified in section \ref{sec:property}.
+Given a program and a set of secret-dependent branches, this tool partitions instructions into sets according to their positions in secret dependent branches. Following the notation of section \ref{sec:property}, let \textit{ep} be a secret dependent branch, and let $ep^n$ be the n'th instruction in a region, then define the set 
+\begin{equation} \label{eq:toolSets}
+    ep_i = \{ ep^n |i = n \land  (ep^n \in region_{then}(ep) \lor ep^n \in region_{else}(ep)\}
+\end{equation}
+The static analysis verifies that both the regions have the same number of execution points, and that for each set $ep_i$ it holds that all 
+instruction have the same latency.
+
+The second metric aims to measure the correctness of the algorithm. The algorithm is considered to work correctly if it does not change the program output. For each program in the benchmark suite a number of input values were determined such that all possible paths of the program control flow were covered.
+These values were supplied as inputs to both the original program and the balanced program, generating two output values. The output values were then compared to 
+verify that the algorithm correctly modified the program without changing the output. 
+
+The effect on the program's performance is evaluated by measuring the increase in the sum of the latencies along corresponding paths 
+in the control flow of the original program and the balanced program. To this end the CFGs are constructed from the original binary as well as from the balanced binary.
+To determine for a path in the original CFG what its corresponding path is in the modified CFG a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
+This mapping takes into account the condition of a branching instruction, and can be defined inductively. 
+The root of the original CFG is mapped to the root of the root of the balanced CFG. 
+If two nodes are mapped and they both have one successor then their successors are mapped. 
+If two nodes are mapped and they have two successors, then then nodes that are reached if the branching condition is true are mapped,
+and those that are reached if the condition is false are mapped.
+
+Formally, let $G$ denote the original CFG, and let $G'$ denote the modified CFG. Let $succ(n)$ be the successors of node $n$, and let $succT(n)$ be 
+the successor of node N when the branching condition is true. Let $F$ be the function that maps between the two CFGs.  
+\begin{enumerate}
+    \item $\begin{aligned}[t]
+    F(root(G)) = root(G')
+\end{aligned}$
+\item $\begin{aligned}[t]
+    F(n) = n' \land succ(n) = \{s\} \land succ(n')=\{s'\} \\ 
+    \implies F(s)=s'
+\end{aligned}$
+\item $\begin{aligned}[t]
+    F(n) = n' \land succ(n) = \{s, t\} \land succ(n')=\{s', t'\} \land succ_T(n)=s \land succ_T(n') = s'\\
+    \implies F(s)=s', F(t) = t'
+\end{aligned}$
+\end{enumerate}
+Let $p$ be a path in $G$
+$$ p: p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_n$$
+Then its corresonding path in $G'$ is defined as follows 
+$$ p': F(p_1) \rightarrow F(p_2) \rightarrow ... \rightarrow F(p_n)$$
+
+This definition requires that the $G$ and $G'$ as isomorphic. If during the first stage of the algorithm additional nodes were inserted in the CFG
+then this will not be true. Therefore before being able to evaluate the effect on runtime the first stage of the algorithm has to be reapplied on $G$ such 
+that it is isomorphic to $G'$
+
+To evaluate the effect on runtime performance the sum of the latencies along all relevants paths in G are compared to the sum of the latencies of their corresponding paths. A relevant path is a path that starts in secret-depdendent node and ends in a final node of one of the branches. Any nodes that do not belong to such a path 
+are not affected by the algorithm and are therefore not considered in this evaluation. 
+
+    
+\section{Results}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{ l | c | c | c c c c c c }
+    Name & Effectiveness & Correct & \multicolumn{6}{c}{Performance} \\ 
+     & & & path1 & path2 & path3 & path4 & path5 & path6\\
+     \hline 
+    bsl         & Y & Y & 1.42 & 1.00 & & & &  \\ 
+    call        & Y & Y & 1.32 & 1.17 & &  & & \\  
+    call2       & Y & N & 1.25 & 1.22 & &  & & \\
+    diamond     & Y & Y & 1.35 & 1.06 & 1.06 & & &  \\ 
+    fork        & Y & Y & 1.43 & 1.15 & & & &  \\  
+    ifcompound  & Y & Y & 1.31 & 1.26 & 1.11 & 1.11 & 1.09 & 1.09  \\
+    indirect    & Y & Y & 1.44 & 1.32 & 1.20 & 1.11 & & \\ 
+    keypad      & Y & Y &  &  &  &  &  &   \\  
+    multifork   & Y & Y & 1.80 & 1.58 & 1.41 & 1.41 & &   \\
+    triangle    & Y & Y & 1.30 & 1.16 & & & &  \\
+    \end{tabular}
+    \includegraphics{}
+    \caption{experiment results. Increase in performance is expressed as a percentage increase of the sum of the latencies along the path}
+    \label{fig:experiment results }
+\end{figure}
+
+The algorithm was able to ensure the Nemesis sensitive property holds for all programs, as verified by the static analysis tool described in the previous section. 
+
+In all but one test case the algorithm had no effect on the program output. The erroneous test case contains a call to a function that modifies the global state of the program in one of its secret dependent branches. During balancing of the program this function call is copied to the other branch. Because the function call 
+has side effects the final output of the program is different. 
+
+The effect on performance ... 
