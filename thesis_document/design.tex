@@ -212,62 +212,61 @@ the node is inserted.
    \textit{subgraph} $\leftarrow$ \extractSubgraphFNName(g, v) \\  
    \textit{longestPathLengths} $\leftarrow$ \computeLongestPathFNName{subgraph, v} \\
    \ForAll{(u, v) $\in$ \edges{subgraph}}{
-   diff \leftarrow \textit{longestPathLengths}[u] - longestPathLengths[v] \\
+   diff $\leftarrow$  \textit{longestPathLengths}[u] - longestPathLengths[v] \\
    \uIf{diff $>$ 1}{
         \textit{head} $\leftarrow$ v \\ 
         \For{$i \in$ 1, 2, ..., diff-1}{
-            \FSetLatencies(node, target\_latencies)
+%            \FSetLatencies(node, target\_latencies)
             \textit{newNode} $\leftarrow$ \CreateNodeFNName{} \\
             \InsertNodeFNName{newNode, u, head} \\
             \textit{head} $\leftarrow$ newNode \\
         }
    }
    }
+   }{}
    
      \SetKwProg{ComputeLongestPathLengths}{Function}{}{}
   \ComputeLongestPathLengths{\computeLongestPathFNName{g: CFG, s: Node}}{
   dist = \{n : -1 $\vert$  n $\in$ \nodes{g} \} \\
-  dist[s] \leftarrow 0 \\
+  dist[s] $\leftarrow$  0 \\
   \ForAll{n $\in$ \topologicalorder{g}}{
     
     \ForAll{succ $\in$ \successors{n}}{
-        dist[succ] \leftarrow  \max{dist[succ], dist[n] + 1} \\
+        dist[succ] $\leftarrow$ \max{dist[succ], dist[n] + 1} \\
     }
     
   }
   \KwRet dist \\
   }
   
-    \SetKwFunction{computeImmediateDominators}{computeImmediateDominators}
-  
+   \SetKwFunction{computeImmediateDominators}{computeImmediateDominators}
   \SetKwProg{ExtractSubGraph}{Function}{}{}
   \ExtractSubGraph{\extractSubgraphFNName{g: CFG, n: Node}}{
-  \textit{immedidateDominators} \leftarrow \computeImmediateDominators{g, n} \\
-  \textit{leafDominators} \leftarrow \{ $u$ $\in$ \nodes{g} \vert $(u, v)$ \in \textit{leafDominators} $ \land $  $v$ \in \leaves{g} \} \\
+  \textit{immedidateDominators} $\leftarrow$  \computeImmediateDominators{g, n} \\
+  \textit{leafDominators} $\leftarrow$  \{ $u$ $\in$ \nodes{g} $\vert(u, v) \in$ \textit{leafDominators} $ \land v \in$ \leaves{g} \} \\
   
-  \uIf{\vert leafDominators \vert = 1}{
-    dominator \leftarrow leafDominators[0] \\
+  \uIf{$\vert$ leafDominators $\vert$ = 1}{
+    dominator $\leftarrow$  leafDominators[0] \\
   } \uElse{
-    dominator \leftarrow \varnothing \\
+    dominator $\leftarrow$  $\varnothing$ \\
   }
   
-  
-  \textit{subgraphNodes} \leftarrow [n] \\
-  \textit{adjacentNodes}  \leftarrow \successors{n} \\
-  \While{\vert adjacentNodes \vert > 0}{
-    currentNode \leftarrow adjacentNodes[0] \\
-    adjacentNodes \leftarrow adacentNodes $ \setminus $ \{currentNode\} \\
+ 
+  \textit{subgraphNodes} $\leftarrow$  [n] \\
+  \textit{adjacentNodes}  $\leftarrow$  \successors{n} \\
+  \While{$\vert$ adjacentNodes $\vert$ > 0}{
+    currentNode $\leftarrow$  adjacentNodes[0] \\
+    adjacentNodes $\leftarrow$  adacentNodes $ \setminus $ \{currentNode\} \\
     \uIf{currentNode = dominator}{
         \KwRet \textit{subgraphNodes}
         }
-    \textit{adjacentNodes} \leftarrow \textit{adjacentNodes}  $ \bigcup $ $( \successors{currentNode} \setminus \textit{adjacentNodes} )$ \\
+    \textit{adjacentNodes} $\leftarrow$  \textit{adjacentNodes}  $ \bigcup $ $( \successors{currentNode} \setminus \textit{adjacentNodes} )$ \\
   } 
   \KwRet \textit{subgraphNodes}
   }
+  
   \caption{Equalize Path Lengths}
   \label{alg:equalizePaths}
-  
-    }{}
 \end{algorithm*}
 
 \begin{algorithm*}
@@ -277,18 +276,18 @@ the node is inserted.
     \SetKwFunction{equalizeBranchesFNName}{EqualizeBranches}
 
     \equalizeBranches{\equalizeBranchesFNName{g: CFG, n: Node}}{
-    \textit{subgraph} \leftarrow \extractSubgraphFNName(g, v) \\  
-    \textit{longestPathLengths} \leftarrow \computeLongestPathFNName{subgraph, v} \\
-    \textit{maxPathLength} \leftarrow \max{$\{ longestPathLengths[v] \, \vert \,  v \in  \leaves{subgraph}\}$} \\
-    \ForAll{leaf \in \leaves{subgraph}}{
-        diff \leftarrow \textit{longestPathLengths[leaf]} - maxPathLength \\
+    \textit{subgraph} $\leftarrow$ \extractSubgraphFNName(g, v) \\  
+    \textit{longestPathLengths} $\leftarrow$ \computeLongestPathFNName{subgraph, v} \\
+    \textit{maxPathLength} $\leftarrow$ \max{$\{ longestPathLengths[v] \, \vert \,  v \in  \leaves{subgraph}\}$} \\
+    \ForAll{leaf $\in$ \leaves{subgraph}}{
+        diff $\leftarrow$ \textit{longestPathLengths[leaf]} - maxPathLength \\
         
         \uIf{diff $>$ 0}{
-                $v$ \leftarrow leaf \\
-                \For{i \in 1, 2, ..., diff}{
-                    newNode \leftarrow \CreateNodeFNName{} \\
+                $v$ $\leftarrow$ leaf \\
+                \For{i $\in$ 1, 2, ..., diff}{
+                    newNode $\leftarrow$ \CreateNodeFNName{} \\
                     \addNode{g, newNode} \\
-                    \ForAll{$p$ \in \predecessors{v}}{
+                    \ForAll{$p \in$ \predecessors{v}}{
                         \addEdge{g, (p, newNode)} \\
                         \removeEdge{g, (p, v)} \\
                     }
@@ -313,11 +312,11 @@ the node is inserted.
     \SetKwFunction{computeDistanceFromNode}{ComputeDistanceFromNode}
     
     \alignCFG{\alignCFGFNName{g: CFG, n: Node}}{
-    subgraph \leftarrow \extractSubgraphFNName{g, v} \\
-    pathLengths \leftarrow \computeDistanceFromNode{subgraph, v} \\
-    levels \leftarrow \{ l \; \vert \; u \in \nodes{subgraph} \land pathLengths[u] = l \} \\
-    \ForAll{l \in levels}{
-        levelNodes \leftarrow \{ u \; \vert \; u \in \nodes{subgraph} \land pathLengths[u] = l \} \\
+    subgraph $\leftarrow$ \extractSubgraphFNName{g, v} \\
+    pathLengths $\leftarrow$ \computeDistanceFromNode{subgraph, v} \\
+    levels $\leftarrow$ \{ l $\; \vert \; u \in$ \nodes{subgraph} $\land$ pathLengths[u] = l \} \\
+    \ForAll{l $\in$ levels}{
+        levelNodes $\leftarrow$ \{ $u \; \vert \; u \in$ \nodes{subgraph} $\land$ pathLengths[u] = l \} \\
         \alignNodesFNName{subraph, levelNodes} \\
     }
     }
@@ -335,23 +334,23 @@ the node is inserted.
     \SetKwFunction{insertInstruction}{insertInstruction}
     
     \alignNodes{\alignNodesFNName{g: CFG, ns : NodeSet}}{
-    index \leftarrow 0 \\ 
+    index $\leftarrow$ 0 \\ 
     \While{True}{
-        nodeLengths \leftarrow \{ node: \countInstruction{node} \; | \; node \in \nodes{g} \} \\
-        candidates \leftarrow \{n \; | \;  n \in \nodes{g} \land  nodeLengths[n] = \max{nodeLengths} \} \\
-        referenceNode \leftarrow \selectReferenceNode{candidates} \\
-        referenceInstruction \leftarrow \getNodeInstruction{referenceNode, index} \\
+        nodeLengths $\leftarrow$ \{ node: \countInstruction{node} $\; \vert \;$ node $\in$ \nodes{g} \} \\
+        candidates $\leftarrow$ \{n $\; \vert \;  n \in$ \nodes{g} $\land$  nodeLengths[n] = \max{nodeLengths} \} \\
+        referenceNode $\leftarrow$ \selectReferenceNode{candidates} \\
+        referenceInstruction $\leftarrow$ \getNodeInstruction{referenceNode, index} \\
         
-        \ForAll{node \in \{n \vert n \in \nodes{g} \land n $\neq$ referenceNode \}}{
-            \uIf{index $<$ nodeLength[node] \; \land \;  \latency{\getNodeInstruction{node, index}} = \latency{referenceInstruction}}{
+        \ForAll{node $\in$ \{n $\vert$ n $\in$ \nodes{g} $\land$ n $\neq$ referenceNode \}}{
+            \uIf{index $<$ nodeLength[node] $\; \land \;$  \latency{\getNodeInstruction{node, index}} = \latency{referenceInstruction}}{
                 continue
             }
             \uIf{\isBranch{referenceInstruction}}{
-                newInstruction \leftarrow \getBranchInstruction{}\\ 
+                newInstruction $\leftarrow$ \getBranchInstruction{}\\ 
                 \insertInstruction{node, newInstruction} \\
             } \uElse{
-                reg \leftarrow \selectRegister{} \\ 
-                newInstruction \leftarrow \getNOPInstruction{\latency{referenceInstruction}, reg} \\ 
+                reg $\leftarrow$ \selectRegister{} \\ 
+                newInstruction $\leftarrow$ \getNOPInstruction{\latency{referenceInstruction}, reg} \\ 
                 \insertInstruction{node, newInstruction} \\
             }
         }    
@@ -362,9 +361,9 @@ the node is inserted.
     \SetKwFunction{selectReferenceNodeFNName}{SelectReferenceNode}
 
     \selectReferenceNode{\selectReferenceNodeFNName{candidates: NodeSet, index: Integer}}{
-        \For{n \in candidates}{
-            candidateInstruction \leftarrow \getNodeInstruction{n, index} \\
-            \uIf{\lnot (\isBranch{candidateInstruction} \lor \isReturn{candidateInstruction}) }{
+        \For{n $\in$ candidates}{
+            candidateInstruction $\leftarrow$ \getNodeInstruction{n, index} \\
+            \uIf{$\lnot$ (\isBranch{candidateInstruction} $\lor$ \isReturn{candidateInstruction}) }{
                 \KwRet n \\
             }
         }

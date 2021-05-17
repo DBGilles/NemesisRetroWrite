@@ -6,7 +6,7 @@
 [X] support for function calls (?)
 [X]  figure out when/where cycles should be removed/replaced etc.
 [X] clean up code -- ook zeker file structure, notebooks etc.
-5.  !!! zie multifork -- merge inserted nodes gebeurt daar niet correct !!!
+[X]  !!! zie multifork -- merge inserted nodes gebeurt daar niet correct !!!
 6.  insert push and pop before/after instruction (at all nodes in level)
 7.  improve design section writing + implementation section
     - something about function calls
@@ -21,13 +21,13 @@
 #########
 - subraph function is has been modified -- adjust text
 - _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
-- balancing with multiple targets -- adjust text (for each targer, first insert nodes, then align for each node, etc. ..)
+- balancing with multiple targets -- adjust text (for each target, first insert nodes, then align for each node, etc. ..)
 - iets over feit dat vinden van secret depdendent branches out of scope is
 - static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
     if depths are not the same then some set will be
 - introduce consistent wording -- use it everywhere in the text
     balanced program or aligned program or modified program or .... (kies 1, wees consistent)
-- bij alle test inputs verifieren dat alle paths in control flow covered zijn
+-
 
 ############
 # planning #
@@ -53,3 +53,28 @@ week 31/05 - complete final draft, submit thesis (vrijdag)
     - cant support cycles
     - something about function calls
     - determining which branches are secret-dependent is out of scope -- we asume this is supplied as input
+
+###########
+# Section #
+###########
+Design section
+    - iets over function calls
+    - iets over cycles
+    - modify design section when multiple target (nodes or instructions) exist
+            -> first nodes are inserted so that each target is balanced, then all nodes are aligned)
+    - vinden van secret dependent nodes is out of scope
+    - subgraph function is aangepast geweest (niet langer een breadth first search)
+    - _select register is ook aangepast
+    - meer info over 'select register' of leg dit allesinds beter uit
+Evaluation section
+    - alle programma's toevoegen van beetze.de benchmark suite
+    - verzamalen data
+    - schrijven van evaluation
+    -static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
+    if depths are not the same then some set will be
+    - bij alle test inputs verifieren dat alle paths in control flow covered zijn
+
+Implementation section
+    - implemented using retrowrite framework
+    - latency information used from agner fog en uops.info
+    -
