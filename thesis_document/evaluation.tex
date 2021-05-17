@@ -2,14 +2,14 @@
 \chapter{Evaluation}
 \section{Benchmark Suite}
 Winderix et. al. have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
-collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources [2]. 
+collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources \cite{WinderixHans}. 
 To evaluate the proposed algorithm a subset of this benchmark suite was selected. 
 
 All programs that contain loops inside vulnerable branches were discarded from the synthetic programs in the benchmark suite, 
 since they are not supported by the proposed algorithm. 
 The original authors of the Nemesis attack provide two case studies to demonstrate their attack. 
 The first case study is a password comparison routine from the Texas Instruments MSP430 Bootstrap Loader (BSL). 
-The second case study is secure keypad application that guarantees secrecy of its PIN code [3].
+The second case study is secure keypad application that guarantees secrecy of its PIN code \cite{Nemesis}.
 Both of these are included in the benchmark suite created by Winderix et. al and are also selected as a benchmark for the proposed algorithm. 
 
 The implementation of Nemesis and the benchmark suite created by Winderix et. al are implemented for the Sancus environment. Any pieces of code specific to this

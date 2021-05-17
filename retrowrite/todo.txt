@@ -78,3 +78,6 @@ Implementation section
     - implemented using retrowrite framework
     - latency information used from agner fog en uops.info
     -
+
+misc
+    - bibliography
