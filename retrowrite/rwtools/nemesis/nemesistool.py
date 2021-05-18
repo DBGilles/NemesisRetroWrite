@@ -65,6 +65,8 @@ def get_nop_v2(target_lat):
         return "or -0x4(%rbp), {}", 1
     elif target_lat == 7:
         return "adc -0x4(%rbp), {}", 1
+    elif target_lat == 8:
+        return "imull (%rcx, %rsi, 4), {}", 1
     else:
         raise RuntimeError(f"unkown latency {target_lat}")
 

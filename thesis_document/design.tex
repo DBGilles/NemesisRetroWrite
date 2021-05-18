@@ -1,18 +1,33 @@
 
-%\chapter{Design}
+\chapter{Design}
 \label{cha:design}
 
 \section{Introduction}
-This section outlines the approach to mitigate Nemesis style attacks. The cause of the vulnerability exposed by Nemesis-style attacks are differences in 
-latency traces. Attackers are able to look at the differences in these latency traces and infer which secret-dependent branches were taken by the program, 
-leaking information from the program. The algorithm outlined in this section aims to prevent this by aligning the latency traces along various paths by 
-inserting additional instructions into corresponding nodes of two different branches, ensuring that there are no differences that can leak information. 
 
-The proposed algorithm performs a number of operations on a programs Control Flow Graph (CFG). The two main operations are the insertion of additional nodes into the graph and the alignment of a set of nodes. 
-Because not all CFG structures are suitable for alignment the first stage of the algorithm inserts nodes into the graph to ensure alignment is possible. The second stage consists of alignment corresponding nodes 
-in the graph. 
+The root cause of the vulnerability exposed by Nemesis-style attacks are differences in the latencies of two instruction that occur at the same 
+position in two branches of a secret-dependent branching instruction. 
+In practice an attacker can exploit this vulnerability by generating latency traces along different paths of the program's control flow. 
+Any differences in instruction latencies will be reflected as differences in these latency traces. 
+By carefully inspecting the relevant sections of the latency traces the attacker can infer which paths were taken for a given input. 
+In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information. 
 
-Section \ref{sec:property} will define the property that needs to hold for a program in order for Nemesis-style attacks to be mitigated. Section \ref{sec:cfg} introduces the CFG data structure and translates the aforementioned property to such CFG structures. Finally, sections \ref{seq:equalising} and \ref{seq:alignment} describe the insertion and alignment of nodes, respectively. 
+The goal of the algorithm outlined in this section is to ensure that latency traces cannot be used to leak information in this way.
+It does this by inserting additional instructions into branches of a secret-dependent branching instruction. These instructions 
+are carefully selected such that they have the same latency as their corresponding instruction in the other branch. This ensures that
+any instructions that occur at the same position in two different branches have the same latency. As a result the sections of latency traces
+that correspond to these branches will be identical, making it impossible for an attacker to infer information. 
+
+
+The proposed algorithm inserts additional instructions into the program through manipulation of the program's control flow graph. 
+This graph consists of nodes and vertices, where each node contains a sequence of instructions. 
+One of the main operations performed on the graph is the alignment of a set of nodes. 
+This operation inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
+
+Not all structures found in a control flow graph are suitable for alignment. The aforementioned alignment operation therefore has some conditions on the structure of the control flow graph that need to be met. 
+The other main operation of the algorithm therefore consists of inserting additional nodes into the graph such that these conditions are met. 
+
+Section \ref{sec:property} will formally define the property that needs to hold for a program in order for Nemesis-style attacks to be mitigated. Section \ref{sec:cfg} 
+introduces the CFG data structure and translates the aforementioned property to such structures. Finally, sections \ref{seq:equalising} and \ref{seq:alignment} describe the insertion and alignment of nodes, respectively. 
 
 \section{Nemesis-sensitive property}\label{sec:property}
 In their paper Pouyanrad et. al have formally defined the Nemesis-Sensitive property.  Let $region^{then}(ep)$ and $region^{else}(ep)$ capture the set of execution points belonging to the branch target and the other region of some branching instruction $ep$. Let $ep^i$ be the i'th instruction in a region. A program P with a secret-dependence branch in $ep$ and $region^{then}(ep)$ 
@@ -25,15 +40,18 @@ and region $region^{else}(ep)$ with the same number of execution points, satisfi
     \end{split}
 \end{equation}
 \cite{MSP430Detection}
+
 The relation $s \xrightarrow[]{t} s'$ models the transition between program states $s$ and $s'$, declaring that the transition between $s$ and $s'$ takes a time $t$. 
 For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions in the branches their latencies should be the same.
 
 If this nemesis-sensitive property holds for a program then an attacker is not able to infer which branch was taken by the program based on instruction latencies.
 
 \section{CFG}\label{sec:cfg}
+
 The Control Flow Graph (CFG) is a data structure that represents the control flow of a program. A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a 
-contiguous sequence of instructions. Any branching instruction can only occur at the end of such a sequence, and an instruction that is the target of 
-of a branching sequence can only occur at the start. 
+contiguous sequence of instructions that is always executed as a whole. This implies that any branching instruction can only occur at the end of a node, 
+and an instruction that is the target of a branching sequence can only occur at the start. 
+
 An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ 
 when following program control flow. The algorithm only considers branching instructions that are binary in nature, so a node in the CFG can have at most 2 successors. 
 By construction of this data structure a branching instruction will always be the last instruction in a node. A node is said to be secret-dependent if its last instructions is a 
@@ -74,7 +92,11 @@ int main(){
 
 Following the property described in section \ref{eq:nemesisProperty}, the nemesis-sensitive property can be defined for a node in the CFG. Let $v$ be a secret-dependent node. 
 Let $v_f$ be a node such that all paths from $v$ to some leaf go through $v_f$. Then $region^{then}(v)$ can be defined as the set of nodes reachable following the 
-first of $v$'s outgoing edges up to and including $v_f$ and $region^{else}(v)$ as the set of nodes reachable following the other outgoing edge up to and including $v_f$. Any differences in latencies between two nodes that are descendants of $v_f$ cannot be used to infer information about the secret dependent node $v$. All nodes below $v_f$ therefore do not have to be considered. If no such node $v_f$ exists then the regions simply consists of all nodes reachable from $v$ through one of its outgoing edges. 
+first of $v$'s outgoing edges up to and including $v_f$ and $region^{else}(v)$ as the set of nodes reachable following the other outgoing edge up to and including $v_f$.
+
+Any differences in the latency sequences of two nodes can only be used to infer which branch was taken at the nearest branching point that is an ancestor of both nodes. 
+Any differences in latencies between two nodes that are descendants of $v_f$ can therefore only be used to infer information about which branch was taken at $v_f$. 
+This means that all nodes below $v_f$ do not have to be considered. If no such node $v_f$ exists then the regions simply consists of all nodes reachable from $v$ through one of its outgoing edges. 
 
 Let $n^i \in region(v)$ be a node such that there is a path going to it from node $v$ of length $i$. The depth of $region(v)$ is defined as being the length of the longest path from $v$ to some node $v' \in region(v)$ that does not contain a cycle.
 
@@ -85,9 +107,11 @@ A secret-dependent node $v$ and $region^{then}(v)$ and $region^{else}(v)$ with t
     latencies(n^i) = latencies(n^j)
     \end{split}
 \end{equation}
-where $latencies(n)$ is a function mapping a node $n$ to its latency sequence. 
+where $latencies(n)$ is a function mapping a node $n$ to its latency sequence. This property states that the latency sequence of any two nodes that are the same distance away 
+from some secret-dependent node need to have identical latency sequences. If this property holds then the critical sections of latency traces will be identical and cannot be used to 
+infer information about the secret-dependent branch. 
 
-Figure \ref{fig:regionExamples} illustrates how the borders of each region is defined. The secret-dependent node is marked in green, while the two branches are marked in red and blue. In the second example, the node marked in purple belongs to both regions. In example \ref{fig:regionExampleA} there is node node such that all paths from the secret-dependent node to a leaf go through it, so the regions extend all the way to the leaves. In example \ref{fig:regionExampleB} all paths that start in the secret-dependent node go through the node 6. Any differences in nodes 7 and 8 can only be used to infer information about the branch in node 6. These nodes therefore do not have to be considered.  
+Figure \ref{fig:regionExamples} illustrates how the borders of each region are defined. The secret-dependent node is marked in green, while the two branches are marked in red and blue. In the second example, the node marked in purple belongs to both regions. In example \ref{fig:regionExampleA} there is node node such that all paths from the secret-dependent node to a leaf go through it, so the regions extend all the way to the leaves. In example \ref{fig:regionExampleB} all paths that start in the secret-dependent node go through the node 6. Any differences in nodes 7 and 8 can only be used to infer information about the branch in node 6. These nodes therefore do not have to be considered.  
 
 
 \begin{figure}
@@ -100,21 +124,43 @@ Figure \ref{fig:regionExamples} illustrates how the borders of each region is de
 \end{figure}
 
 \section{Equalising}\label{seq:equalising}
-There are 2 structures commonly found in a program's control flow graph that make it impossible to enforce the nemesis-sensitive property for a node as defined in the previous section, 
-shown in figure \ref{fig:problemStructures}.  Before aligning the nodes an equalising step is applied to ensure these structures are do not occur in the CFG. 
+There are 2 structures found in a program's control flow graph that make it impossible to enforce the nemesis-sensitive property for a node as defined in the previous section. 
+These structures are shown in figure \ref{fig:problemStructures}.  
+The first stage of the algorithm consists of inserting nodes such that these structures no longer occur. 
 
-\subsection{Problematic structure}
-The first such structure occurs when the program contains some sequence of instructions that is only executed if some condition is true.
-In this structure there will be some node that has two paths to it of different lengths. One path will contain the node that corresponds to the conditional instructions, while the other path will 
-not contain this node. Because the paths have some overlapping nodes and because the paths have different lengths it is impossible to equalize their latency traces by inserting additional instructions, since inserting instructions in one of the paths will also insert instructions into the other path. If these paths start at a secret-dependent node it is therefore impossible to 
-ensure that the nemesis-sensitive property holds. 
+The first such structure occurs when the program contains some sequence of instructions that is only executed if some condition is true and is illustrated in fig \label{fig:optional}.
+In such a CFG there will be some node that has two paths to it from the root where the paths have different lengths. 
+One path will contain the node that corresponds to the conditional instructions, while the other path will not.
+
+In such cases it is impossible to equalize the latency traces of the two paths. Because the paths have different lengths one of the latency traces will always be 
+longer than the other one. Additionally, because all nodes in the shorter path are also nodes in the longer path it is impossible to modify the shorter path without also
+modifying the longer path. Any attempts to lengthen the shorter path therefore also lengthen the longer path. If these paths start at a secret-dependent node it is 
+impossible to ensure that the nemesis-sensitive property holds. 
 
 The second problematic structure occurs when one of the branches is shorter than the other one, as shown in figure \label{fig:unequal}. In such cases there will be some nodes in 
 one branch that have no corresponding nodes in the other branch, making it impossible to align them. 
 
 The nemesis-sensitive property as defined in section \ref{eq:nemesisPropertyNode} entails that it is impossible for a node to satisfy the property if one of these 
-structures occurs in its branches, since in both cases the regions have different depths. The first stage of the algorithm therefore consists of first equalizing all path lengths and then 
-equalizing branches. Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict pseudo-code for equalizing paths lengths and equalizing branches respectively. 
+structures occurs in its branches, since in both cases the regions have different depths. 
+The first stage of the algorithm therefore consists of first equalizing all path lengths and then 
+equalizing branches. 
+Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict pseudo-code for equalizing paths lengths and equalizing branches respectively. 
+
+\subsection{Extract Sub-graph}
+The different procedures described in this section only need to take into account the branches of secret dependent nodes. 
+These branches correspond to the regions $region_{then}(v)$ and $region_{else}(v)$ as defined in section \ref{sec:cfg}.
+The procedure \textit{ExtractSubgraph}, shown in \ref{alg:equalizePaths}}, extracts the subset of the graph that contains only the nodes that belong to either one of these regions for a given secret-dependent node. 
+The edges of this new CFG are all the edges of the original CFG whose head and tail are a part of this subset. 
+
+To determine which nodes are a part of this subgraph all immediate dominators are determined starting from node $n$. 
+A node $u$ is said to dominate another node $w$ with respect to $n$ if every path from $n$ to $w$ passes through 
+$u$. 
+Node $v$ is the immediate dominator of $w$ if $v$ dominates $w$ and every other dominator of $w$ dominates $v$ \cite{dominator}.
+The immediate dominator is determined for each node reachable from $n$. If all leaves reachable from $n$ have the same immediate dominator $d$ then all paths from $n$ to some leaf go through $d$. 
+In this case any descendants of $d$ are not part of $region_{then}(v)$ or $region_{else}(v)$ and do not have to be included in the sub-graph. 
+
+If such a node $d$ exists then the nodes that are a part of the sub-graph are all nodes that are on a path from $n$ to $d$. If $d$ does not exists 
+the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
 
 \subsection{Equalize paths}
 To equalize all path lengths starting from some secret-dependent node $v$, first a subset of the graph's nodes are extracted such that 
@@ -122,7 +168,7 @@ only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered. This 
 current node dominates all of the leaves reachable from $n$. By definition all paths between $n$ and a leaf will pass through this node, in which case the 
 any of the following nodes no dot have to be considered. Next the length of the longest path is computed  from $v$ to all nodes in the sub-graph. 
 If there exists edges such that the length of the longest path to the tail and the length of the longest path to the head differ by more than one then 
-there are at least 2 paths to the head of different lengths. In this case additional nodes are inserted between the tail and the head to equalize these path lengths. 
+there are at least two paths to the head of different lengths. In this case additional nodes are inserted between the tail and the head to equalize these path lengths. 
 
 \subsection{Equalize branches}
 The branches of a CFG can be equalized in a similar way. Given some secret-dependent node $v$ a subset of the graph's nodes are extracted. 
@@ -240,6 +286,7 @@ the node is inserted.
   }
   
    \SetKwFunction{computeImmediateDominators}{computeImmediateDominators}
+   \SetKwFunction{computeAllPaths}{computeAllPaths}
   \SetKwProg{ExtractSubGraph}{Function}{}{}
   \ExtractSubGraph{\extractSubgraphFNName{g: CFG, n: Node}}{
   \textit{immedidateDominators} $\leftarrow$  \computeImmediateDominators{g, n} \\
@@ -251,18 +298,22 @@ the node is inserted.
     dominator $\leftarrow$  $\varnothing$ \\
   }
   
- 
-  \textit{subgraphNodes} $\leftarrow$  [n] \\
-  \textit{adjacentNodes}  $\leftarrow$  \successors{n} \\
-  \While{$\vert$ adjacentNodes $\vert$ > 0}{
-    currentNode $\leftarrow$  adjacentNodes[0] \\
-    adjacentNodes $\leftarrow$  adacentNodes $ \setminus $ \{currentNode\} \\
-    \uIf{currentNode = dominator}{
-        \KwRet \textit{subgraphNodes}
-        }
-    \textit{adjacentNodes} $\leftarrow$  \textit{adjacentNodes}  $ \bigcup $ $( \successors{currentNode} \setminus \textit{adjacentNodes} )$ \\
-  } 
-  \KwRet \textit{subgraphNodes}
+  \textit{subgraphNodes} $\leftarrow$  \{ \} \\
+  \uIf{domintor $\neq \varnothing$}{
+  	\ForAll{$path \in$ \computeAllPaths{g, n, dominator}}{
+  		$subgraphNodes \leftarrow subgraphNodes \cup (\{ p \vert p \in path \} \setminus subraphNodes)$
+  	}
+  } \uElse{
+    \ForAll{l $\in$ \leaves{g}}{
+        \ForAll{$path \in$ \computeAllPaths{g, l, dominator}}{
+  		$subgraphNodes \leftarrow subgraphNodes \cup (\{ p \vert p \in path \} \setminus subraphNodes)$
+  	}
+    }
+  }
+  
+  $subgraphEdges \leftarrow \{ (u, v) \vert u \in subgraphNodes \land v \in subgraphNodes \land (u, v) \in $ \edges{g} $\}$
+
+	\KwRet $(subgraphNodes, subgraphEdges)$
   }
   
   \caption{Equalize Path Lengths}
