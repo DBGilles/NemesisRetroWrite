@@ -52,13 +52,11 @@
 # Sections #
 ############
 Design section
-    - iets over function calls
+    - iets over function calls (einde subsection NOP instructions -- moet uitgebreider)
     - iets over cycles
     - modify design section when multiple target (nodes or instructions) exist
             -> first nodes are inserted so that each target is balanced, then all nodes are aligned)
     - vinden van secret dependent nodes is out of scope
-    - _select register is ook aangepast
-    - meer info over 'select register' of leg dit allesinds beter uit
     - ergens aangeven dat return en jumps speciaal behandeld worden (i.e. latency -1)
     - stuk over selecteren van reference node moet beter, uitgebreider (misschien met voorbeelden om duidelijk te maken wat de regels juist zijn)
         i.e. de verschillend mogelijke cases, en hoe dit leidt tot de regel
@@ -77,19 +75,3 @@ Implementation section
 
 misc
     - bibliography
-
-############
-# vanavond #
-############
-- design verder afwerken vanaf create subgraph
-    - iets over cycles
-    - iets over function calls
-    - _select register is ook aangepast
-    - meer info over 'select register' of leg dit allesinds beter uit
-- alle programmas toevoegen van beetze.de + verzamelen data + finalize inputs for tests
-
-##########
-# morgen #
-##########
-- second draft evaluation
-- conclusion?

@@ -183,6 +183,13 @@ The procedure then iterates over all leaves in the sub-graph and determines the 
 If this difference is larger than zero then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
 path length. Because the final instruction in a leaf is a return statement any new nodes have to be added as predecessors. 
 
+\subsection{Cycles}
+\textbf{Is this section necessary? technically cycles aren't an issue when it comes to equalizing paths and branches, they are removed as part of my concrete implementation}
+The aforementioned operations do not work if there are cycles in the CFG. Before equalizing paths and branches all cycles are removed from the CFG. 
+To remove a cycle the depth for each node in the cycle is determined. The depth of a node is equal to the length of the longest path to the node. The edge 
+that connects the deepest node to the most shallow node is removed from the graph to make the graph acyclic. Once all paths and branches are equalize the edge can then 
+be re-inserted to restore the cycle. 
+
 \begin{figure}
  \centering
  \subfloat[optional node]{\includegraphics[height = 6cm]{images/optional.png}\label{fig:optional}}
@@ -241,12 +248,15 @@ If a register of the first type exists then it can be used as the operand of the
 can be inserted as-is into the node. If no such registers exists, a free register of the second type is selected. 
 In this case additional instructions are inserted into the program to ensure that the original value of the register is not lost. 
 In the root of the CFG additional instructions are inserted to push the register value onto the stack, while in every leaf instructions are inserted 
-that pop the value from the stack. 
+that pop the value from the stack. Once these instructions have been inserted the register effectively becomes a free register of the first type and can 
+later be reused when construction additional NOP instructions.
 
 If there are no free registers available, any register is arbitrarily selected. Additional instructions are inserted before and after the NOP instruction to push and pop the register value. To ensure the nodes are 
 still balanced these push and pop instructions are inserted across all nodes of the current level. 
 
 If the reference instruction is a branching instruction the the NOP instruction will also be a branching instruction. The target of the branching instruction is then the address of the first instruction of the node's successors. 
+
+If the reference instruction is a call to a function then the NOP instruction will be a function call to the same function.
 
 \begin{algorithm*}
   \SetAlgoLined

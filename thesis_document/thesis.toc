@@ -25,11 +25,11 @@
 \contentsline {subsection}{\numberline {2.4.1}Extract Sub-graph}{7}%
 \contentsline {subsection}{\numberline {2.4.2}Equalize paths}{7}%
 \contentsline {subsection}{\numberline {2.4.3}Equalize branches}{8}%
+\contentsline {subsection}{\numberline {2.4.4}Cycles}{8}%
 \contentsline {section}{\numberline {2.5}Alignment}{8}%
 \contentsline {subsection}{\numberline {2.5.1}Basic Operation}{9}%
 \contentsline {subsection}{\numberline {2.5.2}Selecting the Reference Node}{9}%
 \contentsline {subsection}{\numberline {2.5.3}Constructing NOP instruction}{10}%
-\contentsline {subsection}{\numberline {2.5.4}branching instructions}{10}%
 \contentsline {chapter}{\chapternumberline {3}Implementation}{15}%
 \contentsline {chapter}{\chapternumberline {4}Evaluation}{17}%
 \contentsline {section}{\numberline {4.1}Benchmark Suite}{17}%
