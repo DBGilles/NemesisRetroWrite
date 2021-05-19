@@ -346,7 +346,7 @@ keypad_init:
 keypad_poll:
 .L1200:
 .LC1200:
-pushq %r13
+pushq %rbx
 	pushq %rbp
 .LC1201:
 	movq %rsp, %rbp
@@ -413,52 +413,52 @@ jmp .R440
 .L128d:
 .LC128d:
 .L5:
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
 add $0, %rax
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
 add $0, %rax
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
 add $0, %rax
-or -0x4(%rbp), %r13
+or -0x4(%rbp), %rbx
 jmp .R440
 .L4:
-or -0x4(%rbp), %r13
+or -0x4(%rbp), %rbx
 jmp .R592
 .R592:
 .L3:
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
 add $0, %rax
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
 add $0, %rax
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
 add $0, %rax
-or -0x4(%rbp), %r13
+or -0x4(%rbp), %rbx
 jmp .R440
 .L2:
-or -0x4(%rbp), %r13
+or -0x4(%rbp), %rbx
 jmp .R586
 .R586:
 .L1:
-or -0x4(%rbp), %r13
+or -0x4(%rbp), %rbx
 jmp .R34
 .R34:
 .L0:
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
 add $0, %rax
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
 add $0, %rax
-movq -0x4(%rbp), %r13
-movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %rbx
+movq -0x4(%rbp), %rbx
 add $0, %rax
-or -0x4(%rbp), %r13
+or -0x4(%rbp), %rbx
 jmp .R495
 .R495:
 .R440:
@@ -490,7 +490,7 @@ jmp .R495
 	addq $0x20, %rsp
 .LC12c0:
 	popq %rbp
-popq %r13
+popq %rbx
 .LC12c1:
 	retq 
 .size keypad_poll,.-keypad_poll

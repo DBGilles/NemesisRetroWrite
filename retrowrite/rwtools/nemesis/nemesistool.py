@@ -1,4 +1,5 @@
 import pickle
+import re
 from enum import Enum
 
 import networkx as nx
@@ -66,7 +67,9 @@ def get_nop_v2(target_lat):
     elif target_lat == 7:
         return "adc -0x4(%rbp), {}", 1
     elif target_lat == 8:
-        return "imull (%rcx, %rsi, 4), {}", 1
+        return "imulq (%rcx, %rsi, 4), {}", 1
+    elif target_lat == 28:
+        return "idivl {}", 1
     else:
         raise RuntimeError(f"unkown latency {target_lat}")
 
@@ -306,7 +309,12 @@ class NemesisInstrumentFunction:
                 else:
                     # otherwise determine what to do
                     selected_register, reg_type = self._select_register(node, it)
-
+                    # TODO: registers need to be modified based on expected type of instruction
+                    if "idivl" in dummy_instruction:
+                        # r9, r10,  ... becomes r9d, r10d, ...
+                        if re.compile("r[0-9]+").fullmatch(selected_register):
+                            print(selected_register)
+                            selected_register += "d"
                     reg = n_args * [f"%{selected_register}"]
 
                     # insert instruction into node

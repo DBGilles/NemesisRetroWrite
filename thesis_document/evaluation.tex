@@ -32,9 +32,9 @@ The second metric aims to measure the correctness of the algorithm. The algorith
 These values were supplied as inputs to both the original program and the balanced program, generating two output values. The output values were then compared to 
 verify that the algorithm correctly modified the program without changing the output. 
 
-The effect on the program's performance is evaluated by measuring the increase in the sum of the latencies along corresponding paths 
-in the control flow of the original program and the balanced program. To this end the CFGs are constructed from the original binary as well as from the balanced binary.
-To determine for a path in the original CFG what its corresponding path is in the modified CFG a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
+The effect on the program's performance is evaluated by measuring the increase in the sum of the latencies along paths in the programs CFG. 
+To measure this increase CFG are constructed from the original binary and from the modified binary. 
+For each path in the original CFG its corresponding path in the modified CFG is determined. TO do so a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
 This mapping takes into account the condition of a branching instruction, and can be defined inductively. 
 The root of the original CFG is mapped to the root of the root of the balanced CFG. 
 If two nodes are mapped and they both have one successor then their successors are mapped. 
@@ -61,7 +61,7 @@ $$ p: p_1 \rightarrow p_2 \rightarrow ... \rightarrow p_n$$
 Then its corresonding path in $G'$ is defined as follows 
 $$ p': F(p_1) \rightarrow F(p_2) \rightarrow ... \rightarrow F(p_n)$$
 
-This definition requires that the $G$ and $G'$ as isomorphic. If during the first stage of the algorithm additional nodes were inserted in the CFG
+This definition requires that $G$ and $G'$ are isomorphic. If during the first stage of the algorithm additional nodes were inserted in the CFG
 then this will not be true. Therefore before being able to evaluate the effect on runtime the first stage of the algorithm has to be reapplied on $G$ such 
 that it is isomorphic to $G'$
 
@@ -71,31 +71,38 @@ are not affected by the algorithm and are therefore not considered in this evalu
     
 \section{Results}
 
+The results of the experiments are summarized in figure \ref{fig:experiment results}. 
+The results show that  the algorithm was able to ensure the Nemesis sensitive property holds for all programs, as verified by the static analysis tool described in the previous section. 
+
+In all but one test case the algorithm had no effect on the program output. 
+The erroneous test case contains a call to a function that modifies the global state of the program in one of its secret dependent branches. 
+During balancing of the program this function call is copied to the other branch. 
+Because the function call has side effects the final output of the program is different. 
+
+
+The effect on performance ... 
+
 \begin{figure}
     \centering
     \begin{tabular}{ l | c | c | c c c c c c }
     Name & Effectiveness & Correct & \multicolumn{6}{c}{Performance} \\ 
      & & & path1 & path2 & path3 & path4 & path5 & path6\\
      \hline 
-    bsl         & Y & Y & 1.42 & 1.00 & & & &  \\ 
+
     call        & Y & Y & 1.32 & 1.17 & &  & & \\  
     call2       & Y & N & 1.25 & 1.22 & &  & & \\
     diamond     & Y & Y & 1.35 & 1.06 & 1.06 & & &  \\ 
     fork        & Y & Y & 1.43 & 1.15 & & & &  \\  
     ifcompound  & Y & Y & 1.31 & 1.26 & 1.11 & 1.11 & 1.09 & 1.09  \\
     indirect    & Y & Y & 1.44 & 1.32 & 1.20 & 1.11 & & \\ 
-    keypad      & Y & Y &  &  &  &  &  &   \\  
+
     multifork   & Y & Y & 1.80 & 1.58 & 1.41 & 1.41 & &   \\
     triangle    & Y & Y & 1.30 & 1.16 & & & &  \\
-    sharevalue  & Y & Y & 1.25 & 1.0 & & & &  \\
+  	\hline
+  	bsl         & Y & Y & 1.42 & 1.00 & & & &  \\ 
+	keypad      & Y & Y & 1.67 & 1.55 & 1.45 & 1.02 & 1.12 &   \\  
+%    sharevalue  & Y & Y & 1.25 & 1.0 & & & &  \\
     \end{tabular}
     \caption{experiment results. Increase in performance is expressed as a percentage increase of the sum of the latencies along the path}
-    \label{fig:experiment results }
+    \label{fig:experiment results}
 \end{figure}
-
-The algorithm was able to ensure the Nemesis sensitive property holds for all programs, as verified by the static analysis tool described in the previous section. 
-
-In all but one test case the algorithm had no effect on the program output. The erroneous test case contains a call to a function that modifies the global state of the program in one of its secret dependent branches. During balancing of the program this function call is copied to the other branch. Because the function call 
-has side effects the final output of the program is different. 
-
-The effect on performance ... 
