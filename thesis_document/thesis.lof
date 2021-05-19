@@ -14,9 +14,10 @@
 \babel@toc {english}{}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Example program with corresponding CFG\relax }}{3}%
-\contentsline {figure}{\numberline {1.3}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{4}%
-\contentsline {figure}{\numberline {1.5}{\ignorespaces problematic structures in CFG\relax }}{6}%
+\addvspace {10pt}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Example program with corresponding CFG\relax }}{5}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{6}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces problematic structures in CFG\relax }}{8}%
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {3.1}{\ignorespaces experiment results. Increase in performance is expressed as a percentage increase of the sum of the latencies along the path\relax }}{17}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces experiment results. Increase in performance is expressed as a percentage increase of the sum of the latencies along the path\relax }}{19}%

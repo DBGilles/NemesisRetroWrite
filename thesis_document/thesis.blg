@@ -9,45 +9,45 @@ A level-1 auxiliary file: conclusion.aux
 The style file: abbrv.bst
 Database file #1: references.bib
 Warning--empty booktitle in WinderixHans
-You've used 3 entries,
+You've used 4 entries,
             2118 wiz_defined-function locations,
-            525 strings with 4593 characters,
-and the built_in function-call counts, 1155 in all, are:
-= -- 116
-> -- 54
+            531 strings with 4741 characters,
+and the built_in function-call counts, 1497 in all, are:
+= -- 149
+> -- 67
 < -- 1
-+ -- 21
-- -- 18
-* -- 64
-:= -- 183
-add.period$ -- 11
-call.type$ -- 3
-change.case$ -- 18
++ -- 27
+- -- 22
+* -- 93
+:= -- 239
+add.period$ -- 14
+call.type$ -- 4
+change.case$ -- 23
 chr.to.int$ -- 0
-cite$ -- 4
-duplicate$ -- 60
-empty$ -- 89
-format.name$ -- 18
-if$ -- 260
+cite$ -- 5
+duplicate$ -- 71
+empty$ -- 118
+format.name$ -- 22
+if$ -- 330
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 3
-newline$ -- 18
-num.names$ -- 6
-pop$ -- 25
+int.to.str$ -- 4
+missing$ -- 4
+newline$ -- 23
+num.names$ -- 8
+pop$ -- 28
 preamble$ -- 1
-purify$ -- 15
+purify$ -- 19
 quote$ -- 0
-skip$ -- 46
+skip$ -- 54
 stack$ -- 0
-substring$ -- 33
-swap$ -- 22
+substring$ -- 66
+swap$ -- 23
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 12
+type$ -- 16
 warning$ -- 1
-while$ -- 7
-width$ -- 4
-write$ -- 38
+while$ -- 10
+width$ -- 5
+write$ -- 49
 (There was 1 warning)

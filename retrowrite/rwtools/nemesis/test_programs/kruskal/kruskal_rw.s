@@ -197,7 +197,7 @@ completed.8060_4030: # 4030 -- 4031
 kruskal:
 .L1140:
 .LC1140:
-pushq %r8
+pushq %r10
 	pushq %rbp
 .LC1141:
 	movq %rsp, %rbp
@@ -324,31 +324,31 @@ pushq %r8
 	movslq -0x2c(%rbp), %rsi
 .LC1225:
 	movl %eax, (%rcx, %rsi, 4)
-jmp .R440
+jmp .R586
 .L1228:
 .LC1228:
 .L0:
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
 add $0, %rax
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
 add $0, %rax
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-movq -0x4(%rbp), %r8
-jmp .R495
-.R495:
-.R440:
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+movq -0x4(%rbp), %r10
+jmp .R34
+.R34:
+.R586:
 	jmp .L122d
 .L122d:
 .LC122d:
@@ -378,7 +378,7 @@ jmp .R495
 	addq $0x30, %rsp
 .LC1253:
 	popq %rbp
-popq %r8
+popq %r10
 .LC1254:
 	retq 
 .size kruskal,.-kruskal

@@ -29,14 +29,8 @@
     balanced program or aligned program or modified program or .... (kies 1, wees consistent)
 -
 
-############
-# planning #
-############
-Week 03/05 - start evaluation (write evaluation script, create evaluation programs, run evaluation)
-Week 10/05 - Finish writing evaluation section, conclusion section
-Week 17/05 - Finish introduction, related work
-week 24/05 - complete final draft
-week 31/05 - complete final draft, submit thesis (vrijdag)
+
+
 
 
 ###########
@@ -54,18 +48,21 @@ week 31/05 - complete final draft, submit thesis (vrijdag)
     - something about function calls
     - determining which branches are secret-dependent is out of scope -- we asume this is supplied as input
 
-###########
-# Section #
-###########
+############
+# Sections #
+############
 Design section
     - iets over function calls
     - iets over cycles
     - modify design section when multiple target (nodes or instructions) exist
             -> first nodes are inserted so that each target is balanced, then all nodes are aligned)
     - vinden van secret dependent nodes is out of scope
-    - subgraph function is aangepast geweest (niet langer een breadth first search)
     - _select register is ook aangepast
     - meer info over 'select register' of leg dit allesinds beter uit
+    - ergens aangeven dat return en jumps speciaal behandeld worden (i.e. latency -1)
+    - stuk over selecteren van reference node moet beter, uitgebreider (misschien met voorbeelden om duidelijk te maken wat de regels juist zijn)
+        i.e. de verschillend mogelijke cases, en hoe dit leidt tot de regel
+        ook moet er ergens aangegeven worden waarom branching instructions speciaal zijn, en zelfde voor return instructions.
 Evaluation section
     - alle programma's toevoegen van beetze.de benchmark suite
     - verzamalen data
@@ -77,7 +74,22 @@ Evaluation section
 Implementation section
     - implemented using retrowrite framework
     - latency information used from agner fog en uops.info
-    -
 
 misc
     - bibliography
+
+############
+# vanavond #
+############
+- design verder afwerken vanaf create subgraph
+    - iets over cycles
+    - iets over function calls
+    - _select register is ook aangepast
+    - meer info over 'select register' of leg dit allesinds beter uit
+- alle programmas toevoegen van beetze.de + verzamelen data + finalize inputs for tests
+
+##########
+# morgen #
+##########
+- second draft evaluation
+- conclusion?

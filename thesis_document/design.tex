@@ -163,17 +163,25 @@ If such a node $d$ exists then the nodes that are a part of the sub-graph are al
 the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
 
 \subsection{Equalize paths}
+
 To equalize all path lengths starting from some secret-dependent node $v$, first a subset of the graph's nodes are extracted such that 
-only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered. This is done by applying a modified breadth-first search that stops early when the 
-current node dominates all of the leaves reachable from $n$. By definition all paths between $n$ and a leaf will pass through this node, in which case the 
-any of the following nodes no dot have to be considered. Next the length of the longest path is computed  from $v$ to all nodes in the sub-graph. 
-If there exists edges such that the length of the longest path to the tail and the length of the longest path to the head differ by more than one then 
-there are at least two paths to the head of different lengths. In this case additional nodes are inserted between the tail and the head to equalize these path lengths. 
+only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered.  
+Next the length of the longest path is computed from $v$ to all nodes in the sub-graph. 
+
+Let $(u, v)$ be an edge in the sub-graph. Let $d(u)$ and $d(v)$ be the length of the longest path to $u$ and $v$. If the difference between $d(u)$ and $d(v)$ is more than 
+one then there exists at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessors of $d(v)$ and has 
+length $d(v)$. 
+
+The procedure for equalizing the path lengths iterates over all edges of the sub-graph. If the distances to $u$ and $v$ differ by more than one then nodes are inserted 
+into the edge between $u$ and $v$ such that the path that goes to $v$ through $u$ is of the same length as the longest path to $v$. 
 
 \subsection{Equalize branches}
-The branches of a CFG can be equalized in a similar way. Given some secret-dependent node $v$ a subset of the graph's nodes are extracted. 
-Next the lengths of the longest paths are computed for all leaves of the sub-graph, as well as the length of the longest path from the root to some leaf. 
-If for some leaf the longest path to it is too short then additional nodes are inserted as predecessors to this leaf. 
+The branches of the CFG can be equalized in a similar way. Given some secret-dependent node $v$ a subset of the graph's nodes are extracted. 
+The lengths of the longest paths are computed for all nodes in the sub-graph. 
+The maximum path length is then determined as being the longest path length to some node that is also leaf. 
+The procedure then iterates over all leaves in the sub-graph and determines the difference between the distance to the leaf and the maximum path length. 
+If this difference is larger than zero then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
+path length. Because the final instruction in a leaf is a return statement any new nodes have to be added as predecessors. 
 
 \begin{figure}
  \centering
@@ -186,52 +194,59 @@ If for some leaf the longest path to it is too short then additional nodes are i
 
 \section{Alignment} \label{seq:alignment}
 
-During the alignment stage the nodes of the CFG are aligned in a level-wise manner. During this stage additional instructions are inserted into nodes to ensure that corresponding instructions have the same latency.
-Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm. 
-
-The level of a node is defined as being the distance between the root of the graph and the node. After the first stage of the algorithm all paths to a given nodes have the same length. This makes the level of a node a well 
-defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the nodes found at that level. 
+During the alignment stage the nodes of the CFG are aligned in a level-wise manner. 
+The alignment of a set of nodes consists of inserting instructions such that all instructions at a given position across all nodes in the set have the same latency. 
+The level of a node is defined as being the distance between the root of the graph and the node. The first stage of the algorithm ensures that all paths to a given nodes have the same length making the level of a node a well 
+defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
 
 \subsection{Basic Operation}
-The core of the alignment step consists of repeatedly selecting a reference instruction from one of the nodes and inserting instructions into the other nodes such that the latencies match. The node from which the 
-reference instruction is selected is called the reference node. The reference node can change throughout the algorithm. 
+The core of the alignment operation consists of repeatedly selecting a reference node and inserting instructions into the other nodes to match the latencies of the reference node. 
+Each iteration a set of candidate nodes is determined, from which the reference node is then selected. 
 
-Because an instruction is potentially added to each node that is not the reference node, the reference node needs to have at least as many instructions as the node with the largest number of instructions. This ensure that at some point all nodes have the same number of instructions. Let $n_{max}$ be the number of instructions in the longest node. The set of candidate nodes then consists of all nodes that have $n_{max}$ instructions. The reference 
-node is then selected from this set of candidates. 
+An index variable $i_{ref}$ is used to keep track of the position of the first instruction that has not yet been aligned. This variable is initially equal to zero and is incremented every iteration. 
+The instruction at position $i_{ref}$ in the reference node is called the reference instruction.
 
-An index variable is used to keep track of the position of the reference instruction. This variable is initially zero and is incremented every iteration. Any instructions that have an index smaller than this variable 
-are balanced. The reference instruction is selected by first selecting the reference node and then selecting the instruction in this node that has an index equal to the index variable. 
-
-Given a reference instruction, the algorithm iterates over all nodes that are not the reference node and verifies if the corresponding instruction has the same latency. 
-If the two latencies are not equal, or if the node has no corresponding instruction,  then a new instruction is inserted into the node at the index equal to the index variable. 
-Once this has been done for all nodes then all instructions with an index smaller than or
-equal to the index variable will be balanced and the index variable can be incremented. 
+The algorithm iterates over all nodes that are not the reference node and verifies if the instruction at position $i_{ref}$ has the same latency. 
+If the two latencies are not equal or if the node is shorter than the reference node a new instruction is inserted at position$i_{ref}$. 
+The latency of this new instruction is equal to the latency of the reference instruction. 
+Once this has been repeated for all nodes in the set then all instruction with at position $i_{ref}$ have the same latency and the variable can be incremented. 
 
 \subsection{Selecting the Reference Node}
-If there are multiple candidates nodes then the algorithm selects one of the nodes where the corresponding reference instruction is not a branching instruction or a return statement. From this set a reference node 
-is arbitrarily selected. If there are no such nodes then any node can be selected as the reference node.  
+Because an instruction is potentially added to each node that is not the reference node the reference node needs to have at least as many instructions as the node with the largest number of instructions. 
+This ensure that at some point all nodes have the same number of instructions. 
+The set of candidate nodes therefore consists of all nodes that have $n_{max}$ instructions, where $n_{max}$ is the number of instructions in the longest node. 
 
+The selection of the reference node also determines the reference instruction. 
+If there are any instructions at position $i_{ref}$ that are not a branching or return instruction then the reference instruction cannot be a branching or return instruction. 
+Branching instructions and return instructions are special cases that will result in the insertion of a branching instruction. 
+If there is a regular instruction in some node at position $i_{ref}$ then inserting a branching instruction can lead to errors in the control flow of the program. 
+
+The reference node has to be selected such this situation cannot occur. From the set of candidates only those nodes are considered that do not have a branching instruction at position $i_{ref}$. 
+From this subset a reference node can be selected arbitrarily. If among the candidates all nodes have a branching instruction at $i_{ref}$ then it is safe to insert a branching instruction 
+and a reference node can also be selected arbitrarily. 
+ 
 \subsection{Constructing NOP instruction}
-For each latency class a template NOP instruction has been determined. The instruction can be inserted into the program as-is if it has no effect on the program state, i.e. it does not modify any register values. 
-If the instruction does modify some register the algorithm selects a registers that can safely be used. This needs to be a register that is not in use at the time of execution of the instruction. 
+For each latency class a template NOP instruction has been determined. 
+The instruction can be inserted into the program as-is if it has no effect on the program state, i.e. it does not modify any register values. 
+If the instruction does modify some register the algorithm selects a registers that can safely be used. 
+This needs to be a register that is not in use at the time of execution of the instruction. 
 
-The function is statically analyzed to determine which registers are free to use for this purpose. There are two types of free registers. 
-A register can be free because its current value is no longer used, i.e. because it is overwritten at some later point without
-being read first. Alternatively a register can be free because it isn't used anywhere in the current function. In the latter case, however, it is possible that the register is in use by the caller, 
-since there is no guarantee that the caller stored all the registers it uses. 
+There are two types of free registers. 
+A register can be free because its current value is no longer used. This occurs when the register is overwritten at some later point without being read first. 
+Alternatively a register can be free because it isn't used anywhere in the current function. 
+In the latter case, however, it is possible that the register is in use by the caller, since there is no guarantee that the caller stored all the registers it uses. 
 
+The function is statically analyzed to determine which registers are free to use for this purpose. 
 If a register of the first type exists then it can be used as the operand of the NOP instruction and the resulting instruction 
-can be inserted as-is into the node. If no such registers exists, a free register of the second type is selected, and additional instructions are inserted into the program to ensure that the 
-original value of the register is not lost. In the root of the CFG additional instructions are inserted to push the register value onto the stack, while in every leaf instructions are inserted 
+can be inserted as-is into the node. If no such registers exists, a free register of the second type is selected. 
+In this case additional instructions are inserted into the program to ensure that the original value of the register is not lost. 
+In the root of the CFG additional instructions are inserted to push the register value onto the stack, while in every leaf instructions are inserted 
 that pop the value from the stack. 
 
 If there are no free registers available, any register is arbitrarily selected. Additional instructions are inserted before and after the NOP instruction to push and pop the register value. To ensure the nodes are 
 still balanced these push and pop instructions are inserted across all nodes of the current level. 
 
-\subsection{branching instructions}
-In the cases where the reference instruction is a branching instruction, the newly inserted instruction will also be a branching instruction. The target of the branching instruction is the successor of the node where 
-the node is inserted. 
-
+If the reference instruction is a branching instruction the the NOP instruction will also be a branching instruction. The target of the branching instruction is then the address of the first instruction of the node's successors. 
 
 \begin{algorithm*}
   \SetAlgoLined

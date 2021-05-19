@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{dominator}
+T.~Lengauer and R.~E. Tarjan.
+\newblock A fast algorithm for finding dominators in a flowgraph.
+\newblock {\em ACM Trans. Program. Lang. Syst.}, 1(1):121–141, Jan. 1979.
+
 \bibitem{MSP430Detection}
 S.~Pouyanrad, J.~T. M\"{u}hlberg, and W.~Joosen.
 \newblock Scfmsp: Static detection of side channels in msp430 programs.
