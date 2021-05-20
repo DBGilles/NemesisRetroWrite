@@ -184,11 +184,12 @@ If this difference is larger than zero then additional nodes are inserted as the
 path length. Because the final instruction in a leaf is a return statement any new nodes have to be added as predecessors. 
 
 \subsection{Cycles}
-\textbf{Is this section necessary? technically cycles aren't an issue when it comes to equalizing paths and branches, they are removed as part of my concrete implementation}
-The aforementioned operations do not work if there are cycles in the CFG. Before equalizing paths and branches all cycles are removed from the CFG. 
-To remove a cycle the depth for each node in the cycle is determined. The depth of a node is equal to the length of the longest path to the node. The edge 
-that connects the deepest node to the most shallow node is removed from the graph to make the graph acyclic. Once all paths and branches are equalize the edge can then 
-be re-inserted to restore the cycle. 
+The aforementioned operations require the CFG to be acyclic. 
+To account for this all cycles are removed from the CFG beforehand and later restored. 
+The edge that needs to be removed is determined based on the depths of the nodes in the cycle. 
+The depth of a node is defined as being the length of the longest path to the node from the root. 
+Removing the cycle is done by removing the edge from that graph that connects the deepest node to the most shallow node. 
+The tail and head are stored for all edges that are removed so that they can later be restored, once all paths and branches are equalized. 
 
 \begin{figure}
  \centering
@@ -207,7 +208,7 @@ The level of a node is defined as being the distance between the root of the gra
 defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
 
 \subsection{Basic Operation}
-The core of the alignment operation consists of repeatedly selecting a reference node and inserting instructions into the other nodes to match the latencies of the reference node. 
+The core of the alignment operation consists of repeatedly selecting a reference node and inserting instructions into the other nodes to match the latencies of the reference. 
 Each iteration a set of candidate nodes is determined, from which the reference node is then selected. 
 
 An index variable $i_{ref}$ is used to keep track of the position of the first instruction that has not yet been aligned. This variable is initially equal to zero and is incremented every iteration. 
@@ -256,7 +257,10 @@ still balanced these push and pop instructions are inserted across all nodes of 
 
 If the reference instruction is a branching instruction the the NOP instruction will also be a branching instruction. The target of the branching instruction is then the address of the first instruction of the node's successors. 
 
-If the reference instruction is a call to a function then the NOP instruction will be a function call to the same function.
+If the reference instruction is a call to a function then the NOP instruction will be  a call to the same function. The instruction is simply duplicated into the current node. 
+If function contains no secret dependent node then this ensures that any latency traces cannot leak information from the program. Otherwise the function that is called needs to be aligned as well. 
+It is only safe to insert a call to a function this way if the function in question has no effects on the program state. If the function does modify the program state then inserting additional calls can 
+result in erroneous program outputs. 
 
 \begin{algorithm*}
   \SetAlgoLined

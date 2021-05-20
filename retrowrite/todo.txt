@@ -5,8 +5,6 @@
 #######
 -- writing --
 1.  improve design section writing + implementation section
-    - something about function calls
-    - something about graph needing to be acyclic (or the subgraph at least) or not being able to support loops or something ... (and explain why in a good way)
     - ergens moet er vermeld worden hoe het werkt bij balanced van multiple nodes en/of top level algorithm beschrijven ergens ?
     - determining secret dependent nodes is out of scope
     - stuk over selecteren van reference node moet beter, uitgebreider (misschien met voorbeelden om duidelijk te maken wat de regels juist zijn)
