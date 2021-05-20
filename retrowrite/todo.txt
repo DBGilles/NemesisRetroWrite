@@ -1,18 +1,25 @@
-########
-# TODO #
-########
-[X] finish first version evaluation script -- initial version completed -- works only for single function
-[X] fix code so that it works for any/all functions in a program
-[X] support for function calls (?)
-[X]  figure out when/where cycles should be removed/replaced etc.
-[X] clean up code -- ook zeker file structure, notebooks etc.
-[X]  !!! zie multifork -- merge inserted nodes gebeurt daar niet correct !!!
-6.  insert push and pop before/after instruction (at all nodes in level)
-7.  improve design section writing + implementation section
+
+
+#######
+#TODO #
+#######
+-- writing --
+1.  improve design section writing + implementation section
     - something about function calls
     - something about graph needing to be acyclic (or the subgraph at least) or not being able to support loops or something ... (and explain why in a good way)
-8.  finish evaluation, create set of test programs, run evaluation etc.
-9.  Clean up (Abstract)NemesisNode
+    - ergens moet er vermeld worden hoe het werkt bij balanced van multiple nodes en/of top level algorithm beschrijven ergens ?
+    - determining secret dependent nodes is out of scope
+    - stuk over selecteren van reference node moet beter, uitgebreider (misschien met voorbeelden om duidelijk te maken wat de regels juist zijn)
+    i.e. de verschillend mogleijke cases, en hoe dit leidt tot de regel
+    ook moet er ergens aangegeven worden waarom branching instructions speciaal zijn, en zelfde voor return instructions.
+    - ergens aangeven dat return en jumps speciaal behandeld worden (i.e. latency -1)
+
+2. Finish evaluation -- write actual conclusion, some discussion of results
+3. implementation, benefir of binary rewriting
+-- code --
+1. insert push and pop before/after instruction if no free registers
+2. clean up NemesisNode and AbstractNemesisNode
+3. remove old/unused code + general cleanup
 
 
 
@@ -28,50 +35,3 @@
 - introduce consistent wording -- use it everywhere in the text
     balanced program or aligned program or modified program or .... (kies 1, wees consistent)
 -
-
-
-
-
-
-###########
-# vandaag #
-###########
-- toevoegen aan benchmark suite:
-    - programma met function call dat state aanpast
-    - programma met 1 kortere branch dan andere
-    - programma waarbij alle registers gebruikt zijn (op 1 of andere manier)
-- aanpassen tests BSL en keypad zodat die werken met verschillende inputs
-- verzamelen evaluation data
-- write up experiment setup, some discussion of results
-- toevoegen aan design
-    - cant support cycles
-    - something about function calls
-    - determining which branches are secret-dependent is out of scope -- we asume this is supplied as input
-
-############
-# Sections #
-############
-Design section
-    - iets over function calls (einde subsection NOP instructions -- moet uitgebreider)
-    - iets over cycles
-    - modify design section when multiple target (nodes or instructions) exist
-            -> first nodes are inserted so that each target is balanced, then all nodes are aligned)
-    - vinden van secret dependent nodes is out of scope
-    - ergens aangeven dat return en jumps speciaal behandeld worden (i.e. latency -1)
-    - stuk over selecteren van reference node moet beter, uitgebreider (misschien met voorbeelden om duidelijk te maken wat de regels juist zijn)
-        i.e. de verschillend mogelijke cases, en hoe dit leidt tot de regel
-        ook moet er ergens aangegeven worden waarom branching instructions speciaal zijn, en zelfde voor return instructions.
-Evaluation section
-    - alle programma's toevoegen van beetze.de benchmark suite
-    - verzamalen data
-    - schrijven van evaluation
-    -static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
-    if depths are not the same then some set will be
-    - bij alle test inputs verifieren dat alle paths in control flow covered zijn
-
-Implementation section
-    - implemented using retrowrite framework
-    - latency information used from agner fog en uops.info
-
-misc
-    - bibliography

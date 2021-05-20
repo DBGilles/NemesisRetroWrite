@@ -1,5 +1,31 @@
 \begin{thebibliography}{1}
 
+\bibitem{intel-ref-manual}
+{\em Intel® 64 and IA-32 Architectures Optimization Reference Manual}.
+
+\bibitem{uops}
+A.~Abel and J.~Reineke.
+\newblock uops.info: Characterizing latency, throughput, and port usage of
+  instructions on intel microarchitectures.
+\newblock In {\em ASPLOS}, ASPLOS '19, pages 673--686, New York, NY, USA, 2019.
+  ACM.
+
+\bibitem{Dinesh2020RetroWriteSI}
+S.~Dinesh, N.~Burow, D.~Xu, and M.~Payer.
+\newblock Retrowrite: Statically instrumenting cots binaries for fuzzing and
+  sanitization.
+\newblock {\em 2020 IEEE Symposium on Security and Privacy (SP)}, pages
+  1497--1511, 2020.
+
+\bibitem{fog_2021}
+A.~Fog.
+\newblock Instruction tables:lists of instruction latencies, throughputs and
+  micro-operation breakdowns for intel, amd, and via cpus, Mar 2021.
+
+\bibitem{hexhive}
+HexHive.
+\newblock Hexhive/retrowrite.
+
 \bibitem{dominator}
 T.~Lengauer and R.~E. Tarjan.
 \newblock A fast algorithm for finding dominators in a flowgraph.

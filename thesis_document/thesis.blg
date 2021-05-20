@@ -8,46 +8,50 @@ A level-1 auxiliary file: evaluation.aux
 A level-1 auxiliary file: conclusion.aux
 The style file: abbrv.bst
 Database file #1: references.bib
+Warning--to sort, need author, editor, or key in intel-ref-manual
+Warning--empty author and editor in intel-ref-manual
+Warning--empty publisher in intel-ref-manual
+Warning--empty year in intel-ref-manual
 Warning--empty booktitle in WinderixHans
-You've used 4 entries,
+You've used 9 entries,
             2118 wiz_defined-function locations,
-            531 strings with 4741 characters,
-and the built_in function-call counts, 1497 in all, are:
-= -- 149
-> -- 67
-< -- 1
-+ -- 27
-- -- 22
-* -- 93
-:= -- 239
-add.period$ -- 14
-call.type$ -- 4
-change.case$ -- 23
+            557 strings with 5539 characters,
+and the built_in function-call counts, 3044 in all, are:
+= -- 301
+> -- 118
+< -- 3
++ -- 48
+- -- 38
+* -- 182
+:= -- 462
+add.period$ -- 26
+call.type$ -- 9
+change.case$ -- 45
 chr.to.int$ -- 0
-cite$ -- 5
-duplicate$ -- 71
-empty$ -- 118
-format.name$ -- 22
-if$ -- 330
+cite$ -- 14
+duplicate$ -- 143
+empty$ -- 260
+format.name$ -- 38
+if$ -- 681
 int.to.chr$ -- 0
-int.to.str$ -- 4
-missing$ -- 4
-newline$ -- 23
-num.names$ -- 8
-pop$ -- 28
+int.to.str$ -- 9
+missing$ -- 7
+newline$ -- 44
+num.names$ -- 16
+pop$ -- 67
 preamble$ -- 1
-purify$ -- 19
+purify$ -- 37
 quote$ -- 0
-skip$ -- 54
+skip$ -- 119
 stack$ -- 0
-substring$ -- 66
-swap$ -- 23
-text.length$ -- 1
+substring$ -- 159
+swap$ -- 48
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 16
-warning$ -- 1
-while$ -- 10
-width$ -- 5
-write$ -- 49
-(There was 1 warning)
+type$ -- 34
+warning$ -- 5
+while$ -- 23
+width$ -- 10
+write$ -- 94
+(There were 5 warnings)

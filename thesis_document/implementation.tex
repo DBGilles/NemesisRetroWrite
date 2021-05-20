@@ -1,2 +1,34 @@
 
 \chapter{Implementation}
+
+The algorithm has been implemented in X lines of Python code as part of the RetroWrite framework. 
+RetroWrite is a binary rewriting tool developed for statically instrumenting programs. 
+The authors are able to leverage relocation information present in position independent code to produce assembly files that can be reassembled into binaries.
+On top of this the framework provides a rewriting API that allows for flexible and expressive transformations of the binary code \cite{Dinesh2020RetroWriteSI}. 
+
+Implementing the algorithm on top of the RetroWrite frameworks allows for the alignment of instructions in existing binaries. This means that you do not need access to 
+the source code ... \textbf{benefits of binary rewriting here}
+
+The RetroWrite framework imposes some restrictions on the binary. The binary 
+
+\begin{itemize}
+	\item must be compiled as position independent code 
+	\item must be \textit{x86\_64} 
+	\item must contain symbols and cannot be stripped
+\end{itemize}
+\cite{hexhive}
+
+The detection of secret dependent branches is not part of the algorithm or the implementation. The user has to provide the algorithm with the address of the target instruction. 
+At the time of writing secret dependent branching instructions need to be identified through manual inspection. However, research has shown that static detection of these side channels is possible, though 
+this is currently limited to the MSP430 architecture \cite{MSP430Detection}.
+
+Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual} but this data is not complete.
+To obtain better data Abel et. al developed novel algorithms to infer the latency throughput, and port usage based on automatically-generated microbenchmarks \cite{uops}. 
+The authors claim that their results are more accurate and precise than existing work. 
+Another source of data on instruction latencies is provided by Agner Fog who provides the results of his own measurements \cite{fog_2021}. 
+
+The data provided by Abel et. al is  used as the primary source of instruction latencies. In the case where an instruction is not covered by their work the data 
+provided by Agner Fog and Intel are used as a secondary source. If a program contains an instruction that is not covered by any of the datasets then the program cannot
+be aligned. The exception to this rule are branching instructions. There is no latency information available about these instructions in any of the sources. 
+To account for this  all branching instructions are aligned with new branching instructions. To preserve the control flow of the program the target of 
+the branching instruction is equal to the address of the next instruction. 
