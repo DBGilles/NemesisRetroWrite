@@ -1,4 +1,3 @@
-
 \chapter{Design}
 \label{cha:design}
 
@@ -9,7 +8,7 @@ position in two branches of a secret-dependent branching instruction.
 In practice an attacker can exploit this vulnerability by generating latency traces along different paths of the program's control flow. 
 Any differences in instruction latencies will be reflected as differences in these latency traces. 
 By carefully inspecting the relevant sections of the latency traces the attacker can infer which paths were taken for a given input. 
-In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information. 
+In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information from the program.
 
 The goal of the algorithm outlined in this section is to ensure that latency traces cannot be used to leak information in this way.
 It does this by inserting additional instructions into branches of a secret-dependent branching instruction. These instructions 
@@ -24,7 +23,7 @@ One of the main operations performed on the graph is the alignment of a set of n
 This operation inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
 
 Not all structures found in a control flow graph are suitable for alignment. The aforementioned alignment operation therefore has some conditions on the structure of the control flow graph that need to be met. 
-The other main operation of the algorithm therefore consists of inserting additional nodes into the graph such that these conditions are met. 
+The other main operation of the algorithm consists of inserting additional nodes into the graph such that these conditions are met. 
 
 Section \ref{sec:property} will formally define the property that needs to hold for a program in order for Nemesis-style attacks to be mitigated. Section \ref{sec:cfg} 
 introduces the CFG data structure and translates the aforementioned property to such structures. Finally, sections \ref{seq:equalising} and \ref{seq:alignment} describe the insertion and alignment of nodes, respectively. 
@@ -50,11 +49,11 @@ If this nemesis-sensitive property holds for a program then an attacker is not a
 
 The Control Flow Graph (CFG) is a data structure that represents the control flow of a program. A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a 
 contiguous sequence of instructions that is always executed as a whole. This implies that any branching instruction can only occur at the end of a node, 
-and an instruction that is the target of a branching sequence can only occur at the start. 
+and an instruction that is the target of a branching instruction can only occur at the start. 
 
 An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ 
 when following program control flow. The algorithm only considers branching instructions that are binary in nature, so a node in the CFG can have at most 2 successors. 
-By construction of this data structure a branching instruction will always be the last instruction in a node. A node is said to be secret-dependent if its last instructions is a 
+A node is said to be secret-dependent if its last instructions is a 
 secret-dependent branching instruction. 
 
 Each node has a latency sequence associated with it, equal to the latencies of the node's instructions.  
@@ -96,7 +95,7 @@ first of $v$'s outgoing edges up to and including $v_f$ and $region^{else}(v)$ a
 
 Any differences in the latency sequences of two nodes can only be used to infer which branch was taken at the nearest branching point that is an ancestor of both nodes. 
 Any differences in latencies between two nodes that are descendants of $v_f$ can therefore only be used to infer information about which branch was taken at $v_f$. 
-This means that all nodes below $v_f$ do not have to be considered. If no such node $v_f$ exists then the regions simply consists of all nodes reachable from $v$ through one of its outgoing edges. 
+This means that all nodes below $v_f$ do not have to be considered. If no such node $v_f$ exists then the regions simply consist of all nodes reachable from $v$ through one of its outgoing edges. 
 
 Let $n^i \in region(v)$ be a node such that there is a path going to it from node $v$ of length $i$. The depth of $region(v)$ is defined as being the length of the longest path from $v$ to some node $v' \in region(v)$ that does not contain a cycle.
 
@@ -111,7 +110,7 @@ where $latencies(n)$ is a function mapping a node $n$ to its latency sequence. T
 from some secret-dependent node need to have identical latency sequences. If this property holds then the critical sections of latency traces will be identical and cannot be used to 
 infer information about the secret-dependent branch. 
 
-Figure \ref{fig:regionExamples} illustrates how the borders of each region are defined. The secret-dependent node is marked in green, while the two branches are marked in red and blue. In the second example, the node marked in purple belongs to both regions. In example \ref{fig:regionExampleA} there is node node such that all paths from the secret-dependent node to a leaf go through it, so the regions extend all the way to the leaves. In example \ref{fig:regionExampleB} all paths that start in the secret-dependent node go through the node 6. Any differences in nodes 7 and 8 can only be used to infer information about the branch in node 6. These nodes therefore do not have to be considered.  
+Figure \ref{fig:regionExamples} illustrates how the borders of each region are defined. The secret-dependent node is marked in green, while the two branches are marked in red and blue. In the second example, the node marked in purple belongs to both regions. In example \ref{fig:regionExampleA} there is no node such that all paths from the secret-dependent node to a leaf go through it, so the regions extend all the way to the leaves. In example \ref{fig:regionExampleB} all paths that start in the secret-dependent node go through the node 6. Any differences in nodes 7 and 8 can only be used to infer information about the branch in node 6. These nodes therefore do not have to be considered.  
 
 
 \begin{figure}
@@ -129,13 +128,17 @@ These structures are shown in figure \ref{fig:problemStructures}.
 The first stage of the algorithm consists of inserting nodes such that these structures no longer occur. 
 
 The first such structure occurs when the program contains some sequence of instructions that is only executed if some condition is true and is illustrated in fig \label{fig:optional}.
-In such a CFG there will be some node that has two paths to it from the root where the paths have different lengths. 
+The corresponding CFG will have some node that has two paths to it from the root where the paths have different lengths. 
 One path will contain the node that corresponds to the conditional instructions, while the other path will not.
 
-In such cases it is impossible to equalize the latency traces of the two paths. Because the paths have different lengths one of the latency traces will always be 
-longer than the other one. Additionally, because all nodes in the shorter path are also nodes in the longer path it is impossible to modify the shorter path without also
-modifying the longer path. Any attempts to lengthen the shorter path therefore also lengthen the longer path. If these paths start at a secret-dependent node it is 
-impossible to ensure that the nemesis-sensitive property holds. 
+In such cases it is impossible to align the latency traces of the two paths since of the latency traces will always be longer than the other one. Aditionally,
+because the nodes in the shorter path form a subset of the nodes in the longer path it is impossible to modify the shorter path without also modifying the longer path, making it 
+impossible to equalize the lenghts of the traces. 
+
+%In such cases it is impossible to equalize the latency traces of the two paths. Because the paths have different lengths one of the latency traces will always be 
+%longer than the other one. Additionally, because all nodes in the shorter path are also nodes in the longer path it is impossible to modify the shorter path without
+%modifying the longer path. Any attempts to lengthen the shorter path therefore also lengthen the longer path. If these paths start at a secret-dependent node it is 
+%impossible to ensure that the nemesis-sensitive property holds. 
 
 The second problematic structure occurs when one of the branches is shorter than the other one, as shown in figure \label{fig:unequal}. In such cases there will be some nodes in 
 one branch that have no corresponding nodes in the other branch, making it impossible to align them. 
@@ -149,7 +152,8 @@ Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict pseudo-
 \subsection{Extract Sub-graph}
 The different procedures described in this section only need to take into account the branches of secret dependent nodes. 
 These branches correspond to the regions $region_{then}(v)$ and $region_{else}(v)$ as defined in section \ref{sec:cfg}.
-The procedure \textit{ExtractSubgraph}, shown in \ref{alg:equalizePaths}}, extracts the subset of the graph that contains only the nodes that belong to either one of these regions for a given secret-dependent node. 
+The procedure \textit{ExtractSubgraph}, shown in algorithm \ref{alg:equalizePaths}}, extracts the subset of the graph that contains only the nodes that belong to 
+either one of these regions for a given secret-dependent node. 
 The edges of this new CFG are all the edges of the original CFG whose head and tail are a part of this subset. 
 
 To determine which nodes are a part of this subgraph all immediate dominators are determined starting from node $n$. 
@@ -169,7 +173,7 @@ only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered.
 Next the length of the longest path is computed from $v$ to all nodes in the sub-graph. 
 
 Let $(u, v)$ be an edge in the sub-graph. Let $d(u)$ and $d(v)$ be the length of the longest path to $u$ and $v$. If the difference between $d(u)$ and $d(v)$ is more than 
-one then there exists at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessors of $d(v)$ and has 
+one then there exists at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
 length $d(v)$. 
 
 The procedure for equalizing the path lengths iterates over all edges of the sub-graph. If the distances to $u$ and $v$ differ by more than one then nodes are inserted 
@@ -224,15 +228,17 @@ Because an instruction is potentially added to each node that is not the referen
 This ensure that at some point all nodes have the same number of instructions. 
 The set of candidate nodes therefore consists of all nodes that have $n_{max}$ instructions, where $n_{max}$ is the number of instructions in the longest node. 
 
-The selection of the reference node also determines the reference instruction. 
-If there are any instructions at position $i_{ref}$ that are not a branching or return instruction then the reference instruction cannot be a branching or return instruction. 
-Branching instructions and return instructions are special cases that will result in the insertion of a branching instruction. 
-If there is a regular instruction in some node at position $i_{ref}$ then inserting a branching instruction can lead to errors in the control flow of the program. 
+The instruction in the reference node at position $i_{ref}$ determines what instructions are inserted into the other nodes. 
+There are some restrictions on the selection of the reference node. 
+These stem from the fact that branching instructions are special cases that will result in the insertion of branching instruction in the other nodes. 
+Additionally a branching instruction cannot be inserted into the middle of a node since this will change the program's control flow. 
+A node can therefore not be selected as the reference node when the instruction at position $i_{ref}$ is a branching instruction, unless during the very last iteration. 
 
-The reference node has to be selected such this situation cannot occur. From the set of candidates only those nodes are considered that do not have a branching instruction at position $i_{ref}$. 
-From this subset a reference node can be selected arbitrarily. If among the candidates all nodes have a branching instruction at $i_{ref}$ then it is safe to insert a branching instruction 
-and a reference node can also be selected arbitrarily. 
- 
+If among the set of candidate nodes there is at least one node with a non-branching instruction at position $i_{ref}$ then this node is selected as the reference node. 
+If there are multiple such nodes then a candidate node can be selected arbitrarily. 
+The case where all candidate nodes have a branching instruction at position $i_{ref}$ can only occur during the very last iteration. 
+At this point any of the candidate nodes are suitable and one is selected arbitrarily again. 
+
 \subsection{Constructing NOP instruction}
 For each latency class a template NOP instruction has been determined. 
 The instruction can be inserted into the program as-is if it has no effect on the program state, i.e. it does not modify any register values. 

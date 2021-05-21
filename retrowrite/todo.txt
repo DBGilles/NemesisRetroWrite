@@ -13,7 +13,8 @@
     - ergens aangeven dat return en jumps speciaal behandeld worden (i.e. latency -1)
 
 2. Finish evaluation -- write actual conclusion, some discussion of results
-3. implementation, benefir of binary rewriting
+3. implementation, benefits of binary rewriting
+
 -- code --
 1. insert push and pop before/after instruction if no free registers
 2. clean up NemesisNode and AbstractNemesisNode
@@ -24,8 +25,8 @@
 #########
 # extra #
 #########
-- subraph function is has been modified -- adjust text
 - _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
+- insertion of nodes -- also inserts branching instructions into the nodes etc.
 - balancing with multiple targets -- adjust text (for each target, first insert nodes, then align for each node, etc. ..)
 - iets over feit dat vinden van secret depdendent branches out of scope is
 - static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
