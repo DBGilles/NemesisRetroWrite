@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{intel-ref-manual}
 {\em Intel® 64 and IA-32 Architectures Optimization Reference Manual}.
@@ -17,6 +17,20 @@ S.~Dinesh, N.~Burow, D.~Xu, and M.~Payer.
 \newblock {\em 2020 IEEE Symposium on Security and Privacy (SP)}, pages
   1497--1511, 2020.
 
+\bibitem{smart}
+K.~Eldefrawy, D.~Perito, and G.~Tsudik.
+\newblock Smart: Secure and minimal architecture for (establishing a dynamic)
+  root of trust.
+\newblock 01 2012.
+
+\bibitem{isox}
+D.~Evtyushkin, J.~Elwell, M.~Ozsoy, D.~Ponomarev, N.~A. Ghazaleh, and R.~Riley.
+\newblock Iso-x: A flexible architecture for hardware-managed isolated
+  execution.
+\newblock In {\em Proceedings of the 47th Annual IEEE/ACM International
+  Symposium on Microarchitecture}, MICRO-47, page 190–202, USA, 2014. IEEE
+  Computer Society.
+
 \bibitem{fog_2021}
 A.~Fog.
 \newblock Instruction tables:lists of instruction latencies, throughputs and
@@ -26,10 +40,37 @@ A.~Fog.
 HexHive.
 \newblock Hexhive/retrowrite.
 
+\bibitem{trustlite}
+P.~Koeberl, S.~Schulz, V.~Varadharajan, and A.-R. Sadeghi.
+\newblock Trustlite: A security architecture for tiny embedded devices.
+\newblock 04 2014.
+
 \bibitem{dominator}
 T.~Lengauer and R.~E. Tarjan.
 \newblock A fast algorithm for finding dominators in a flowgraph.
 \newblock {\em ACM Trans. Program. Lang. Syst.}, 1(1):121–141, Jan. 1979.
+
+\bibitem{trusted-computing-architectures}
+P.~Maene, J.~Götzfried, R.~de~Clercq, T.~Müller, F.~Freiling, and
+  I.~Verbauwhede.
+\newblock Hardware-based trusted computing architectures for isolation and
+  attestation.
+\newblock {\em IEEE Transactions on Computers}, 67(3):361--374, 2018.
+
+\bibitem{SGX}
+F.~McKeen, I.~Alexandrovich, A.~Berenzon, C.~V. Rozas, H.~Shafi, V.~Shanbhogue,
+  and U.~R. Savagaonkar.
+\newblock Innovative instructions and software model for isolated execution.
+\newblock In {\em Proceedings of the 2nd International Workshop on Hardware and
+  Architectural Support for Security and Privacy}, HASP '13, New York, NY, USA,
+  2013. Association for Computing Machinery.
+
+\bibitem{sancus}
+J.~Noorman, J.~Van~Bulck, J.~T. M{\"u}hlberg, F.~Piessens, P.~Maene,
+  B.~Preneel, I.~Verbauwhede, J.~G{\"o}tzfried, T.~M{\"u}ller, and F.~Freiling.
+\newblock Sancus 2.0: {A} low-cost security architecture for {I}o{T} devices.
+\newblock {\em ACM Transactions on Privacy and Security (TOPS)},
+  20(3):7:1--7:33, September 2017.
 
 \bibitem{MSP430Detection}
 S.~Pouyanrad, J.~T. M\"{u}hlberg, and W.~Joosen.
@@ -37,6 +78,11 @@ S.~Pouyanrad, J.~T. M\"{u}hlberg, and W.~Joosen.
 \newblock In {\em Proceedings of the 15th International Conference on
   Availability, Reliability and Security}, ARES '20, New York, NY, USA, 2020.
   Association for Computing Machinery.
+
+\bibitem{psma}
+R.~Strackx, J.~Noorman, I.~Verbauwhede, B.~Preneel, and F.~Piessens.
+\newblock {\em Protected Software Module Architectures}, pages 241--251.
+\newblock 01 2013.
 
 \bibitem{Nemesis}
 J.~Van~Bulck, F.~Piessens, and R.~Strackx.
@@ -51,5 +97,12 @@ H.~Winderix, J.~T. Mühlberg, and f.~Piessens.
 \newblock Compiler-assisted hardening of embedded software against interrupt
   latency side-channel attacks.
 \newblock 2021.
+
+\bibitem{xu}
+Y.~Xu, W.~Cui, and M.~Peinado.
+\newblock Controlled-channel attacks: Deterministic side channels for untrusted
+  operating systems.
+\newblock {\em 2015 IEEE Symposium on Security and Privacy}, pages 640--656,
+  2015.
 
 \end{thebibliography}

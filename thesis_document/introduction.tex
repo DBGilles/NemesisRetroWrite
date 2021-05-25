@@ -1,7 +1,86 @@
 
+\lstdefinelanguage
+   [x64]{Assembler}     % add a "x64" dialect of Assembler
+   [x86masm]{Assembler} % based on the "x86masm" dialect
+   % with these extra keywords:
+   {morekeywords={CDQE,CQO,CMPSQ,CMPXCHG16B,JRCXZ,LODSQ,MOVSXD, %
+                  POPFQ,PUSHFQ,SCASQ,STOSQ,IRETQ,RDTSCP,SWAPGS, %
+                  rax,rdx,rcx,rbx,rsi,rdi,rsp,rbp, %
+                  r8,r8d,r8w,r8b,r9,r9d,r9w,r9b, %
+                  r10,r10d,r10w,r10b,r11,r11d,r11w,r11b, %
+                  r12,r12d,r12w,r12b,r13,r13d,r13w,r13b, %
+                  r14,r14d,r14w,r14b,r15,r15d,r15w,r15b}} % etc.
+
 \chapter{Introduction}
 \label{cha:introduction}
 
-\section{First topic of the Chapter}
+Because of the increasing popularity of IoT devices more and more embedded computing devices are being connected to the Internet. 
+These devices are often more susceptible to being exploited because they support software extensibility. 
+Additionally because these devices are connected to a network the risk increases since attacks can be done remotely. 
+An important technique for securing such devices is the use of hardware support for virtual memory and processor privilege levels.
+The OS can build on this support to isolate a process from any other malicious processes on the device. 
+However, this introduces a sizable software layer however which is difficult to get sufficiently secure \cite{psma}.
+If the attacker controls the OS then its capabilities for attacking a process on the devices increase considerably \cite{citation needed}. 
 
-\section{Second topic of the chapter}
+Maene et. al state that \textit{the goal of trusted computing is to develop technologies which give users guarantees about the behaviour of the software running on their devices}.
+An important aspect of trusted computing is therefore to protect software even when attackers have full control of the system. 
+One means of achieving this is through the use of Protected Module Architectures (PMAs). 
+These architectures seperate critical components into protected modules, also called enclaves,
+that are isolated from one another through hardware \cite{trusted-computing-architectures}.  
+
+A number of Protected Module Architectures (PMAs) have been developed to address this problem, both by researchers and industry. 
+% volgende zin trekt mogelijks te veel op zin in nemesis paper
+PMAs have been developed for both low-end microcontrollers found in embedded systems \cite{trustlite, smart} as well as high-end processors \cite{isox}.
+One architecture developed for embedded systems is Sancus. Sancus is a security architecture that can provide strong isolation guarantees on networked embedded systems, 
+and has been implemented on a modified TI MSP430 micro-controller \cite{sancus}. 
+At the higher end of the spectrum there is Intel SGX. 
+Intel SGX is an extension  added to the Intel architecture that allows applications to instantiate enclaves. 
+Enclaves are areas in the application's memory that are protected from access from outside of the enclave, even from 
+privileged software such as the OS \cite{SGX}. 
+
+Research has shown that it is possible to extract information from protected applications in PMAs. In their work Xu et. al introduce a novel type of side-channel attack 
+called controlled-attacks. These attacks are categorized by untrusted operating systems that create side-channels through its extensive control of the system.
+The authors were able to leverage the OS's high degree of control over the system to extract large amounts of data from applications which were until 
+then safe from side-channel attacks \cite{xu}. 
+
+More recently Van Bulck et. al \cite{Nemesis} developed Nemesis, a controlled-channel attack that leverages the interrupt mechanism to extract sensitive information from 
+enclaved applications. The authors were able to exploit timing differences in the latency between the arrival of an interrupt request (IRQ) and the execution of the first instruction in the 
+interrupt service routine (ISR). They state that their attack is \textit{based on the key observation that an IRQ during a multi-cycle instruction increases the interrupt 
+latency with the number of cycles left to execute}. By carefully and deliberately interrupting a process at the right time the authors were able to infer the duration of the interrupted instruction. 
+Potential attackers can use this information to determine where the instruction is situated in the program's control flow. When the instruction is part of a secret-dependent branch the 
+attacker is able to infer some information about the secret, successfully leaking sensitive information from the program. Van Bulck et. al \cite{Nemesis} showed that this attack is applicable to 
+the whole computing spectrum. They were able to apply their attack to the aforementioned Sancus architecture as well as Intel SGX enclaves.  
+
+Figure \ref{fig:pseudo-assembly} illustrates how such an attack might work with a piece of assembly pseudocode. An attacker who is in control of the OS could carefully interrupt the program right
+after the conditional jump at line 5. Depending on the value of register r1 the next interrupted instruction is either the addition instruction at line 4 or the multiplication instruction at line 7. 
+By measuring the interrupt latency the attacker can infer which of the two instructions was being executed at the time of the interrupt and, more importantly, infer if the value in register r0 is equal to 0. 
+
+
+\lstset{language=[x64]Assembler, numbers=left, stepnumber=1, frame=single}
+\begin{figure}
+
+    \begin{lstlisting}
+	CMP r1, $0
+	JEQ .l1
+	.l1: 
+	ADD r1, r2 		; 1 cycle instruction
+	JMP .end
+	.l2: 
+	MUL r1, r2 		; 2 cycle instruction
+	JMP .end
+	\end{lstlisting}
+	\caption{Assembly pseudo-code with a secret-dependent branch that is vulnerable to Nemesis attack}
+	\label{fig:pseudo-assembly}
+\end{figure}
+
+This paper presents a novel algorithm for automatically transforming a program in order to remove any timing leaks. It achieves this by addressing the core cause of the vulnerability: differences in 
+latencies between corresponding instructions in secret-dependent branches. Corresponding instructions are instructions that are the same distance away from a branching instruction. 
+The proposed algorithm inserts additional instructions such that all corresponding instructions have the same latency without changing affecting the program output. 
+
+The main contributions of this paper are:
+\begin{enumerate}
+\item The paper presents a novel algorithm for automatically transforming a program to remove any timing leaks.
+\item The paper presents an implementation of this algorithm for the Intel x86-64 architecture. 
+\item The paper presents an evaluation of the algorithm based on a suite of benchmark programs. 
+\end{enumerate}
+

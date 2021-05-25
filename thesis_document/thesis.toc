@@ -15,24 +15,24 @@
 \babel@toc {english}{}
 \contentsline {chapter}{List of Figures and Tables}{v}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}%
-\contentsline {section}{\numberline {1.1}First topic of the Chapter}{1}%
-\contentsline {section}{\numberline {1.2}Second topic of the chapter}{1}%
-\contentsline {chapter}{\chapternumberline {2}Design}{3}%
-\contentsline {section}{\numberline {2.1}Introduction}{3}%
-\contentsline {section}{\numberline {2.2}Nemesis-sensitive property}{4}%
-\contentsline {section}{\numberline {2.3}CFG}{4}%
-\contentsline {section}{\numberline {2.4}Equalising}{6}%
-\contentsline {subsection}{\numberline {2.4.1}Extract Sub-graph}{7}%
-\contentsline {subsection}{\numberline {2.4.2}Equalize paths}{7}%
-\contentsline {subsection}{\numberline {2.4.3}Equalize branches}{8}%
-\contentsline {subsection}{\numberline {2.4.4}Cycles}{8}%
-\contentsline {section}{\numberline {2.5}Alignment}{8}%
-\contentsline {subsection}{\numberline {2.5.1}Basic Operation}{8}%
-\contentsline {subsection}{\numberline {2.5.2}Selecting the Reference Node}{9}%
-\contentsline {subsection}{\numberline {2.5.3}Constructing NOP instruction}{10}%
-\contentsline {chapter}{\chapternumberline {3}Implementation}{15}%
-\contentsline {chapter}{\chapternumberline {4}Evaluation}{17}%
-\contentsline {section}{\numberline {4.1}Benchmark Suite}{17}%
-\contentsline {section}{\numberline {4.2}Experiment Setup}{17}%
-\contentsline {section}{\numberline {4.3}Results}{19}%
-\contentsline {chapter}{Bibliography}{21}%
+\contentsline {chapter}{\chapternumberline {2}Design}{5}%
+\contentsline {section}{\numberline {2.1}Introduction}{5}%
+\contentsline {section}{\numberline {2.2}Nemesis-sensitive property}{6}%
+\contentsline {section}{\numberline {2.3}CFG}{6}%
+\contentsline {section}{\numberline {2.4}Equalising}{8}%
+\contentsline {subsection}{\numberline {2.4.1}Extract Sub-graph}{9}%
+\contentsline {subsection}{\numberline {2.4.2}Equalize paths}{9}%
+\contentsline {subsection}{\numberline {2.4.3}Equalize branches}{10}%
+\contentsline {subsection}{\numberline {2.4.4}Cycles}{10}%
+\contentsline {section}{\numberline {2.5}Alignment}{10}%
+\contentsline {subsection}{\numberline {2.5.1}Basic Operation}{10}%
+\contentsline {subsection}{\numberline {2.5.2}Selecting the Reference Node}{11}%
+\contentsline {subsection}{\numberline {2.5.3}Constructing NOP instruction}{12}%
+\contentsline {chapter}{\chapternumberline {3}Implementation}{17}%
+\contentsline {chapter}{\chapternumberline {4}Evaluation}{19}%
+\contentsline {section}{\numberline {4.1}Benchmark Suite}{19}%
+\contentsline {section}{\numberline {4.2}Experiment Setup}{19}%
+\contentsline {section}{\numberline {4.3}Results}{21}%
+\contentsline {chapter}{\chapternumberline {5}Related Work}{23}%
+\contentsline {chapter}{\chapternumberline {6}Conclusion}{25}%
+\contentsline {chapter}{Bibliography}{27}%
