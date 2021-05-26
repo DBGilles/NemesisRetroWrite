@@ -8,7 +8,7 @@ position in two branches of a secret-dependent branching instruction.
 In practice an attacker can exploit this vulnerability by generating latency traces along different paths of the program's control flow. 
 Any differences in instruction latencies will be reflected as differences in these latency traces. 
 By carefully inspecting the relevant sections of the latency traces the attacker can infer which paths were taken for a given input. 
-In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information from the program.
+In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information from the program \cite{Nemesis}.
 
 The goal of the algorithm outlined in this section is to ensure that latency traces cannot be used to leak information in this way.
 It does this by inserting additional instructions into branches of a secret-dependent branching instruction. These instructions 
@@ -17,10 +17,10 @@ any instructions that occur at the same position in two different branches have 
 that correspond to these branches will be identical, making it impossible for an attacker to infer information. 
 
 
-The proposed algorithm inserts additional instructions into the program through manipulation of the program's control flow graph. 
+The proposed algorithm inserts additional instructions into the functions of a program through manipulation of the function's control flow graph. 
 This graph consists of nodes and vertices, where each node contains a sequence of instructions. 
 One of the main operations performed on the graph is the alignment of a set of nodes. 
-This operation inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
+This operation consists of inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
 
 Not all structures found in a control flow graph are suitable for alignment. The aforementioned alignment operation therefore has some conditions on the structure of the control flow graph that need to be met. 
 The other main operation of the algorithm consists of inserting additional nodes into the graph such that these conditions are met. 
@@ -43,20 +43,22 @@ and region $region^{else}(ep)$ with the same number of execution points, satisfi
 The relation $s \xrightarrow[]{t} s'$ models the transition between program states $s$ and $s'$, declaring that the transition between $s$ and $s'$ takes a time $t$. 
 For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions in the branches their latencies should be the same.
 
-If this nemesis-sensitive property holds for a program then an attacker is not able to infer which branch was taken by the program based on instruction latencies.
+If this nemesis-sensitive property holds for a program then an attacker is not able to infer which branch was taken by the program based on latency traces of the program.
 
 \section{CFG}\label{sec:cfg}
 
-The Control Flow Graph (CFG) is a data structure that represents the control flow of a program. A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a 
+The Control Flow Graph (CFG) is a data structure that represents the control flow of a function. 
+If a program has multiple functions then each function is represented by its own CFG. 
+A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a 
 contiguous sequence of instructions that is always executed as a whole. This implies that any branching instruction can only occur at the end of a node, 
-and an instruction that is the target of a branching instruction can only occur at the start. 
+and an instruction that is the target of a branching instruction can only occur at the start.
 
 An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ 
 when following program control flow. The algorithm only considers branching instructions that are binary in nature, so a node in the CFG can have at most 2 successors. 
 A node is said to be secret-dependent if its last instructions is a 
 secret-dependent branching instruction. 
 
-Each node has a latency sequence associated with it, equal to the latencies of the node's instructions.  
+Each node has a latency sequence associated with it. This latency sequence is equal to the latencies of the node's instructions.  
 A latency trace along a path of the CFG is then equal to the concatenation of the latency sequences of each node along the path.
 Figure \ref{fig:exampleCFG} shows an example of a such a CFG, along with the original program it is created from. The CFG also contains the latency for each instruction. Note that by convention the only node with no incoming edges is considered the starting node of the CFG. 
 
@@ -122,25 +124,23 @@ Figure \ref{fig:regionExamples} illustrates how the borders of each region are d
  \label{fig:regionExamples}
 \end{figure}
 
+
 \section{Equalising}\label{seq:equalising}
 There are 2 structures found in a program's control flow graph that make it impossible to enforce the nemesis-sensitive property for a node as defined in the previous section. 
-These structures are shown in figure \ref{fig:problemStructures}.  
+These structures are shown in figure \ref{fig:problemstructures}.  
 The first stage of the algorithm consists of inserting nodes such that these structures no longer occur. 
 
-The first such structure occurs when the program contains some sequence of instructions that is only executed if some condition is true and is illustrated in fig \label{fig:optional}.
-The corresponding CFG will have some node that has two paths to it from the root where the paths have different lengths. 
-One path will contain the node that corresponds to the conditional instructions, while the other path will not.
+The first such structure occurs when a function contains some sequence of instructions that is only executed if some condition is true and is illustrated in figure \ref{fig:optional}.
+Analogously the corresponding CFG will contain a conditional node that is only reached if the condition is true.
+A consequence of this is that there will be some node in the CFG that has at least two paths to it. One path will contain the conditional node while the other will not. 
+Additionally, the path with the conditional node will be longer than the other path. 
 
-In such cases it is impossible to align the latency traces of the two paths since of the latency traces will always be longer than the other one. Aditionally,
-because the nodes in the shorter path form a subset of the nodes in the longer path it is impossible to modify the shorter path without also modifying the longer path, making it 
-impossible to equalize the lenghts of the traces. 
 
-%In such cases it is impossible to equalize the latency traces of the two paths. Because the paths have different lengths one of the latency traces will always be 
-%longer than the other one. Additionally, because all nodes in the shorter path are also nodes in the longer path it is impossible to modify the shorter path without
-%modifying the longer path. Any attempts to lengthen the shorter path therefore also lengthen the longer path. If these paths start at a secret-dependent node it is 
-%impossible to ensure that the nemesis-sensitive property holds. 
+In such cases it is impossible to align the latency traces of the two paths since of the latency traces will always be longer than the other one. 
+Because the nodes in the shorter path form a subset of the nodes in the longer path it is impossible to modify the shorter path without also modifying the longer path, making it 
+impossible to ever equalize the lengths of the traces. 
 
-The second problematic structure occurs when one of the branches is shorter than the other one, as shown in figure \label{fig:unequal}. In such cases there will be some nodes in 
+The second problematic structure occurs when one of the branches is shorter than the other one, as shown in figure \ref	{fig:unequal}. In such cases there will be some nodes in 
 one branch that have no corresponding nodes in the other branch, making it impossible to align them. 
 
 The nemesis-sensitive property as defined in section \ref{eq:nemesisPropertyNode} entails that it is impossible for a node to satisfy the property if one of these 
@@ -182,27 +182,29 @@ into the edge between $u$ and $v$ such that the path that goes to $v$ through $u
 \subsection{Equalize branches}
 The branches of the CFG can be equalized in a similar way. Given some secret-dependent node $v$ a subset of the graph's nodes are extracted. 
 The lengths of the longest paths are computed for all nodes in the sub-graph. 
-The maximum path length is then determined as being the longest path length to some node that is also leaf. 
+The maximum path length is then determined as being the longest path length to one of the leaves of the CFG.
 The procedure then iterates over all leaves in the sub-graph and determines the difference between the distance to the leaf and the maximum path length. 
 If this difference is larger than zero then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
 path length. Because the final instruction in a leaf is a return statement any new nodes have to be added as predecessors. 
-
-\subsection{Cycles}
-The aforementioned operations require the CFG to be acyclic. 
-To account for this all cycles are removed from the CFG beforehand and later restored. 
-The edge that needs to be removed is determined based on the depths of the nodes in the cycle. 
-The depth of a node is defined as being the length of the longest path to the node from the root. 
-Removing the cycle is done by removing the edge from that graph that connects the deepest node to the most shallow node. 
-The tail and head are stored for all edges that are removed so that they can later be restored, once all paths and branches are equalized. 
-
-\begin{figure}
- \centering
- \subfloat[optional node]{\includegraphics[height = 6cm]{images/optional.png}\label{fig:optional}}
- \subfloat[unequal branches]{\includegraphics[height = 6cm]{images/unequal.png}\label{fig:unequal}} 
-
- \captionof{figure}{problematic structures in CFG}
- \label{fig:problemStructures}
-\end{figure}
+ 
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/optional.png}
+        \caption{optional node}
+        \label{fig:optional}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/unequal.png}
+        \caption{unequal branches}
+        \label{fig:unequal}
+    \end{subfigure}
+    \caption{problematic structures in CFG}
+    \label{fig:problemstructures}
+\end{figure*}
 
 \section{Alignment} \label{seq:alignment}
 
@@ -264,9 +266,39 @@ still balanced these push and pop instructions are inserted across all nodes of 
 If the reference instruction is a branching instruction the the NOP instruction will also be a branching instruction. The target of the branching instruction is then the address of the first instruction of the node's successors. 
 
 If the reference instruction is a call to a function then the NOP instruction will be  a call to the same function. The instruction is simply duplicated into the current node. 
-If function contains no secret dependent node then this ensures that any latency traces cannot leak information from the program. Otherwise the function that is called needs to be aligned as well. 
+If the function contains no secret dependent node then this ensures that any latency traces cannot leak information from the program. Otherwise the function that is called needs to be aligned as well. 
 It is only safe to insert a call to a function this way if the function in question has no effects on the program state. If the function does modify the program state then inserting additional calls can 
 result in erroneous program outputs. 
+
+\section{The algorithm}
+
+
+\subsection{Cycles}
+The operations described in section \ref{seq:equalising} require the CFG to be acyclic.
+To account for this all cycles are removed from the CFG beforehand and later restored. 
+The edge that needs to be removed is determined based on the depths of the nodes in the cycle. 
+The depth of a node is defined as being the length of the longest path to the node from the root. 
+Removing the cycle is done by removing the edge from that graph that connects the deepest node to the most shallow node. 
+The tail and head are stored for all edges that are removed so that they can later be restored. 
+
+The removal of these edges has no effect on the operations of the algorithm if the cycle is not part of a branch of a secret dependent node.  
+Cycles within a branch of a secret dependent node are not supported by the proposed algorithm.
+In this case the algorithm correctly aligns the nodes of the branches but the latency traces will still not be identical.
+The branch that contains the cycle will be executed a higher number of times, resulting in a longer latency trace. 
+
+\subsection{Closing timing leaks}
+Algorithm \ref{alg:closeleaks} illustrates the top-level operation of the algorithm. 
+The secret-dependent branching instructions are passed to the algorithm as arguments. 
+Determining which branching instructions are secret-dependent is not part of the proposed algorithm. 
+The user has to provide the algorithm with the address of the target instruction.
+
+Based on the given instructions the secret-dependent nodes of the CFG are determined. 
+These are all nodes that contain a secret-dependent instruction. 
+First the equalizing operations are applied for each secret-dependent node. 
+Only once all necessary nodes have been inserted is the CFG aligned.
+This order of operations ensures that the algorithm works correctly even when secret-dependent node is nested inside the branch of another secret-dependent node. 
+This can occur when, for example, a program contains a nested if-statement. Cycles are removed from the CFG and restored as described in the previous section.
+
 
 \begin{algorithm*}
   \SetAlgoLined
@@ -456,9 +488,40 @@ result in erroneous program outputs.
         \KwRet candidates[0] \\
     }
     
-    
-
-    
+       
     \caption{Align CFG}
     \label{alg:align}
+\end{algorithm*}
+
+\begin{algorithm*}
+    \SetAlgoLined
+    \DontPrintSemicolon
+    
+    
+    \SetKwProg{closeTimingLeaks}{Procedure}{}{}
+    \SetKwProg{alignNodes}{Procedure}{}{}
+    
+    \SetKwFunction{closeTimingLeaksName}{CloseTimingLeaks}
+    \SetKwFunction{alignNodesFNName}{AlignNodes}
+    \SetKwFunction{computeDistanceFromNode}{ComputeDistanceFromNode}
+	\SetKwFunction{removeCycles}{RemoveCycles}    
+    \SetKwFunction{restoreCycles}{RestoreCycles}    
+    
+    \closeTimingLeaks{\closeTimingLeaksName{g: CFG, instrs: [Instruction]}}{	
+     	targetNodes $\leftarrow$ $\{ n \vert n \in $\nodes{g}$ \land  \exists instr \in instrs : instr \in n \}$ \\
+     	removedEdges $\leftarrow$ \removeCycles{g} \\
+     	\ForAll{node $\in$ targetNodes}{
+     		\equalizePathsFnName{g, node} \\
+     		\equalizeBranchesFNName{g, node} \\
+     	}
+
+     	\ForAll{node $\in$ targetNodes}{
+     		\alignCFGFNName{g, node} \\	
+     	}
+		
+		\restoreCycles{g, removedEdges} \\
+     	
+    }
+    \caption{Close timing leaks}
+    \label{alg:closeleaks}
 \end{algorithm*}

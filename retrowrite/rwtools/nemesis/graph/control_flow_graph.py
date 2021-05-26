@@ -342,6 +342,8 @@ class ControlFlowGraph:
         self.graph.remove_node(from_node)
 
     def merge_inserted_nodes(self):
+        # cycles will mess with topological ordering needed for merging inserted node,
+        # remove the cycles and restore them later
         targets = []
         # determine which nodes need to be inserted
         # for node in self.graph.nodes:

@@ -188,7 +188,7 @@ LockedStatus_4034: # 4034 -- 4038
 BSL430_unlock_BSL:
 .L1140:
 .LC1140:
-pushq %r8
+pushq %r13
 	pushq %rbp
 .LC1141:
 	movq %rsp, %rbp
@@ -219,6 +219,7 @@ pushq %r8
 	movsbl (%rax, %rdx), %esi
 .LC117e:
 	cmpl %esi, %ecx
+or -0x4(%rbp), %r13
 .LC1180:
 	je .L0
 .LC1186:
@@ -227,16 +228,16 @@ pushq %r8
 	orl $0x40, %eax
 .LC118c:
 	movl %eax, -0x10(%rbp)
-jmp .R586
+jmp .R592
 .L118f:
 .LC118f:
 .L0:
-movq -0x4(%rbp), %r8
+movq -0x4(%rbp), %r13
 add $0, %rax
-movq -0x4(%rbp), %r8
-jmp .R34
-.R34:
-.R586:
+movq -0x4(%rbp), %r13
+jmp .R16
+.R16:
+.R592:
 	jmp .L1194
 .L1194:
 .LC1194:
@@ -255,28 +256,42 @@ jmp .R34
 	jmp .L1161
 .L11b1:
 .LC11b1:
+movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %r13
+movq -0x4(%rbp), %r13
+add $0, %rax
 	cmpl $0, -0x10(%rbp)
 .LC11b5:
 	jne .L11d1
 .LC11bb:
 	movl $0xa5a4, .LC4034(%rip)
+add $0, %rax
 .LC11c5:
 	movl $0, -0x14(%rbp)
 .LC11cc:
-	jmp .L11e2
+	jmp .L1
 .L11d1:
 .LC11d1:
 	movl $0, .LC4034(%rip)
+add $0, %rax
 .LC11db:
 	movl $5, -0x14(%rbp)
+jmp .L1
 .L11e2:
 .LC11e2:
+.L1:
+jmp .R495
+.R495:
 	movl -0x14(%rbp), %eax
 .LC11e5:
 	movsbl %al, %eax
 .LC11e8:
 	popq %rbp
-popq %r8
+popq %r13
+add $0, %rax
+movq -0x4(%rbp), %r13
 .LC11e9:
 	retq 
 .size BSL430_unlock_BSL,.-BSL430_unlock_BSL
