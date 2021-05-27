@@ -25,9 +25,9 @@
 \contentsline {section}{\numberline {2.3}CFG}{6}%
 \contentsline {section}{\numberline {2.4}Equalising}{8}%
 \contentsline {subsection}{\numberline {2.4.1}Extract Sub-graph}{9}%
-\contentsline {subsection}{\numberline {2.4.2}Equalize paths}{9}%
+\contentsline {subsection}{\numberline {2.4.2}Equalize path lengths}{9}%
 \contentsline {subsection}{\numberline {2.4.3}Equalize branches}{10}%
-\contentsline {section}{\numberline {2.5}Alignment}{10}%
+\contentsline {section}{\numberline {2.5}Alignment}{11}%
 \contentsline {subsection}{\numberline {2.5.1}Basic Operation}{11}%
 \contentsline {subsection}{\numberline {2.5.2}Selecting the Reference Node}{11}%
 \contentsline {subsection}{\numberline {2.5.3}Constructing NOP instruction}{12}%

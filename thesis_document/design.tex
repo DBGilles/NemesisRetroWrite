@@ -17,7 +17,7 @@ any instructions that occur at the same position in two different branches have 
 that correspond to these branches will be identical, making it impossible for an attacker to infer information. 
 
 
-The proposed algorithm inserts additional instructions into the functions of a program through manipulation of the function's control flow graph. 
+The proposed algorithm inserts additional instructions into the functions of a program through manipulation of the function's control flow graph (CFG). 
 This graph consists of nodes and vertices, where each node contains a sequence of instructions. 
 One of the main operations performed on the graph is the alignment of a set of nodes. 
 This operation consists of inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
@@ -48,9 +48,9 @@ If this nemesis-sensitive property holds for a program then an attacker is not a
 \section{CFG}\label{sec:cfg}
 
 The Control Flow Graph (CFG) is a data structure that represents the control flow of a function. 
-If a program has multiple functions then each function is represented by its own CFG. 
+If a program has multiple functions then each function is represented by a separate CFG. 
 A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a 
-contiguous sequence of instructions that is always executed as a whole. This implies that any branching instruction can only occur at the end of a node, 
+contiguous sequence of instructions that is always executed as a whole. This implies that a branching instruction can only be found at the end of a node, 
 and an instruction that is the target of a branching instruction can only occur at the start.
 
 An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ 
@@ -92,6 +92,7 @@ int main(){
 \end{figure}
 
 Following the property described in section \ref{eq:nemesisProperty}, the nemesis-sensitive property can be defined for a node in the CFG. Let $v$ be a secret-dependent node. 
+
 Let $v_f$ be a node such that all paths from $v$ to some leaf go through $v_f$. Then $region^{then}(v)$ can be defined as the set of nodes reachable following the 
 first of $v$'s outgoing edges up to and including $v_f$ and $region^{else}(v)$ as the set of nodes reachable following the other outgoing edge up to and including $v_f$.
 
@@ -99,8 +100,8 @@ Any differences in the latency sequences of two nodes can only be used to infer 
 Any differences in latencies between two nodes that are descendants of $v_f$ can therefore only be used to infer information about which branch was taken at $v_f$. 
 This means that all nodes below $v_f$ do not have to be considered. If no such node $v_f$ exists then the regions simply consist of all nodes reachable from $v$ through one of its outgoing edges. 
 
-Let $n^i \in region(v)$ be a node such that there is a path going to it from node $v$ of length $i$. The depth of $region(v)$ is defined as being the length of the longest path from $v$ to some node $v' \in region(v)$ that does not contain a cycle.
-
+The depth of $region(v)$ is defined as being the length of the longest path from $v$ to some node $v' \in region(v)$ that does not contain a cycle.
+Let $n^i \in region(v)$ be a node such that there is a path going to it from node $v$ of length $i$. 
 A secret-dependent node $v$ and $region^{then}(v)$ and $region^{else}(v)$ with the same depth satisfies the nemesis-sensitive property if and only if 
 \begin{equation} \label{eq:nemesisPropertyNode}
     \begin{split}
@@ -146,7 +147,7 @@ one branch that have no corresponding nodes in the other branch, making it impos
 The nemesis-sensitive property as defined in section \ref{eq:nemesisPropertyNode} entails that it is impossible for a node to satisfy the property if one of these 
 structures occurs in its branches, since in both cases the regions have different depths. 
 The first stage of the algorithm therefore consists of first equalizing all path lengths and then 
-equalizing branches. 
+equalizing all branch depths. This is achieved by inserting additional instructions into the CFG.  
 Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict pseudo-code for equalizing paths lengths and equalizing branches respectively. 
 
 \subsection{Extract Sub-graph}
@@ -166,15 +167,19 @@ In this case any descendants of $d$ are not part of $region_{then}(v)$ or $regio
 If such a node $d$ exists then the nodes that are a part of the sub-graph are all nodes that are on a path from $n$ to $d$. If $d$ does not exists 
 the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
 
-\subsection{Equalize paths}
+\subsection{Equalize path lengths}
 
 To equalize all path lengths starting from some secret-dependent node $v$, first a subset of the graph's nodes are extracted such that 
 only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered.  
 Next the length of the longest path is computed from $v$ to all nodes in the sub-graph. 
 
 Let $(u, v)$ be an edge in the sub-graph. Let $d(u)$ and $d(v)$ be the length of the longest path to $u$ and $v$. If the difference between $d(u)$ and $d(v)$ is more than 
-one then there exists at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
+one then there exist at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
 length $d(v)$. 
+
+The solution is based on the observation that the edge $(u, v)$ is a part of the shorter path. Additional nodes can be inserted between $u$ and $v$ to increase the length of the path until it 
+is as long as the longest path. 
+All other paths to $v$ will be unaffected. 
 
 The procedure for equalizing the path lengths iterates over all edges of the sub-graph. If the distances to $u$ and $v$ differ by more than one then nodes are inserted 
 into the edge between $u$ and $v$ such that the path that goes to $v$ through $u$ is of the same length as the longest path to $v$. 
