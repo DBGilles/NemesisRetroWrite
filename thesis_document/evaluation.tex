@@ -1,8 +1,8 @@
 
 \chapter{Evaluation}
 \section{Benchmark Suite}
-Winderix et. al. have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
-collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources \cite{WinderixHans}. 
+Winderix et. al. \cite{WinderixHans} have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
+collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources. 
 To evaluate the proposed algorithm a subset of this benchmark suite was selected. 
 
 All programs that contain loops inside vulnerable branches were discarded from the synthetic programs in the benchmark suite, 
@@ -20,7 +20,7 @@ modifies a non-local variable though a pointer. This function is only called in 
 
 \section{Experiment Setup}
 The algorithm is evaluated using three metrics. The first metric aims to measure the effectiveness of the algorithm. A static analysis tool was developed to verify 
-for a given program whether or not the program satisfies the Nemesis-sensitive property as specified in section \ref{sec:property}.
+whether or not program satisfies the Nemesis-sensitive property as specified in section \ref{sec:property}.
 Given a program and a set of secret-dependent branches, this tool partitions instructions into sets according to their positions in secret dependent branches. Following the notation of section \ref{sec:property}, let \textit{ep} be a secret dependent branch, and let $ep^n$ be the n'th instruction in a region, then define the set 
 \begin{equation} \label{eq:toolSets}
     ep_i = \{ ep^n |i = n \land  (ep^n \in region_{then}(ep) \lor ep^n \in region_{else}(ep)\}
@@ -33,8 +33,8 @@ These values were supplied as inputs to both the original program and the balanc
 verify that the algorithm correctly modified the program without changing the output. 
 
 The effect on the program's performance is evaluated by measuring the increase in the sum of the latencies along paths in the programs CFG. 
-To measure this increase CFG are constructed from the original binary and from the modified binary. 
-For each path in the original CFG its corresponding path in the modified CFG is determined. TO do so a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
+To measure this increase CFGs are constructed from the original binary and from the modified binary. 
+For each path in the original CFG its corresponding path in the modified CFG is determined. To do so a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
 This mapping takes into account the condition of a branching instruction, and can be defined inductively. 
 The root of the original CFG is mapped to the root of the root of the balanced CFG. 
 If two nodes are mapped and they both have one successor then their successors are mapped. 
@@ -69,40 +69,65 @@ To evaluate the effect on runtime performance the sum of the latencies along all
 are not affected by the algorithm and are therefore not considered in this evaluation. 
 
     
-\section{Discussion}
+\section{Results}
 
-The results of the experiments are summarized in figure \ref{fig:experiment results}. 
-The results show that  the algorithm was able to ensure the Nemesis sensitive property holds for all programs, as verified by the static analysis tool described in the previous section. 
+The results of the experiments are summarized in figure \ref{fig:experiment results}.
+The algorithm was able to ensure the Nemesis-sensitive property holds for all programs, as verified by the static analysis tool described in the previous section. This effectively closes the 
+timing leaks found in the program. 
 
 In all but one test case the algorithm had no effect on the program output. 
 The erroneous test case contains a call to a function that modifies the global state of the program in one of its secret dependent branches. 
 During balancing of the program this function call is copied to the other branch. 
 Because the function call has side effects the final output of the program is different. 
 
-
-The effect on performance ... 
+The effects on program performance are summarized in the last 6 columns of figure \ref{fig:experiment results}. 
+These results are sorted from largest to smallest. 
+The increase in latencies ranges from 1.00 times up to 1.8 times. 
 
 \begin{figure}
     \centering
-    \begin{tabular}{ l | c | c | c c c c c c }
-    Name & Effectiveness & Correct & \multicolumn{6}{c}{Performance} \\ 
+    \begin{tabular}{| l | c | c | c c c c c c |}
+    \hline
+    Benchmark & Effectiveness & Correctness & \multicolumn{6}{ c|}{Performance} \\ 
      & & & path1 & path2 & path3 & path4 & path5 & path6\\
      \hline 
 
-    call        & Y & Y & 1.32 & 1.17 & &  & & \\  
-    call2       & Y & N & 1.25 & 1.22 & &  & & \\
-    diamond     & Y & Y & 1.35 & 1.06 & 1.06 & & &  \\ 
-    fork        & Y & Y & 1.43 & 1.15 & & & &  \\  
-    ifcompound  & Y & Y & 1.31 & 1.26 & 1.11 & 1.11 & 1.09 & 1.09  \\
-    indirect    & Y & Y & 1.44 & 1.32 & 1.20 & 1.11 & & \\ 
+    call        & \cmark & \cmark & 1.32 & 1.17 & &  & & \\  
+    call2       & \cmark & \xmark & 1.25 & 1.22 & &  & & \\
+    diamond     & \cmark & \cmark & 1.35 & 1.06 & 1.06 & & &  \\ 
+    fork        & \cmark & \cmark & 1.43 & 1.15 & & & &  \\  
+    ifcompound  & \cmark & \cmark & 1.31 & 1.26 & 1.11 & 1.11 & 1.09 & 1.09  \\
+    indirect    & \cmark & \cmark & 1.44 & 1.32 & 1.20 & 1.11 & & \\ 
 
-    multifork   & Y & Y & 1.80 & 1.58 & 1.41 & 1.41 & &   \\
-    triangle    & Y & Y & 1.30 & 1.16 & & & &  \\
+    multifork   & \cmark & \cmark & 1.80 & 1.58 & 1.41 & 1.41 & &   \\
+    triangle    & \cmark & \cmark & 1.30 & 1.16 & & & &  \\
   	\hline
-  	bsl         & Y & Y & 1.42 & 1.00 & & & &  \\ 
-	keypad      & Y & Y & 1.67 & 1.55 & 1.45 & 1.02 & 1.12 &   \\  
+  	bsl         & \cmark & \cmark & 1.42 & 1.00 & & & &  \\ 
+	keypad      & \cmark & \cmark & 1.67 & 1.55 & 1.45 & 1.02 & 1.12 &   \\  
 %    sharevalue  & Y & Y & 1.25 & 1.0 & & & &  \\
+%	\hline
+%	geometric mean & & & 1.67 & 1.55 & 1.45 & 1.02 & 1.12 & \\
+	\hline 
     \end{tabular}
-    \caption{experiment results. Increase in performance is expressed as a percentage increase of the sum of the latencies along the path}
+    \caption{Results of the evaluation experiments. A check mark in the second column indicates that all timing-leaks were closes. A checkmark in the third column indicates that the program output has not changed. 
+    The third column contains the increase in the sum of the latencies along various paths in the program, expressed as a percentage increase.}
     \label{fig:experiment results}
 \end{figure}
+
+\section{Discussion}
+One limitation of the proposed algorithm is the lack of support for cycles within secret-dependent branches.
+However, the results show that the algorithm is effective in closing timing leaks. 
+This indicates that it is possible modify the algorithm such that it is able to close these leaks even in the presence of cycles. 
+
+The root cause of the issue the fact that a section of the first branch will be executed a higher number of times than the corresponding section in the second branch. 
+As a consequence one of the latency traces will be, even when the relevant sections are aligned.
+A solution that addresses this would have to make more extensive changes to the program. 
+Before aligning the nodes, the structure of the cycle would have to be duplicated into the second branch such that the corresponding section is is executed the same number of times. 
+This requires additional analysis to determine which register contains the loop counter and how many time it is incremented. 
+The duplication of the cycle also requires more significant changes than those implemented by the current algorithm. % hier nog aangeven waarom / welke aanpassingen? 
+Due to the added complexity such a solution is not included in the proposed algorithm and is left to future research. 
+
+A second limitation is the incomplete coverage of the latency data. There are certain instructions for which there is no available latency data. 
+If these instructions are encountered in branches of  a secret-dependent branching instruction then the algorithm is not able to close the timing leaks. 
+However this issue was not encountered during evaluation of the algorithm. 
+This indicates that the most commonly used instructions are present in the data and that the coverage of the data is sufficient to close timing leaks in most programs. 

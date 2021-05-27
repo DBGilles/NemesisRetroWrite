@@ -4,6 +4,10 @@
 #TODO #
 #######
 -- writing --
+ . general
+    - use consistent wording everywhere
+        - close timing leaks vs nemesis style attacks
+    - extend evaluation. more test programs, and do if conversion to check effect on performance (cfg. beetze.de)
 0. abstract
     - engels
     - nederlands
@@ -24,20 +28,6 @@
 1. insert push and pop before/after instruction if no free registers
 2. clean up NemesisNode and AbstractNemesisNode
 3. remove old/unused code + general cleanup
-
-
-
-#########
-# extra #
-#########
-- _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
-- insertion of nodes -- also inserts branching instructions into the nodes etc.
-- balancing with multiple targets -- adjust text (for each target, first insert nodes, then align for each node, etc. ..)
-- static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
-    if depths are not the same then some set will be
-- introduce consistent wording -- use it everywhere in the text
-    balanced program or aligned program or modified program or .... (kies 1, wees consistent)
-
 
 ###################################
 # richtlijnen en info rond thesis #
@@ -60,10 +50,3 @@ titel.
 • De doelstellingen en de onderzoeksvragen van de masterproef.
 • Een overzicht van de verschillende hoofdstukken.
 
-##############
-# discussion #
-##############
-- something about the (lack of) support for cycles
-    does not indicate that the algorithm is inferior or does not work, the algorithm can be modified to ...
-- something about latency data that is not available
-   although not all instructions are covered, evaluation results show that the coverage is sufficient to cover 'normal' instructions

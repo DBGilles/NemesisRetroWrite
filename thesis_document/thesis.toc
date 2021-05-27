@@ -38,7 +38,8 @@
 \contentsline {chapter}{\chapternumberline {4}Evaluation}{21}%
 \contentsline {section}{\numberline {4.1}Benchmark Suite}{21}%
 \contentsline {section}{\numberline {4.2}Experiment Setup}{21}%
-\contentsline {section}{\numberline {4.3}Discussion}{23}%
+\contentsline {section}{\numberline {4.3}Results}{23}%
+\contentsline {section}{\numberline {4.4}Discussion}{24}%
 \contentsline {chapter}{\chapternumberline {5}Related Work}{25}%
 \contentsline {chapter}{\chapternumberline {6}Conclusion}{27}%
 \contentsline {chapter}{Bibliography}{29}%
