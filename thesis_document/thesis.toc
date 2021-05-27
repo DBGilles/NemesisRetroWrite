@@ -15,6 +15,10 @@
 \babel@toc {english}{}
 \contentsline {chapter}{List of Figures and Tables}{v}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}%
+\contentsline {section}{\numberline {1.1}Protected Module Architectures}{1}%
+\contentsline {section}{\numberline {1.2}Nemesis}{2}%
+\contentsline {section}{\numberline {1.3}Related Work}{3}%
+\contentsline {section}{\numberline {1.4}Thesis Goal and Outline}{3}%
 \contentsline {chapter}{\chapternumberline {2}Design}{5}%
 \contentsline {section}{\numberline {2.1}Introduction}{5}%
 \contentsline {section}{\numberline {2.2}Nemesis-sensitive property}{6}%
@@ -39,7 +43,7 @@
 \contentsline {section}{\numberline {4.1}Benchmark Suite}{21}%
 \contentsline {section}{\numberline {4.2}Experiment Setup}{21}%
 \contentsline {section}{\numberline {4.3}Results}{23}%
-\contentsline {section}{\numberline {4.4}Discussion}{24}%
-\contentsline {chapter}{\chapternumberline {5}Related Work}{25}%
-\contentsline {chapter}{\chapternumberline {6}Conclusion}{27}%
-\contentsline {chapter}{Bibliography}{29}%
+\contentsline {chapter}{\chapternumberline {5}Conclusion}{25}%
+\contentsline {section}{\numberline {5.1}Discussion}{25}%
+\contentsline {section}{\numberline {5.2}Future work}{25}%
+\contentsline {chapter}{Bibliography}{27}%

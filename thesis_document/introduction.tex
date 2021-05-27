@@ -14,6 +14,7 @@
 \chapter{Introduction}
 \label{cha:introduction}
 
+\section{Protected Module Architectures}
 Because of the increasing popularity of IoT devices more and more embedded computing devices are being connected to the Internet. 
 These devices are often more susceptible to being exploited because they support software extensibility. 
 Additionally because these devices are connected to a network the risk increases since attacks can be done remotely. 
@@ -43,6 +44,7 @@ called controlled-attacks. These attacks are categorized by untrusted operating 
 The authors were able to leverage the OS's high degree of control over the system to extract large amounts of data from applications which were until 
 then safe from side-channel attacks \cite{xu}. 
 
+\section{Nemesis}
 More recently Van Bulck et. al \cite{Nemesis} developed Nemesis, a controlled-channel attack that leverages the interrupt mechanism to extract sensitive information from 
 enclaved applications. The authors were able to exploit timing differences in the latency between the arrival of an interrupt request (IRQ) and the execution of the first instruction in the 
 interrupt service routine (ISR). They state that their attack is \textit{based on the key observation that an IRQ during a multi-cycle instruction increases the interrupt 
@@ -73,6 +75,11 @@ By measuring the interrupt latency the attacker can infer which of the two instr
 	\label{fig:pseudo-assembly}
 \end{figure}
 
+
+
+\section{Related Work}
+
+\section{Thesis Goal and Outline}
 This paper presents a novel algorithm for automatically transforming a program in order to remove any timing leaks. It achieves this by addressing the core cause of the vulnerability: differences in 
 latencies between corresponding instructions in secret-dependent branches. Corresponding instructions are instructions that are the same distance away from a branching instruction. 
 The proposed algorithm inserts additional instructions such that all corresponding instructions have the same latency without changing affecting the program output. 
