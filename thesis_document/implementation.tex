@@ -1,29 +1,50 @@
 
+
 \chapter{Implementation}
 
+\subsubsection{RetroWrite}
 The algorithm has been implemented in X lines of Python code as part of the RetroWrite framework. 
-RetroWrite is a binary rewriting tool developed for statically instrumenting programs. 
+RetroWrite is a binary rewriting tool developed for statically instrumenting C and C++ binaries. 
 The authors are able to leverage relocation information present in position independent code to produce assembly files that can be reassembled into binaries.
-On top of this the framework provides a rewriting API that allows for flexible and expressive transformations of the binary code \cite{Dinesh2020RetroWriteSI}. 
+On top of this the framework provides a rewriting API that allows for flexible and expressive transformations of the reconstructed assembly files \cite{Dinesh2020RetroWriteSI}
 
-Implementing the algorithm on top of the RetroWrite frameworks allows for the alignment of instructions in existing binaries. This means that you do not need access to 
-the source code ... \textbf{benefits of binary rewriting here}
+% volgende zin bijna letterlijk uit RetroWrite paper 
+The RetroWrite frameworks implements a logical abstraction for rewriting passes to operate on.
+These come in the form of data structures that represent the logical units of a program,
+Each of these data structure provide an interfaces for analyzing and modifying the underlying data. 
+One such logical abstraction is the \textit{InstructionWrapper}. 
+This datastructure stores among other things, the instruction address, the mnemonic, and the operand string, and provides an interface
+for modifying the underlying instruction and for prepending or appending additional instructions.  
+The \textit{Function} datastructure contains a set of instructions and a function that maps each instruction to all instruction that can follow it. 
 
-The RetroWrite framework imposes some restrictions on the binary. The binary 
+The proposed algorithm is implemented as an additional abstraction layer on top of these data structures. 
+Each node of the CFG consists of a sequence of \textit{InstructionWrapper}s. 
+The edges of the CFG are reconstructed based on data inside the \textit{Function} instances. 
+The CFG data structure implements  an interface for the insertion of additional nodes into the graph and the insertion of additional instructions into nodes. 
+This interface is built on top of the RetroWrite API, so all modifications to the CFG result in modification to the underlying \textit{InstructionWrapper} instances. 
+RetroWrite provides functionality for writing the instruction to assembly files. This assembly file can then be compiled using any of-the-shelf compiler. 
 
-\begin{itemize}
-	\item must be compiled as position independent code 
-	\item must be \textit{x86\_64} 
-	\item must contain symbols and cannot be stripped
-\end{itemize}
-\cite{hexhive}
 
+The RetroWrite framework imposes some restrictions on the binary. The binary must be compiled as position independent code, it must contain instructions from x86\_64 architecture, and 
+it cannot be stripped of symbols \cite{hexhive}. 
+As a result the implementation only supports binaries that meet these restrictions. 
+
+\subsubsection{Binary Rewriting}
+% TODO dit meer uitgebreid 
+Implementing the algorithm as part of a binary rewriting framework has two main advantages. 
+Firstly the algorithm can be applied to existing binaries. 
+Secondly the algorithm does not require the source code of the program. It can be applied to third-party software. 
+
+
+\subsubsection{Secret-dependent branches}
 The detection of secret dependent branches is not part of the algorithm or the implementation. The user has to provide the algorithm with the address of the target instruction. 
 At the time of writing secret dependent branching instructions need to be identified through manual inspection. However, research has shown that static detection of these side channels is possible, though 
 this is currently limited to the MSP430 architecture \cite{MSP430Detection}.
 
+\subsubsection{Instruction Latencies}
+The construction of NOP instructions as described in section \ref{sec:nop} is based on data that measures the latency of instructions in the x86-64 architecture.
 Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual} but this data is not complete.
-To obtain better data Abel et. al developed novel algorithms to infer the latency throughput, and port usage based on automatically-generated microbenchmarks \cite{uops}. 
+To obtain better data Abel et. al  \cite{uops} developed novel algorithms to infer the latency throughput, and port usage based on automatically-generated microbenchmarks. 
 The authors claim that their results are more accurate and precise than existing work. 
 Another source of data on instruction latencies is provided by Agner Fog who provides the results of his own measurements \cite{fog_2021}. 
 

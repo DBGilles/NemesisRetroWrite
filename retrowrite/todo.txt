@@ -4,15 +4,21 @@
 #TODO #
 #######
 -- writing --
-1.  improve design section writing + implementation section
-    - ergens moet er vermeld worden hoe het werkt bij balanced van multiple nodes en/of top level algorithm beschrijven ergens ?
-    - stuk over selecteren van reference node moet beter, uitgebreider (misschien met voorbeelden om duidelijk te maken wat de regels juist zijn)
-    i.e. de verschillend mogleijke cases, en hoe dit leidt tot de regel
-    ook moet er ergens aangegeven worden waarom branching instructions speciaal zijn, en zelfde voor return instructions.
-    - ergens aangeven dat return en jumps speciaal behandeld worden (i.e. latency -1)
+0. abstract
+    - engels
+    - nederlands
+1. introduction
+    - meer uitgebreid
+2. Design section
+    - voorbeeld van aligning algorithm (met figuur)
+3. implementation
+    - benefits of binary rewriting
+4. evaluation
+    - write actual conclusion + discussion of results
 
-2. Finish evaluation -- write actual conclusion, some discussion of results
-3. implementation, benefits of binary rewriting
+5. related work
+    - alles
+
 
 -- code --
 1. insert push and pop before/after instruction if no free registers
@@ -27,18 +33,37 @@
 - _select_register was also modified slightly (check if function is in set of keys, although this should always be true)
 - insertion of nodes -- also inserts branching instructions into the nodes etc.
 - balancing with multiple targets -- adjust text (for each target, first insert nodes, then align for each node, etc. ..)
-- iets over feit dat vinden van secret depdendent branches out of scope is
 - static analysis evaluation tool - mention something about it first verifying that the depths of the trees are same? Or is this overbodig?
     if depths are not the same then some set will be
 - introduce consistent wording -- use it everywhere in the text
     balanced program or aligned program or modified program or .... (kies 1, wees consistent)
--
 
 
-woensdag
-1. verder afwerken design section (vooral laatste stuk)
-2. afwerken implementation stuk
-3. afwerken evaluation + conclusion
-4. code aanpassen zodat dit overeenkomt (bekijk cycles, voor welke stukken van de code moeten die weg?)
-donderdag en vrijdag
-1. related work
+###################################
+# richtlijnen en info rond thesis #
+###################################
+
+https://wms.cs.kuleuven.be/cs/studeren/master-computerwetenschappen/masterproef/eindwerken03-2021.pdf
+
+!!! schrijfhulp !!!
+https://awa.schrijfhulp.be/index.php (link staat ook in bovenstaand pdf)
+
+uit richtlijnen
+De inleiding is in zekere zin het belangrijkste hoofdstuk van je tekst. De inleiding mag vrij
+uitgebreid zijn. Ze bevat o.a. volgende zaken.
+• Een situering van het onderwerp in een ruimere context. Dit kan, al naar gelang het
+onderwerp, vrij ver gaan: situering binnen het vakdomein, situering binnen de maatschappelijke evolutie, raakvlakken met andere disciplines,. . ..
+• Een beknopt historisch overzicht van de evolutie van het onderwerp.
+• Een bespreking van bestaande oplossingen en systemen.
+• De verklaring van de titel en dus ook definitie van de termen die gebruikt worden in de
+titel.
+• De doelstellingen en de onderzoeksvragen van de masterproef.
+• Een overzicht van de verschillende hoofdstukken.
+
+##############
+# discussion #
+##############
+- something about the (lack of) support for cycles
+    does not indicate that the algorithm is inferior or does not work, the algorithm can be modified to ...
+- something about latency data that is not available
+   although not all instructions are covered, evaluation results show that the coverage is sufficient to cover 'normal' instructions

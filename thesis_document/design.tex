@@ -242,10 +242,12 @@ The case where all candidate nodes have a branching instruction at position $i_{
 At this point any of the candidate nodes are suitable and one is selected arbitrarily again. 
 
 \subsection{Constructing NOP instruction}
-For each latency class a template NOP instruction has been determined. 
-The instruction can be inserted into the program as-is if it has no effect on the program state, i.e. it does not modify any register values. 
-If the instruction does modify some register the algorithm selects a registers that can safely be used. 
-This needs to be a register that is not in use at the time of execution of the instruction. 
+\label{sec:nop}
+Any instructions that is inserted into the program can have no effect on the program outcome. In this regard they are the same as the no-operation instruction and are 
+referred to as NOP instructions. For each latency class a template NOP instruction has been determined. 
+For some latency classes a NOP instruction exists that has no effect on the program state. These can be inserted into the program as-is. 
+For other latency classes the NOP instruction modifies some register value. In these cases the algorithm selects a registers that can safely be used. 
+This needs to be a register that is not in use at the time of execution of the instruction in order to guarantee that the program outcome is not changed. 
 
 There are two types of free registers. 
 A register can be free because its current value is no longer used. This occurs when the register is overwritten at some later point without being read first. 

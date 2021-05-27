@@ -27,14 +27,18 @@
 \contentsline {subsection}{\numberline {2.5.1}Basic Operation}{11}%
 \contentsline {subsection}{\numberline {2.5.2}Selecting the Reference Node}{11}%
 \contentsline {subsection}{\numberline {2.5.3}Constructing NOP instruction}{12}%
-\contentsline {section}{\numberline {2.6}The algorithm}{12}%
-\contentsline {subsection}{\numberline {2.6.1}Cycles}{12}%
+\contentsline {section}{\numberline {2.6}The algorithm}{13}%
+\contentsline {subsection}{\numberline {2.6.1}Cycles}{13}%
 \contentsline {subsection}{\numberline {2.6.2}Closing timing leaks}{13}%
 \contentsline {chapter}{\chapternumberline {3}Implementation}{19}%
+\contentsline {subsubsection}{RetroWrite}{19}%
+\contentsline {subsubsection}{Binary Rewriting}{20}%
+\contentsline {subsubsection}{Secret-dependent branches}{20}%
+\contentsline {subsubsection}{Instruction Latencies}{20}%
 \contentsline {chapter}{\chapternumberline {4}Evaluation}{21}%
 \contentsline {section}{\numberline {4.1}Benchmark Suite}{21}%
 \contentsline {section}{\numberline {4.2}Experiment Setup}{21}%
-\contentsline {section}{\numberline {4.3}Results}{23}%
+\contentsline {section}{\numberline {4.3}Discussion}{23}%
 \contentsline {chapter}{\chapternumberline {5}Related Work}{25}%
 \contentsline {chapter}{\chapternumberline {6}Conclusion}{27}%
 \contentsline {chapter}{Bibliography}{29}%
