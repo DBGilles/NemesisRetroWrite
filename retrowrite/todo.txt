@@ -8,6 +8,7 @@
     - use consistent wording everywhere
         - close timing leaks vs nemesis style attacks
     - extend evaluation. more test programs, and do if conversion to check effect on performance (cfg. beetze.de)
+    - in the introduction - latency trace vs. statictical mean of latency traces (as in nemesis paper)
 0. abstract
     - engels
     - nederlands
@@ -15,6 +16,7 @@
     - meer uitgebreid
 2. Design section
     - voorbeeld van aligning algorithm (met figuur)
+    - latency trace vs statistical meawn of latency traces
 3. implementation
     - benefits of binary rewriting
 4. evaluation
@@ -50,3 +52,65 @@ titel.
 • De doelstellingen en de onderzoeksvragen van de masterproef.
 • Een overzicht van de verschillende hoofdstukken.
 
+
+temporary
+
+Things to mention:
+\begin{enumerate}
+\itemsep0em
+\item constant time IRQ defences (insufficient according to Nemesis paper)  \\
+\item automated if-conversion \\
+\item if-conversion comes with significant overhead (https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=5207636)	\\
+\item "Alternatively, compilers could focus on detecting, rather than
+eliminating, IRQ timing attacks. Our interrupt extensions for Sancus indeed follow PMA designs [7, 14, 41] that explicitly call into
+an enclave to request resumption of internal execution. As such,
+Sancus enclaves are interrupt-aware and they could use excessive
+interrupt rates as an indicator to trigger some security policy that
+terminates the module and/or destroys secrets. Interrupts also occur in benign conditions, however, and a single interrupt already
+suffices to leak confidential information, as evident from our Sancus
+attack scenarios. Adversaries could thus adapt their attacks to the
+entry policy of a victim enclave." \\
+\item However, a contemporary line of research [10, 28, 63]
+leverages hardware support for Transactional Synchronization eXtensions (TSX) in recent x86 processors to detect interrupts or page
+faults in enclave mode. More specifically, these proposals rely on
+the property that code executing in a TSX transaction is aborted
+and automatically rolled back when an external interrupt request
+arrives. TSX furthermore modifies the stored in-enclave instruction
+pointer upon AEX, such that a preregistered transaction abort handler is called on the next eresume invocation. Whereas TSX-based
+defenses would likely recognize suspicious interrupt rates when
+single-stepping enclaved execution, advanced Nemesis adversaries
+could construct stealthy Sancus-like IRQ timing attacks that only
+interrupt the victim enclave minimally and stay under under the
+radar of the transaction abort handler’s probabilistic security policy.
+Moreover, TSX-based defenses also suffer from some important limitations [67, 74], ranging from the absence of TSX features in some
+processors to severe runtime performance impact and the false positive/negative rates inherent to heuristic defenses. In conclusion,
+we do not regard current ad-hoc TSX approaches as a solution,
+even apart from compatibility and performance issues, since they
+cannot prevent the root information leakage cause. Our attacks
+against Sancus show that a single interrupt can deterministically
+leak sensitive information, and we expect further development of
+the attacks against SGX to increase stealthiness, as has been shown
+for instance for page-table based attacks [75, 77] \\
+\item end \\q
+\end{enumerate}
+
+Busi et al proposed a hardware based countermeasure ... \cite{busi}
+
+Alternatively the hardware can be used to make processes interrupt aware.
+
+, a contemporary line of research [10, 28, 63]
+leverages hardware support for Transactional Synchronization eXtensions (TSX) in recent x86 processors to detect interrupts or page
+faults in enclave mode. More specifically, these proposals rely on
+the property that code executing in a TSX transaction is aborted
+and automatically rolled back when an external interrupt request
+arrives. TSX furthermore modifies the stored in-enclave instruction
+pointer upon AEX, such that a preregistered transaction abort handler is called on the next eresume invocation. Whereas TSX-based
+defenses would likely recognize suspicious interrupt rates when
+single-stepping enclaved execution, advanced Nemesis adversaries
+could construct stealthy Sancus-like IRQ timing attacks that only
+interrupt the victim enclave minimally and stay under under the
+radar of the transaction abort handler’s probabilistic security policy.
+Moreover, TSX-based defenses also suffer from some important limitations [67, 74], ranging from the absence of TSX features in some
+processors to severe runtime performance impact and the false positive/negative rates inherent to heuristic defenses.
+
+An orthogonal approach to closing timing leaks employs hardware-based counter

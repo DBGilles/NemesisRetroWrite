@@ -78,7 +78,23 @@ By measuring the interrupt latency the attacker can infer which of the two instr
 
 
 \section{Related Work}
+\subsubsection{Automated if-conversion}
 
+\subsubsection{Hardware support}
+An orthogonal approach is to close timing leaks using hardware-based solutions. 
+
+Recently Busi et. al \cite{busi} proposed a design for  interruptible enclaves that is able to close timing-leaks. They define a security criterion and prove that 
+their design satisfies it. 
+
+
+
+\subsubsection{Constant time policy}
+
+\subsubsection{Automatic detection of timing side channels / leaks}
+
+
+\subsubsection{Beetze.de}
+	
 \section{Thesis Goal and Outline}
 This paper presents a novel algorithm for automatically transforming a program in order to remove any timing leaks. It achieves this by addressing the core cause of the vulnerability: differences in 
 latencies between corresponding instructions in secret-dependent branches. Corresponding instructions are instructions that are the same distance away from a branching instruction. 

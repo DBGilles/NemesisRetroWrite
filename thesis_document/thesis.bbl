@@ -10,6 +10,12 @@ A.~Abel and J.~Reineke.
 \newblock In {\em ASPLOS}, ASPLOS '19, pages 673--686, New York, NY, USA, 2019.
   ACM.
 
+\bibitem{busi}
+M.~Busi, J.~Noorman, J.~Van~Bulck, L.~Galletta, P.~Degano, J.~Mühlberg, and
+  F.~Piessens.
+\newblock Provably secure isolation for interruptible enclaved execution on
+  small microprocessors: Extended version, 01 2020.
+
 \bibitem{Dinesh2020RetroWriteSI}
 S.~Dinesh, N.~Burow, D.~Xu, and M.~Payer.
 \newblock Retrowrite: Statically instrumenting cots binaries for fuzzing and
