@@ -436,8 +436,9 @@ This can occur when, for example, a program contains a nested if-statement. Cycl
     \SetKwFunction{alignNodesFNName}{AlignNodes}
     \SetKwFunction{computeDistanceFromNode}{ComputeDistanceFromNode}
     
-    \alignCFG{\alignCFGFNName{g: CFG, n: Node}}{
+    \alignCFG{\alignCFGFNName{g: CFG, v: Node}}{
     subgraph $\leftarrow$ \extractSubgraphFNName{g, v} \\
+    \tcp{Compute distances from $v$ to all nodes in $subgraph$}
     pathLengths $\leftarrow$ \computeDistanceFromNode{subgraph, v} \\
     levels $\leftarrow$ \{ l $\; \vert \; u \in$ \nodes{subgraph} $\land$ pathLengths[u] = l \} \\
     \ForAll{l $\in$ levels}{

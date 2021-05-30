@@ -13,7 +13,7 @@ A level-1 auxiliary file: conclusion.aux
 The style file: abbrv.bst
 Database file #1: references.bib
 Warning--entry type for "Busi" isn't style-file defined
---line 231 of file references.bib
+--line 212 of file references.bib
 Warning--to sort, need author, editor, or key in intel-ref-manual
 Warning--empty author and editor in intel-ref-manual
 Warning--empty publisher in intel-ref-manual
@@ -22,45 +22,45 @@ Warning--empty journal in smart
 Warning--empty booktitle in trustlite
 Warning--empty publisher in psma
 Warning--empty booktitle in WinderixHans
-You've used 18 entries,
+You've used 19 entries,
             2118 wiz_defined-function locations,
-            609 strings with 7682 characters,
-and the built_in function-call counts, 7102 in all, are:
-= -- 673
-> -- 400
-< -- 6
-+ -- 159
-- -- 140
-* -- 500
-:= -- 1129
-add.period$ -- 54
-call.type$ -- 18
-change.case$ -- 122
+            615 strings with 7917 characters,
+and the built_in function-call counts, 7574 in all, are:
+= -- 719
+> -- 418
+< -- 7
++ -- 166
+- -- 146
+* -- 528
+:= -- 1195
+add.period$ -- 57
+call.type$ -- 19
+change.case$ -- 128
 chr.to.int$ -- 0
-cite$ -- 26
-duplicate$ -- 284
-empty$ -- 512
-format.name$ -- 140
-if$ -- 1524
+cite$ -- 27
+duplicate$ -- 307
+empty$ -- 553
+format.name$ -- 146
+if$ -- 1635
 int.to.chr$ -- 0
-int.to.str$ -- 18
-missing$ -- 16
-newline$ -- 88
-num.names$ -- 34
-pop$ -- 161
+int.to.str$ -- 19
+missing$ -- 17
+newline$ -- 93
+num.names$ -- 36
+pop$ -- 170
 preamble$ -- 1
-purify$ -- 106
+purify$ -- 111
 quote$ -- 0
-skip$ -- 230
+skip$ -- 250
 stack$ -- 0
-substring$ -- 327
-swap$ -- 93
-text.length$ -- 6
+substring$ -- 360
+swap$ -- 104
+text.length$ -- 7
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 68
+type$ -- 72
 warning$ -- 8
-while$ -- 49
-width$ -- 20
-write$ -- 190
+while$ -- 53
+width$ -- 21
+write$ -- 201
 (There was 1 error message)

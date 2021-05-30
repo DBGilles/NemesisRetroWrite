@@ -79,16 +79,37 @@ By measuring the interrupt latency the attacker can infer which of the two instr
 
 \section{Related Work}
 \subsubsection{Automated if-conversion}
+"Moreover, if-conversion comes with a significant performance overhead [12] that somewhat invalidates the
+PMA promise of native code execution in a protected environment." -- Nemesis 
 
-\subsubsection{Hardware support}
+\subsubsection{Software-based approaches}
+
+Molnar et. at \cite{programcounter} introduce methods for the detection and mitigation of control-flow side channel attacks.
+They define a model called the \textit{program counter transcript model} to model attacks where the adversary can see the control flow of the program. 
+In this model the only information 
+\textbf{TODO ... is dit wel van toepasssing}
+Quote van dit artikel": "Nonetheless, we believe these assumptions are reasonable for some embedded devices, namely those which do not have caches or
+sophisticated arithmetic units
+
+\textbf{TODO: iets over constant time policies}
+%Commonly used software-based approaches to mitigating timing-based side-channel attacks are the program counter and constant-time policies \cite{Barthe}.
+ 
+
+\subsubsection{Hardware-based approaches}
 An orthogonal approach is to close timing leaks using hardware-based solutions. 
+Recently Busi et. al \cite{busi} proposed an approach to extend architectures with non-interruptible enclaved execution such that they can also support interruptions without breaking 
+the existing isolation properties. Based on this approach they proposed  a design for interruptible enclaves that are resistent against interrupt attacks. 
+This design is based on an earlier version of Sancus with non-interruptible enclaves. They modify the architecture to add padding cycles whenever the enclave is interrupted, effectively closing timing leaks. 
 
-Recently Busi et. al \cite{busi} proposed a design for  interruptible enclaves that is able to close timing-leaks. They define a security criterion and prove that 
-their design satisfies it. 
+A limitation of their approach is that their design is based on the assumption that the timing of instruction is predictable. This is generally not the case for more complex architectures such as Intel's x86\_64.
+Additionally their approach requires hardware modifications which means it cannot be applied to off-the-shelf and existing devices. 
 
+%In the case of \textit{interrupt-aware} architectures security policies could be implemented that use excessive interrupt rates as a trigger to terminate an enclave \cite{Nemesis}. 
+% Zie nemesis paper, iets over intel sgx instructions (niet 100 procent of dit wel relevant is, nakijken) 
 
 
 \subsubsection{Constant time policy}
+
 
 \subsubsection{Automatic detection of timing side channels / leaks}
 

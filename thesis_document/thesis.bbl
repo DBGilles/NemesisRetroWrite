@@ -10,6 +10,13 @@ A.~Abel and J.~Reineke.
 \newblock In {\em ASPLOS}, ASPLOS '19, pages 673--686, New York, NY, USA, 2019.
   ACM.
 
+\bibitem{Barthe}
+G.~Barthe, B.~Grégoire, and V.~Laporte.
+\newblock Secure compilation of side-channel countermeasures: The case of
+  cryptographic “constant-time”.
+\newblock In {\em 2018 IEEE 31st Computer Security Foundations Symposium
+  (CSF)}, pages 328--343, 2018.
+
 \bibitem{busi}
 M.~Busi, J.~Noorman, J.~Van~Bulck, L.~Galletta, P.~Degano, J.~Mühlberg, and
   F.~Piessens.

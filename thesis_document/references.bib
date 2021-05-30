@@ -154,25 +154,6 @@ location = {Cambridge, United Kingdom},
 series = {MICRO-47}
 }
 
-@article{10.1145/2499368.2451146,
-author = {Hofmann, Owen S. and Kim, Sangman and Dunn, Alan M. and Lee, Michael Z. and Witchel, Emmett},
-title = {InkTag: Secure Applications on an Untrusted Operating System},
-year = {2013},
-issue_date = {April 2013},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-volume = {48},
-number = {4},
-issn = {0362-1340},
-url = {https://doi.org/10.1145/2499368.2451146},
-doi = {10.1145/2499368.2451146},
-abstract = {InkTag is a virtualization-based architecture that gives strong safety guarantees to high-assurance processes even in the presence of a malicious operating system. InkTag advances the state of the art in untrusted operating systems in both the design of its hypervisor and in the ability to run useful applications without trusting the operating system. We introduce paraverification, a technique that simplifies the InkTag hypervisor by forcing the untrusted operating system to participate in its own verification. Attribute-based access control allows trusted applications to create decentralized access control policies. InkTag is also the first system of its kind to ensure consistency between secure data and metadata, ensuring recoverability in the face of system crashes.},
-journal = {SIGPLAN Not.},
-month = mar,
-pages = {265–278},
-numpages = {14},
-keywords = {paraverification, application protection, virtualization-based security}
-}
 
 @inproceedings{inktag,
 author = {Hofmann, Owen S. and Kim, Sangman and Dunn, Alan M. and Lee, Michael Z. and Witchel, Emmett},
@@ -234,5 +215,32 @@ year = {2020},
 month = {01},
 pages = {},
 title = {Provably Secure Isolation for Interruptible Enclaved Execution on Small Microprocessors: Extended Version}
+}
+
+%@INPROCEEDINGS{Barthe,
+%  author={Barthe, Gilles and Grégoire, Benjamin and Laporte, Vincent},
+%  booktitle={2018 IEEE 31st Computer Security Foundations Symposium (CSF)}, 
+%  title={Secure Compilation of Side-Channel Countermeasures: The Case of Cryptographic “Constant-Time”}, 
+%  year={2018},
+%  volume={},
+%  number={},
+%  pages={328-343},
+%  doi={10.1109/CSF.2018.00031}}
+
+@InProceedings{programcounter,
+author="Molnar, David
+and Piotrowski, Matt
+and Schultz, David
+and Wagner, David",
+editor="Won, Dong Ho
+and Kim, Seungjoo",
+title="The Program Counter Security Model: Automatic Detection and Removal of Control-Flow Side Channel Attacks",
+booktitle="Information Security and Cryptology - ICISC 2005",
+year="2006",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="156--168",
+abstract="We introduce new methods for detecting control-flow side channel attacks, transforming C source code to eliminate such attacks, and checking that the transformed code is free of control-flow side channels. We model control-flow side channels with a program counter transcript, in which the value of the program counter at each step is leaked to an adversary. The program counter transcript model captures a class of side channel attacks that includes timing attacks and error disclosure attacks.",
+isbn="978-3-540-33355-5"
 }
 
