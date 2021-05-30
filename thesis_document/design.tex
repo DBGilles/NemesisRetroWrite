@@ -312,31 +312,30 @@ Two additional nodes are added as ancestor to the branch's leaf in order to incr
 \section{Alignment} \label{seq:alignment}
 During the second stage of the algorithm the nodes of the CFG are aligned in a level-wise manner. 
 The alignment of a set of nodes consists of inserting instructions such that all instructions at a given position across all nodes in the set have the same latency. 
-The level of a node is defined as being the distance between the root of the graph and the node. The first stage of the algorithm ensures that all paths to a given nodes have the same length making the level of a node a well 
-defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
+The level of a node is defined as being the distance between the root of the graph and the node. The first stage of the algorithm ensures that all paths to a given nodes have the same length making the level of a node a 
+well-defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
 
 \subsection{Basic Operation}
 The core of the alignment operation consists of repeatedly selecting a reference node and inserting instructions into the other nodes to match the latencies of the reference. 
-Each iteration a set of candidate nodes is determined, from which the reference node is then selected. 
+Each iteration a set of candidate nodes is determined from which the reference node is then selected. 
 
 An index variable $i_{ref}$ is used to keep track of the position of the first instruction that has not yet been aligned. This variable is initially equal to zero and is incremented every iteration. 
 The instruction at position $i_{ref}$ in the reference node is called the reference instruction.
 
 The algorithm iterates over all nodes that are not the reference node and verifies if the instruction at position $i_{ref}$ has the same latency. 
-If the two latencies are not equal or if the node is shorter than the reference node a new instruction is inserted at position$i_{ref}$. 
+If the two latencies are not equal or if the node is shorter than the reference node a dummy instruction is inserted at position$i_{ref}$. 
 The latency of this new instruction is equal to the latency of the reference instruction. 
-Once this has been repeated for all nodes in the set then all instruction with at position $i_{ref}$ have the same latency and the variable can be incremented. 
+Once this has been repeated for all nodes in the set then all instruction at position $i_{ref}$ have the same latency and the variable can be incremented. 
+
 
 \subsection{Selecting the Reference Node}
 Because an instruction is potentially added to each node that is not the reference node the reference node needs to have at least as many instructions as the node with the largest number of instructions. 
 This ensure that at some point all nodes have the same number of instructions. 
 The set of candidate nodes therefore consists of all nodes that have $n_{max}$ instructions, where $n_{max}$ is the number of instructions in the longest node. 
 
-The instruction in the reference node at position $i_{ref}$ determines what instructions are inserted into the other nodes. 
-There are some restrictions on the selection of the reference node. 
-These stem from the fact that branching instructions are special cases that will result in the insertion of branching instruction in the other nodes. 
-Additionally a branching instruction cannot be inserted into the middle of a node since this will change the program's control flow. 
-A node can therefore not be selected as the reference node when the instruction at position $i_{ref}$ is a branching instruction, unless during the very last iteration. 
+A branching instruction is a special case that will result in the insertion of dummy branching instructions into the other nodes. 
+Additionally a branching instruction cannot be inserted into he middle of a node since this will change the program's control flow. 
+A node can therefore not be selected as the reference node when the instruction at position $i_{ref}$ is a branching instruction, unless during the very last iteration.
 
 If among the set of candidate nodes there is at least one node with a non-branching instruction at position $i_{ref}$ then this node is selected as the reference node. 
 If there are multiple such nodes then a candidate node can be selected arbitrarily. 
@@ -374,46 +373,54 @@ If the function contains no secret dependent node then this ensures that any lat
 It is only safe to insert a call to a function this way if the function in question has no effects on the program state. If the function does modify the program state then inserting additional calls can 
 result in erroneous program outputs. 
 
+
+
 \begin{figure}
+    
     \centering
     \begin{subfigure}[t]{0.5\textwidth}
         \centering
         \includegraphics[width=4cm]{images/align-example-1.png}
-        \caption{}
-        \label{fig:equalize-example-1}
+        \caption{$i_{ref}=0$}
+        \label{fig:align-example-1}
     \end{subfigure}%
     ~
 	\begin{subfigure}[t]{0.5\textwidth}
     \centering
     \includegraphics[width=4cm]{images/align-example-2.png}
-    \caption{}
-    \label{fig:equalize-example-2}
+    \caption{$i_{ref}=1$}
+    \label{fig:align-example-2}
     \end{subfigure}%    
   	
-  	\bigskip
 	\begin{subfigure}[t]{0.5\textwidth}
 		\centering
     	\includegraphics[width=4cm]{images/align-example-3.png}
-    	\caption{}
-    	\label{fig:equalize-example-3}
+    	\caption{$i_{ref}=2$}
+    	\label{fig:align-example-3}
     \end{subfigure}%
     ~
     \begin{subfigure}[t]{0.5\textwidth}
     \centering
     \includegraphics[width=4cm]{images/align-example-4.png}
-    \caption{}
-    \label{fig:equalize-example-4}
+    \caption{$i_{ref}=3$}
+    \label{fig:align-example-4}
     \end{subfigure}
-    \bigskip
     
     \begin{subfigure}[t]{0.5\textwidth}
     \centering
     \includegraphics[width=4cm]{images/align-example-5.png}
-    \caption{}
-    \label{fig:equalize-example-1}
+    \caption{$i_{ref}=4$}
+    \label{fig:align-example-5}
     \end{subfigure}
+
     \caption{Example of alignment of a set of three nodes}
+    \label{fig:align-example}
 \end{figure}
+
+\subsection{Example}
+Figure \ref{fig:align-example} illustrates the different iterations of the alignment of a set of three nodes. 
+Each node is labeled with its latency sequence. The set of instructions that have been aligned are underlined. Each iteration the variable $i_{ref}$ is incremented by one. 
+The set of candidate nodes is marked in each iteration by a red rectangle.  
 
 \section{The algorithm}
 

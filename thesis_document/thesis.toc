@@ -36,9 +36,10 @@
 \contentsline {subsection}{\numberline {2.4.1}Basic Operation}{12}%
 \contentsline {subsection}{\numberline {2.4.2}Selecting the Reference Node}{12}%
 \contentsline {subsection}{\numberline {2.4.3}Constructing NOP instruction}{13}%
+\contentsline {subsection}{\numberline {2.4.4}Example}{14}%
 \contentsline {section}{\numberline {2.5}The algorithm}{14}%
 \contentsline {subsection}{\numberline {2.5.1}Cycles}{14}%
-\contentsline {subsection}{\numberline {2.5.2}Closing timing leaks}{14}%
+\contentsline {subsection}{\numberline {2.5.2}Closing timing leaks}{15}%
 \contentsline {chapter}{\chapternumberline {3}Implementation}{21}%
 \contentsline {subsubsection}{RetroWrite}{21}%
 \contentsline {subsubsection}{Binary Rewriting}{22}%
