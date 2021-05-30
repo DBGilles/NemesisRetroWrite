@@ -10,13 +10,6 @@ A.~Abel and J.~Reineke.
 \newblock In {\em ASPLOS}, ASPLOS '19, pages 673--686, New York, NY, USA, 2019.
   ACM.
 
-\bibitem{Barthe}
-G.~Barthe, B.~Grégoire, and V.~Laporte.
-\newblock Secure compilation of side-channel countermeasures: The case of
-  cryptographic “constant-time”.
-\newblock In {\em 2018 IEEE 31st Computer Security Foundations Symposium
-  (CSF)}, pages 328--343, 2018.
-
 \bibitem{busi}
 M.~Busi, J.~Noorman, J.~Van~Bulck, L.~Galletta, P.~Degano, J.~Mühlberg, and
   F.~Piessens.
@@ -53,6 +46,10 @@ A.~Fog.
 HexHive.
 \newblock Hexhive/retrowrite.
 
+\bibitem{nemesisrepo}
+jovanbulck.
+\newblock jovanbulck/nemesis.
+
 \bibitem{trustlite}
 P.~Koeberl, S.~Schulz, V.~Varadharajan, and A.-R. Sadeghi.
 \newblock Trustlite: A security architecture for tiny embedded devices.
@@ -78,6 +75,14 @@ F.~McKeen, I.~Alexandrovich, A.~Berenzon, C.~V. Rozas, H.~Shafi, V.~Shanbhogue,
   Architectural Support for Security and Privacy}, HASP '13, New York, NY, USA,
   2013. Association for Computing Machinery.
 
+\bibitem{programcounter}
+D.~Molnar, M.~Piotrowski, D.~Schultz, and D.~Wagner.
+\newblock The program counter security model: Automatic detection and removal
+  of control-flow side channel attacks.
+\newblock In D.~H. Won and S.~Kim, editors, {\em Information Security and
+  Cryptology - ICISC 2005}, pages 156--168, Berlin, Heidelberg, 2006. Springer
+  Berlin Heidelberg.
+
 \bibitem{sancus}
 J.~Noorman, J.~Van~Bulck, J.~T. M{\"u}hlberg, F.~Piessens, P.~Maene,
   B.~Preneel, I.~Verbauwhede, J.~G{\"o}tzfried, T.~M{\"u}ller, and F.~Freiling.
@@ -91,6 +96,10 @@ S.~Pouyanrad, J.~T. M\"{u}hlberg, and W.~Joosen.
 \newblock In {\em Proceedings of the 15th International Conference on
   Availability, Reliability and Security}, ARES '20, New York, NY, USA, 2020.
   Association for Computing Machinery.
+
+\bibitem{sancussupport}
+sancus tee.
+\newblock sancus-tee/sancus-support.
 
 \bibitem{psma}
 R.~Strackx, J.~Noorman, I.~Verbauwhede, B.~Preneel, and F.~Piessens.

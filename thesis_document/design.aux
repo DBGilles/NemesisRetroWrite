@@ -1,17 +1,19 @@
 \relax 
 \citation{Nemesis}
+\citation{nemesisrepo}
+\citation{sancussupport}
+\citation{Nemesis}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
 \@writefile{toc}{\contentsline {chapter}{\chapternumberline {2}Design}{5}\protected@file@percent }
 \@writefile{loa}{\addvspace {10\p@ }}
 \newlabel{cha:design}{{\M@TitleReference {2}{Design}}{5}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.1}Introduction}{5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.1}Algorithm Goals}{5}\protected@file@percent }
+\newlabel{seq:goals}{{\M@TitleReference {2.1}{Algorithm Goals}}{5}}
 \citation{MSP430Detection}
-\@writefile{toc}{\contentsline {section}{\numberline {2.2}Nemesis-sensitive property}{6}\protected@file@percent }
-\newlabel{sec:property}{{\M@TitleReference {2.2}{Nemesis-sensitive property}}{6}}
-\newlabel{eq:nemesisProperty}{{\M@TitleReference {2.1}{Nemesis-sensitive property}}{6}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.3}CFG}{6}\protected@file@percent }
-\newlabel{sec:cfg}{{\M@TitleReference {2.3}{CFG}}{6}}
+\newlabel{eq:nemesisProperty}{{\M@TitleReference {2.1}{Algorithm Goals}}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}CFG}{6}\protected@file@percent }
+\newlabel{sec:cfg}{{\M@TitleReference {2.2}{CFG}}{6}}
 \newlabel{fig:c_program}{{\M@TitleReference {2.1a}{C program\relax }}{7}}
 \newlabel{sub@fig:c_program}{{\M@TitleReference {a}{C program\relax }}{7}}
 \newlabel{fig:c_program_cfg}{{\M@TitleReference {2.1b}{Corresponding CFG\relax }}{7}}
@@ -23,39 +25,62 @@
 \newlabel{sub@fig:regionExampleA}{{\M@TitleReference {a}{\relax }}{8}}
 \newlabel{fig:regionExampleB}{{\M@TitleReference {2.2b}{\relax }}{8}}
 \newlabel{sub@fig:regionExampleB}{{\M@TitleReference {b}{\relax }}{8}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{8}\protected@file@percent }
-\newlabel{fig:regionExamples}{{\M@TitleReference {2.3}{then-else regions for secret-dependent nodes\relax }}{8}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.4}Equalising}{8}\protected@file@percent }
-\newlabel{seq:equalising}{{\M@TitleReference {2.4}{Equalising}}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{8}\protected@file@percent }
+\newlabel{fig:regionExamples}{{\M@TitleReference {2.2}{then-else regions for secret-dependent nodes\relax }}{8}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}Equalising}{8}\protected@file@percent }
+\newlabel{seq:equalising}{{\M@TitleReference {2.3}{Equalising}}{8}}
 \citation{dominator}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.1}Extract Sub-graph}{9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.2}Equalize path lengths}{9}\protected@file@percent }
-\newlabel{fig:optional}{{\M@TitleReference {2.4a}{optional node\relax }}{10}}
-\newlabel{sub@fig:optional}{{\M@TitleReference {a}{optional node\relax }}{10}}
-\newlabel{fig:unequal}{{\M@TitleReference {2.4b}{unequal branches\relax }}{10}}
-\newlabel{sub@fig:unequal}{{\M@TitleReference {b}{unequal branches\relax }}{10}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces problematic structures in CFG\relax }}{10}\protected@file@percent }
-\newlabel{fig:problemstructures}{{\M@TitleReference {2.4}{problematic structures in CFG\relax }}{10}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.3}Equalize branches}{10}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2.5}Alignment}{11}\protected@file@percent }
-\newlabel{seq:alignment}{{\M@TitleReference {2.5}{Alignment}}{11}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5.1}Basic Operation}{11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5.2}Selecting the Reference Node}{11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5.3}Constructing NOP instruction}{12}\protected@file@percent }
-\newlabel{sec:nop}{{\M@TitleReference {2.5.3}{Constructing NOP instruction}}{12}}
-\@writefile{toc}{\contentsline {section}{\numberline {2.6}The algorithm}{13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.6.1}Cycles}{13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.6.2}Closing timing leaks}{13}\protected@file@percent }
-\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Equalize Path Lengths\relax }}{14}\protected@file@percent }
-\newlabel{alg:equalizePaths}{{\M@TitleReference {1}{Closing timing leaks}}{14}}
-\@writefile{loa}{\contentsline {algocf}{\numberline {2}{\ignorespaces Equalize Branches\relax }}{15}\protected@file@percent }
-\newlabel{alg:equalizeBranches}{{\M@TitleReference {2}{Closing timing leaks}}{15}}
-\@writefile{loa}{\contentsline {algocf}{\numberline {3}{\ignorespaces Align CFG\relax }}{16}\protected@file@percent }
-\newlabel{alg:align}{{\M@TitleReference {3}{Closing timing leaks}}{16}}
-\@writefile{loa}{\contentsline {algocf}{\numberline {4}{\ignorespaces Close timing leaks\relax }}{17}\protected@file@percent }
-\newlabel{alg:closeleaks}{{\M@TitleReference {4}{Closing timing leaks}}{17}}
+\newlabel{fig:optional}{{\M@TitleReference {2.3a}{optional node\relax }}{9}}
+\newlabel{sub@fig:optional}{{\M@TitleReference {a}{optional node\relax }}{9}}
+\newlabel{fig:unequal}{{\M@TitleReference {2.3b}{unequal branches\relax }}{9}}
+\newlabel{sub@fig:unequal}{{\M@TitleReference {b}{unequal branches\relax }}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces problematic structures in CFG\relax }}{9}\protected@file@percent }
+\newlabel{fig:problemstructures}{{\M@TitleReference {2.3}{problematic structures in CFG\relax }}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Extract Sub-graph}{9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.2}Equalize Path Lengths}{10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.3}Equalize branches}{10}\protected@file@percent }
+\newlabel{fig:equalize-paths-1}{{\M@TitleReference {2.4a}{original CFG\relax }}{11}}
+\newlabel{sub@fig:equalize-paths-1}{{\M@TitleReference {a}{original CFG\relax }}{11}}
+\newlabel{fig:equalize-paths-2}{{\M@TitleReference {2.4b}{equalized CFG\relax }}{11}}
+\newlabel{sub@fig:equalize-paths-2}{{\M@TitleReference {b}{equalized CFG\relax }}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces Equalizing path lengths\relax }}{11}\protected@file@percent }
+\newlabel{fig:equalize-paths}{{\M@TitleReference {2.4}{Equalizing path lengths\relax }}{11}}
+\newlabel{fig:equalize-branches-1}{{\M@TitleReference {2.5a}{original CFG\relax }}{11}}
+\newlabel{sub@fig:equalize-branches-1}{{\M@TitleReference {a}{original CFG\relax }}{11}}
+\newlabel{fig:equalize-branches-2}{{\M@TitleReference {2.5b}{equalized CFG\relax }}{11}}
+\newlabel{sub@fig:equalize-branches-2}{{\M@TitleReference {b}{equalized CFG\relax }}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Equalizing branch depths\relax }}{11}\protected@file@percent }
+\newlabel{fig:equalize-branches}{{\M@TitleReference {2.5}{Equalizing branch depths\relax }}{11}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.4}Alignment}{11}\protected@file@percent }
+\newlabel{seq:alignment}{{\M@TitleReference {2.4}{Alignment}}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.1}Basic Operation}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.2}Selecting the Reference Node}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.3}Constructing NOP instruction}{13}\protected@file@percent }
+\newlabel{sec:nop}{{\M@TitleReference {2.4.3}{Constructing NOP instruction}}{13}}
+\newlabel{fig:equalize-example-1}{{\M@TitleReference {2.6a}{\relax }}{14}}
+\newlabel{sub@fig:equalize-example-1}{{\M@TitleReference {a}{\relax }}{14}}
+\newlabel{fig:equalize-example-2}{{\M@TitleReference {2.6b}{\relax }}{14}}
+\newlabel{sub@fig:equalize-example-2}{{\M@TitleReference {b}{\relax }}{14}}
+\newlabel{fig:equalize-example-3}{{\M@TitleReference {2.6c}{\relax }}{14}}
+\newlabel{sub@fig:equalize-example-3}{{\M@TitleReference {c}{\relax }}{14}}
+\newlabel{fig:equalize-example-4}{{\M@TitleReference {2.6d}{\relax }}{14}}
+\newlabel{sub@fig:equalize-example-4}{{\M@TitleReference {d}{\relax }}{14}}
+\newlabel{fig:equalize-example-1}{{\M@TitleReference {2.6e}{\relax }}{14}}
+\newlabel{sub@fig:equalize-example-1}{{\M@TitleReference {e}{\relax }}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces Example of alignment of a set of three nodes\relax }}{14}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.5}The algorithm}{14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5.1}Cycles}{14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5.2}Closing timing leaks}{14}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces Equalize Path Lengths\relax }}{16}\protected@file@percent }
+\newlabel{alg:equalizePaths}{{\M@TitleReference {1}{Closing timing leaks}}{16}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {2}{\ignorespaces Equalize Branches\relax }}{17}\protected@file@percent }
+\newlabel{alg:equalizeBranches}{{\M@TitleReference {2}{Closing timing leaks}}{17}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {3}{\ignorespaces Align CFG\relax }}{18}\protected@file@percent }
+\newlabel{alg:align}{{\M@TitleReference {3}{Closing timing leaks}}{18}}
+\@writefile{loa}{\contentsline {algocf}{\numberline {4}{\ignorespaces Close timing leaks\relax }}{19}\protected@file@percent }
+\newlabel{alg:closeleaks}{{\M@TitleReference {4}{Closing timing leaks}}{19}}
 \@setckpt{design}{
-\setcounter{page}{18}
+\setcounter{page}{20}
 \setcounter{equation}{2}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -68,7 +93,7 @@
 \setcounter{book}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{2}
-\setcounter{section}{6}
+\setcounter{section}{5}
 \setcounter{subsection}{2}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
@@ -102,17 +127,17 @@
 \setcounter{cmsm@mctr}{0}
 \setcounter{bsm@mctr}{0}
 \setcounter{workm@mctr}{0}
-\setcounter{sheetsequence}{26}
-\setcounter{lastsheet}{36}
-\setcounter{lastpage}{28}
-\setcounter{figure}{4}
+\setcounter{sheetsequence}{28}
+\setcounter{lastsheet}{38}
+\setcounter{lastpage}{30}
+\setcounter{figure}{6}
 \setcounter{lofdepth}{1}
 \setcounter{table}{0}
 \setcounter{lotdepth}{1}
 \setcounter{lstnumber}{11}
 \setcounter{caption@flags}{0}
 \setcounter{continuedfloat}{0}
-\setcounter{subfigure}{2}
+\setcounter{subfigure}{5}
 \setcounter{subtable}{0}
 \setcounter{AlgoLine}{11}
 \setcounter{algocfline}{4}

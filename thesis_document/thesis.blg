@@ -14,6 +14,11 @@ The style file: abbrv.bst
 Database file #1: references.bib
 Warning--entry type for "Busi" isn't style-file defined
 --line 212 of file references.bib
+You're missing a field name---line 221 of file references.bib
+ : 
+ : %  author={Barthe, Gilles and Grégoire, Benjamin and Laporte, Vincent},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
 Warning--to sort, need author, editor, or key in intel-ref-manual
 Warning--empty author and editor in intel-ref-manual
 Warning--empty publisher in intel-ref-manual
@@ -22,45 +27,45 @@ Warning--empty journal in smart
 Warning--empty booktitle in trustlite
 Warning--empty publisher in psma
 Warning--empty booktitle in WinderixHans
-You've used 19 entries,
+You've used 21 entries,
             2118 wiz_defined-function locations,
-            615 strings with 7917 characters,
-and the built_in function-call counts, 7574 in all, are:
-= -- 719
-> -- 418
+            624 strings with 8092 characters,
+and the built_in function-call counts, 8058 in all, are:
+= -- 763
+> -- 445
 < -- 7
-+ -- 166
-- -- 146
-* -- 528
-:= -- 1195
-add.period$ -- 57
-call.type$ -- 19
-change.case$ -- 128
++ -- 177
+- -- 154
+* -- 550
+:= -- 1278
+add.period$ -- 62
+call.type$ -- 21
+change.case$ -- 137
 chr.to.int$ -- 0
-cite$ -- 27
-duplicate$ -- 307
-empty$ -- 553
-format.name$ -- 146
-if$ -- 1635
+cite$ -- 29
+duplicate$ -- 321
+empty$ -- 596
+format.name$ -- 154
+if$ -- 1735
 int.to.chr$ -- 0
-int.to.str$ -- 19
+int.to.str$ -- 21
 missing$ -- 17
-newline$ -- 93
-num.names$ -- 36
-pop$ -- 170
+newline$ -- 101
+num.names$ -- 42
+pop$ -- 186
 preamble$ -- 1
-purify$ -- 111
+purify$ -- 118
 quote$ -- 0
-skip$ -- 250
+skip$ -- 269
 stack$ -- 0
-substring$ -- 360
-swap$ -- 104
+substring$ -- 375
+swap$ -- 105
 text.length$ -- 7
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 72
+type$ -- 80
 warning$ -- 8
-while$ -- 53
-width$ -- 21
-write$ -- 201
-(There was 1 error message)
+while$ -- 59
+width$ -- 23
+write$ -- 217
+(There were 2 error messages)

@@ -1,35 +1,25 @@
 \chapter{Design}
 \label{cha:design}
 
-\section{Introduction}
+This chapter details the design of the proposed algorithm. Section ... \textbf{TODO}
 
-The root cause of the vulnerability exposed by Nemesis-style attacks are differences in the latencies of two instruction that occur at the same 
-position in two branches of a secret-dependent branching instruction. 
-In practice an attacker can exploit this vulnerability by generating latency traces along different paths of the program's control flow. 
-Any differences in instruction latencies will be reflected as differences in these latency traces. 
-By carefully inspecting the relevant sections of the latency traces the attacker can infer which paths were taken for a given input. 
-In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information from the program \cite{Nemesis}.
+\section{Algorithm Goals}
+\label{seq:goals}
+The root cause of the vulnerability exposed by Nemesis is a difference in the latencies of two corresponding instructions in different branches of a 
+conditional jump. 
+In this context two instructions correspond if they are the same distance away from the conditional jump. 
+Van Bulck et. al \cite{Nemesis} convincingly demonstrated that is is possible to exploit this vulnerability by inspecting latency traces of the program.
+To create a latency trace the attack carefully configures a timer such that each instruction of the program is interrupted, effectively single-stepping through the program. 
+The attacker than implements the Interrupt Service Routine (ISR) such that it logs the latency of the interrupted instruction \cite{nemesisrepo, sancussupport}. 
+Any difference in latencies of corresponding instruction will be reflected in the latency trace and can leak information about secret-dependent branches. 
 
-The goal of the algorithm outlined in this section is to ensure that latency traces cannot be used to leak information in this way.
-It does this by inserting additional instructions into branches of a secret-dependent branching instruction. These instructions 
-are carefully selected such that they have the same latency as their corresponding instruction in the other branch. This ensures that
-any instructions that occur at the same position in two different branches have the same latency. As a result the sections of latency traces
-that correspond to these branches will be identical, making it impossible for an attacker to infer information. 
-
-
-The proposed algorithm inserts additional instructions into the functions of a program through manipulation of the function's control flow graph (CFG). 
-This graph consists of nodes and vertices, where each node contains a sequence of instructions. 
-One of the main operations performed on the graph is the alignment of a set of nodes. 
-This operation consists of inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
-
-Not all structures found in a control flow graph are suitable for alignment. The aforementioned alignment operation therefore has some conditions on the structure of the control flow graph that need to be met. 
-The other main operation of the algorithm consists of inserting additional nodes into the graph such that these conditions are met. 
-
-Section \ref{sec:property} will formally define the property that needs to hold for a program in order for Nemesis-style attacks to be mitigated. Section \ref{sec:cfg} 
-introduces the CFG data structure and translates the aforementioned property to such structures. Finally, sections \ref{seq:equalising} and \ref{seq:alignment} describe the insertion and alignment of nodes, respectively. 
-
-\section{Nemesis-sensitive property}\label{sec:property}
-In their paper Pouyanrad et. al have formally defined the Nemesis-Sensitive property.  Let $region^{then}(ep)$ and $region^{else}(ep)$ capture the set of execution points belonging to the branch target and the other region of some branching instruction $ep$. Let $ep^i$ be the i'th instruction in a region. A program P with a secret-dependence branch in $ep$ and $region^{then}(ep)$ 
+If the architecture has completely deterministic instruction latencies then a single latency trace is sufficient for leaking information about secret-dependent branches. 
+In the presence of advanced architectural features, such as paging, caching, and out-of-order execution, instruction latencies are not deterministic. 
+Van Bulck et. al \cite{Nemesis} show that in these cases is still possible to leak information from the program by correlating latency traces from repeated executions over the same input. 
+The authors demonstrate that the latency measurements follow a normal distribution across all executions and are able to use basic statistical measures to create an overall latency trace 
+of the program. 
+	
+In their paper Pouyanrad et. al have formally defined the Nemesis-Sensitive property.  Let $region^{then}(ep)$ and $region^{else}(ep)$ capture the set of execution points belonging to the branch target and the other region of some branching instruction $ep$. Let $ep^i$ be the i'th instruction in a region. A program P with a secret-dependent branch in $ep$ and $region^{then}(ep)$ 
 and region $region^{else}(ep)$ with the same number of execution points, satisfies the nemesis-sensitive property if and only if:  
 
 \begin{equation} \label{eq:nemesisProperty}
@@ -41,20 +31,71 @@ and region $region^{else}(ep)$ with the same number of execution points, satisfi
 \cite{MSP430Detection}
 
 The relation $s \xrightarrow[]{t} s'$ models the transition between program states $s$ and $s'$, declaring that the transition between $s$ and $s'$ takes a time $t$. 
-For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions in the branches their latencies should be the same.
+For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions their latencies should be the same.
 
-If this nemesis-sensitive property holds for a program then an attacker is not able to infer which branch was taken by the program based on latency traces of the program.
+If a program satisfies the nemesis-sensitive property then an attacker will not be able to leak information from the program based on its latency traces. 
+For architectures such as the MSP430 the resulting latency traces will be indistinguishable. Architectures with more complex features will still have minor differences 
+in the resulting traces due to random nature of the instruction latencies. 
+However the variances will be smaller and an attacker will not be able to use statistical analysis to distinguish different instruction latencies. 
+
+The goal of the proposed algorithm is to ensure that latency traces cannot leak information by enforcing the nemesis-sensitive property.
+The algorithm inserts additional instructions into secret-dependent branches such that corresponding instruction always have the same latency. 
+These instruction are carefully constructed such that they have no effect on the program output. 
+
+%\section{Introduction}	
+%
+%The root cause of the vulnerability exposed by Nemesis-style attacks are differences in the latencies of two instruction that occur at the same 
+%position in two branches of a secret-dependent branching instruction. 
+%In practice an attacker can exploit this vulnerability by generating latency traces along different paths of the program's control flow. 
+%Any differences in instruction latencies will be reflected as differences in these latency traces. 
+%By carefully inspecting the relevant sections of the latency traces the attacker can infer which paths were taken for a given input. 
+%In cases where the path depends on some secret data the attacker is then able to infer information about this data, successfully leaking information from the program \cite{Nemesis}.
+%
+%The goal of the algorithm outlined in this section is to ensure that latency traces cannot be used to leak information in this way.
+%It does this by inserting additional instructions into branches of a secret-dependent branching instruction. These instructions 
+%are carefully selected such that they have the same latency as their corresponding instruction in the other branch. This ensures that
+%any instructions that occur at the same position in two different branches have the same latency. As a result the sections of latency traces
+%that correspond to these branches will be identical, making it impossible for an attacker to infer information. 
+%
+%
+%The proposed algorithm inserts additional instructions into the functions of a program through manipulation of the function's control flow graph (CFG). 
+%This graph consists of nodes and vertices, where each node contains a sequence of instructions. 
+%One of the main operations performed on the graph is the alignment of a set of nodes. 
+%This operation consists of inserts additional instructions into nodes such that all instructions at a given position in any of the nodes have the same latency. 
+%
+%Not all structures found in a control flow graph are suitable for alignment. The aforementioned alignment operation therefore has some conditions on the structure of the control flow graph that need to be met. 
+%The other main operation of the algorithm consists of inserting additional nodes into the graph such that these conditions are met. 
+%
+%Section \ref{sec:property} will formally define the property that needs to hold for a program in order for Nemesis-style attacks to be mitigated. Section \ref{sec:cfg} 
+%introduces the CFG data structure and translates the aforementioned property to such structures. Finally, sections \ref{seq:equalising} and \ref{seq:alignment} describe the insertion and alignment of nodes, respectively. 
+%
+%\section{Nemesis-sensitive property}\label{sec:property}
+%In their paper Pouyanrad et. al have formally defined the Nemesis-Sensitive property.  Let $region^{then}(ep)$ and $region^{else}(ep)$ capture the set of execution points belonging to the branch target and the other region of some branching instruction $ep$. Let $ep^i$ be the i'th instruction in a region. A program P with a secret-dependence branch in $ep$ and $region^{then}(ep)$ 
+%and region $region^{else}(ep)$ with the same number of execution points, satisfies the nemesis-sensitive property if and only if:  
+%
+%\begin{equation} \label{eq:nemesisProperty}
+%    \begin{split}
+%    \forall ep^i \in region^{then}(ep) : \forall ep^j \in region^{else}(ep) \text{ \textit{such that} } i=j :  \\ 
+%    (s_{ep^i} \xrightarrow[]{t} s_{ep^i_{next}}) \land (s_{ep^j} \xrightarrow[]{t'} s_{ep^j_{next}}) \iff t = t' \\ 
+%    \end{split}
+%\end{equation}
+%\cite{MSP430Detection}
+%
+%The relation $s \xrightarrow[]{t} s'$ models the transition between program states $s$ and $s'$, declaring that the transition between $s$ and $s'$ takes a time $t$. 
+%For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions in the branches their latencies should be the same.
+%
+%If this nemesis-sensitive property holds for a program then an attacker is not able to infer which branch was taken by the program based on latency traces of the program.
 
 \section{CFG}\label{sec:cfg}
 
-The Control Flow Graph (CFG) is a data structure that represents the control flow of a function. 
+The algorithm makes modifications to a program's functions by manipulating the Control Flow Graph (CFG), a data structure that represents the control flow of a function.
 If a program has multiple functions then each function is represented by a separate CFG. 
-A CFG consists of nodes $V$ and directed edges $E$. Each node $V$ contains a 
+A CFG consists of nodes $V$ and directed edges $E$. Each node $v$ contains a 
 contiguous sequence of instructions that is always executed as a whole. This implies that a branching instruction can only be found at the end of a node, 
 and an instruction that is the target of a branching instruction can only occur at the start.
 
 An edge is drawn from node $v$ to node $v'$ if and only if the last instruction in $v$ can be followed by the first instruction in $v'$ 
-when following program control flow. The algorithm only considers branching instructions that are binary in nature, so a node in the CFG can have at most 2 successors. 
+when following program control flow. The algorithm only considers branching instructions that are binary in nature, so a node in the CFG can have at most two successors. 
 A node is said to be secret-dependent if its last instructions is a 
 secret-dependent branching instruction. 
 
@@ -91,8 +132,7 @@ int main(){
 \label{fig:exampleCFG}
 \end{figure}
 
-Following the property described in section \ref{eq:nemesisProperty}, the nemesis-sensitive property can be defined for a node in the CFG. Let $v$ be a secret-dependent node. 
-
+Following the property described in property \ref{eq:nemesisProperty}, the nemesis-sensitive property can be defined for a node in the CFG. Let $v$ be a secret-dependent node. 
 Let $v_f$ be a node such that all paths from $v$ to some leaf go through $v_f$. Then $region^{then}(v)$ can be defined as the set of nodes reachable following the 
 first of $v$'s outgoing edges up to and including $v_f$ and $region^{else}(v)$ as the set of nodes reachable following the other outgoing edge up to and including $v_f$.
 
@@ -110,87 +150,53 @@ A secret-dependent node $v$ and $region^{then}(v)$ and $region^{else}(v)$ with t
     \end{split}
 \end{equation}
 where $latencies(n)$ is a function mapping a node $n$ to its latency sequence. This property states that the latency sequence of any two nodes that are the same distance away 
-from some secret-dependent node need to have identical latency sequences. If this property holds then the critical sections of latency traces will be identical and cannot be used to 
+from some secret-dependent node must have identical latency sequences. If this property holds then the critical sections of latency traces will be identical and cannot be used to 
 infer information about the secret-dependent branch. 
 
 Figure \ref{fig:regionExamples} illustrates how the borders of each region are defined. The secret-dependent node is marked in green, while the two branches are marked in red and blue. In the second example, the node marked in purple belongs to both regions. In example \ref{fig:regionExampleA} there is no node such that all paths from the secret-dependent node to a leaf go through it, so the regions extend all the way to the leaves. In example \ref{fig:regionExampleB} all paths that start in the secret-dependent node go through the node 6. Any differences in nodes 7 and 8 can only be used to infer information about the branch in node 6. These nodes therefore do not have to be considered.  
 
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/nemesis-property-example-1.png}
+        \caption{}
+        \label{fig:regionExampleA}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/nemesis-property-example-2.png}
+        \caption{}
+        \label{fig:regionExampleB}
+    \end{subfigure}
+    \caption{then-else regions for secret-dependent nodes}
+    \label{fig:regionExamples}
+\end{figure*}
 
-\begin{figure}
- \centering
- \subfloat[]{\includegraphics[height = 6cm]{images/nemesis-property-example-1.png}\label{fig:regionExampleA}}
- \subfloat[]{\includegraphics[height = 6cm]{images/nemesis-property-example-2.png}\label{fig:regionExampleB}} 
-
- \captionof{figure}{then-else regions for secret-dependent nodes}
- \label{fig:regionExamples}
-\end{figure}
-
-
-\section{Equalising}\label{seq:equalising}
-There are 2 structures found in a program's control flow graph that make it impossible to enforce the nemesis-sensitive property for a node as defined in the previous section. 
+\section{Equalising}
+\label{seq:equalising}
+There are two structures that can occur in a function's CFG that make it impossible to enforce the nemesis-sensitive property for a node as defined in the previous section. 
 These structures are shown in figure \ref{fig:problemstructures}.  
 The first stage of the algorithm consists of inserting nodes such that these structures no longer occur. 
 
-The first such structure occurs when a function contains some sequence of instructions that is only executed if some condition is true and is illustrated in figure \ref{fig:optional}.
-Analogously the corresponding CFG will contain a conditional node that is only reached if the condition is true.
+The first such structure, illustrated in figure \ref{fig:optional}, occurs when a function contains some sequence of instructions that is only executed if some condition is true.
+Analogously the corresponding CFG will contain a node that is only reached if the condition is true.
 A consequence of this is that there will be some node in the CFG that has at least two paths to it. One path will contain the conditional node while the other will not. 
 Additionally, the path with the conditional node will be longer than the other path. 
-
-
 In such cases it is impossible to align the latency traces of the two paths since of the latency traces will always be longer than the other one. 
 Because the nodes in the shorter path form a subset of the nodes in the longer path it is impossible to modify the shorter path without also modifying the longer path, making it 
 impossible to ever equalize the lengths of the traces. 
 
-The second problematic structure occurs when one of the branches is shorter than the other one, as shown in figure \ref	{fig:unequal}. In such cases there will be some nodes in 
-one branch that have no corresponding nodes in the other branch, making it impossible to align them. 
+The second problematic structure occurs when one of the branches is shorter than the other one, as shown in figure \ref	{fig:unequal}. 
+If one branch is shorter than the other then there will be some nodes in the longer branch that have no corresponding  nodes in the shorter branch. 
+This makes it impossible to align them. 
 
 The nemesis-sensitive property as defined in section \ref{eq:nemesisPropertyNode} entails that it is impossible for a node to satisfy the property if one of these 
 structures occurs in its branches, since in both cases the regions have different depths. 
-The first stage of the algorithm therefore consists of first equalizing all path lengths and then 
-equalizing all branch depths. This is achieved by inserting additional instructions into the CFG.  
-Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict pseudo-code for equalizing paths lengths and equalizing branches respectively. 
+The first stage of the algorithm therefore consists inserting additional nodes into the CFG such that all path lengths to a given node are equal as well as all branch depths. 
+Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict the procedures for equalizing paths lengths and equalizing branches respectively. 
 
-\subsection{Extract Sub-graph}
-The different procedures described in this section only need to take into account the branches of secret dependent nodes. 
-These branches correspond to the regions $region_{then}(v)$ and $region_{else}(v)$ as defined in section \ref{sec:cfg}.
-The procedure \textit{ExtractSubgraph}, shown in algorithm \ref{alg:equalizePaths}}, extracts the subset of the graph that contains only the nodes that belong to 
-either one of these regions for a given secret-dependent node. 
-The edges of this new CFG are all the edges of the original CFG whose head and tail are a part of this subset. 
-
-To determine which nodes are a part of this subgraph all immediate dominators are determined starting from node $n$. 
-A node $u$ is said to dominate another node $w$ with respect to $n$ if every path from $n$ to $w$ passes through 
-$u$. 
-Node $v$ is the immediate dominator of $w$ if $v$ dominates $w$ and every other dominator of $w$ dominates $v$ \cite{dominator}.
-The immediate dominator is determined for each node reachable from $n$. If all leaves reachable from $n$ have the same immediate dominator $d$ then all paths from $n$ to some leaf go through $d$. 
-In this case any descendants of $d$ are not part of $region_{then}(v)$ or $region_{else}(v)$ and do not have to be included in the sub-graph. 
-
-If such a node $d$ exists then the nodes that are a part of the sub-graph are all nodes that are on a path from $n$ to $d$. If $d$ does not exists 
-the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
-
-\subsection{Equalize path lengths}
-
-To equalize all path lengths starting from some secret-dependent node $v$, first a subset of the graph's nodes are extracted such that 
-only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered.  
-Next the length of the longest path is computed from $v$ to all nodes in the sub-graph. 
-
-Let $(u, v)$ be an edge in the sub-graph. Let $d(u)$ and $d(v)$ be the length of the longest path to $u$ and $v$. If the difference between $d(u)$ and $d(v)$ is more than 
-one then there exist at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
-length $d(v)$. 
-
-The solution is based on the observation that the edge $(u, v)$ is a part of the shorter path. Additional nodes can be inserted between $u$ and $v$ to increase the length of the path until it 
-is as long as the longest path. 
-All other paths to $v$ will be unaffected. 
-
-The procedure for equalizing the path lengths iterates over all edges of the sub-graph. If the distances to $u$ and $v$ differ by more than one then nodes are inserted 
-into the edge between $u$ and $v$ such that the path that goes to $v$ through $u$ is of the same length as the longest path to $v$. 
-
-\subsection{Equalize branches}
-The branches of the CFG can be equalized in a similar way. Given some secret-dependent node $v$ a subset of the graph's nodes are extracted. 
-The lengths of the longest paths are computed for all nodes in the sub-graph. 
-The maximum path length is then determined as being the longest path length to one of the leaves of the CFG.
-The procedure then iterates over all leaves in the sub-graph and determines the difference between the distance to the leaf and the maximum path length. 
-If this difference is larger than zero then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
-path length. Because the final instruction in a leaf is a return statement any new nodes have to be added as predecessors. 
  
 \begin{figure*}[t!]
     \centering
@@ -211,9 +217,100 @@ path length. Because the final instruction in a leaf is a return statement any n
     \label{fig:problemstructures}
 \end{figure*}
 
-\section{Alignment} \label{seq:alignment}
+\subsection{Extract Sub-graph}
+The different procedures described in this section only need to take into account the branches of secret dependent nodes. 
+These branches correspond to the regions $region_{then}(v)$ and $region_{else}(v)$ as defined in section \ref{sec:cfg}.
+The procedure \textit{ExtractSubgraph}, shown in algorithm \ref{alg:equalizePaths}}, extracts the subset of the graph that contains only the nodes that belong to 
+either one of these regions for a given secret-dependent node. 
+The edges of this new CFG are all the edges of the original CFG whose head and tail are a part of this subset. 
 
-During the alignment stage the nodes of the CFG are aligned in a level-wise manner. 
+To determine which nodes are a part of this subgraph all immediate dominators are determined starting from node $n$. 
+A node $u$ is said to dominate another node $w$ with respect to $n$ if every path from $n$ to $w$ passes through 
+$u$. 
+Node $v$ is the immediate dominator of $w$ if $v$ dominates $w$ and every other dominator of $w$ dominates $v$ \cite{dominator}.
+The immediate dominator is determined for each node reachable from $n$. If all leaves reachable from $n$ have the same immediate dominator $d$ then all paths from $n$ to some leaf go through $d$. 
+In this case any descendants of $d$ are not part of $region_{then}(v)$ or $region_{else}(v)$ and do not have to be included in the sub-graph. 
+
+If such a node $d$ exists then the nodes that are a part of the sub-graph are all nodes that are on a path from $n$ to $d$. If $d$ does not exists 
+the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
+
+\subsection{Equalize Path Lengths}
+
+The procedure for equalizing all path lengths is show in algorithm \ref{alg:equalizePaths}.
+Let $v$ be the secret-dependent node. 
+First the subset of the graph is extracted such that 
+only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered.  
+Next the length of the longest path is computed from $v$ to all nodes in the sub-graph. 
+
+Let $(u, v)$ be an edge in the sub-graph. Let $d(u)$ and $d(v)$ be the length of the longest path to $u$ and $v$. If the difference between $d(u)$ and $d(v)$ is more than 
+one then there exist at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
+length $d(v)$. 
+
+The solution is based on the observation that the edge $(u, v)$ is a part of the shorter path. 
+Additional nodes can be inserted between $u$ and $v$ to increase its length until it is as long as the longest path. 
+All other paths to $v$ will be unaffected. 
+
+The procedure  iterates over each edge of the subgraph. If the distances to $u$ and $v$ differ by more than one then nodes are inserted 
+into the edge between $u$ and $v$ until the path is sufficiently long. The number of nodes that need to be inserted is equal to $d(v) - d(u) - 1$
+
+Figure \ref{fig:equalize-paths} illustrates this procedure.
+Each node in the graph is labeled with the length of the longest path to it. 
+Figure \ref{fig:equalize-paths-1} has two edges drawn between nodes where the difference between the path lengths is more than one. These edges are marked in red and blue. 
+Additional nodes are inserted to get the graph shown in figure \ref{fig:equalize-paths-2}. 
+
+
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/equalize_paths_1.png}
+        \caption{original CFG}
+        \label{fig:equalize-paths-1}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/equalize_paths_2.png}
+        \caption{equalized CFG}
+        \label{fig:equalize-paths-2}
+    \end{subfigure}
+    \caption{Equalizing path lengths}
+    \label{fig:equalize-paths}
+\end{figure*}
+
+\subsection{Equalize branches}
+The branches of the CFG can be equalized in a similar way. 
+The procedure for doing so is shown in algorithm \ref{alg:equalizeBranches}.
+Given some secret-dependent node $v$ the subset of the CFG is extracted that contains $region_{then}(v)$ and $region_{else}(v)$. 
+The lengths of the longest paths are computed for all nodes in the sub-graph. 
+The maximum path length is then determined as being the longest path length to one of the leaves of the CFG.
+The procedure iterates over all leaves in the sub-graph and determines the difference between the distance to the leaf and the maximum path length. 
+If this difference is larger than zero then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
+path length. Any additional nodes have to be inserted as predecessors because the final instruction in a leaf is a return statement. 
+
+Figure \ref{fig:equalize-branches} shows how nodes are inserted in order to equalize branch depths. The CFG in figure \ref{fig:equalize-branches-1} has one branch with depth equal to one. 
+Two additional nodes are added as ancestor to the branch's leaf in order to increase the branch depth to three. The result of this process is shown in \ref{fig:equalize-branches-2}.
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/equalize_branches_example-1.png}
+        \caption{original CFG}
+        \label{fig:equalize-branches-1}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=6cm]{images/equalize_branches_example-2.png}
+        \caption{equalized CFG}
+        \label{fig:equalize-branches-2}
+    \end{subfigure}
+    \caption{Equalizing branch depths}
+    \label{fig:equalize-branches}
+\end{figure*}
+
+\section{Alignment} \label{seq:alignment}
+During the second stage of the algorithm the nodes of the CFG are aligned in a level-wise manner. 
 The alignment of a set of nodes consists of inserting instructions such that all instructions at a given position across all nodes in the set have the same latency. 
 The level of a node is defined as being the distance between the root of the graph and the node. The first stage of the algorithm ensures that all paths to a given nodes have the same length making the level of a node a well 
 defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
@@ -276,6 +373,47 @@ If the reference instruction is a call to a function then the NOP instruction wi
 If the function contains no secret dependent node then this ensures that any latency traces cannot leak information from the program. Otherwise the function that is called needs to be aligned as well. 
 It is only safe to insert a call to a function this way if the function in question has no effects on the program state. If the function does modify the program state then inserting additional calls can 
 result in erroneous program outputs. 
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[width=4cm]{images/align-example-1.png}
+        \caption{}
+        \label{fig:equalize-example-1}
+    \end{subfigure}%
+    ~
+	\begin{subfigure}[t]{0.5\textwidth}
+    \centering
+    \includegraphics[width=4cm]{images/align-example-2.png}
+    \caption{}
+    \label{fig:equalize-example-2}
+    \end{subfigure}%    
+  	
+  	\bigskip
+	\begin{subfigure}[t]{0.5\textwidth}
+		\centering
+    	\includegraphics[width=4cm]{images/align-example-3.png}
+    	\caption{}
+    	\label{fig:equalize-example-3}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+    \centering
+    \includegraphics[width=4cm]{images/align-example-4.png}
+    \caption{}
+    \label{fig:equalize-example-4}
+    \end{subfigure}
+    \bigskip
+    
+    \begin{subfigure}[t]{0.5\textwidth}
+    \centering
+    \includegraphics[width=4cm]{images/align-example-5.png}
+    \caption{}
+    \label{fig:equalize-example-1}
+    \end{subfigure}
+    \caption{Example of alignment of a set of three nodes}
+\end{figure}
 
 \section{The algorithm}
 
@@ -449,7 +587,7 @@ This can occur when, for example, a program contains a nested if-statement. Cycl
     
     \SetKwFunction{countInstruction}{CountInstructions}
     \SetKwFunction{selectReferenceNode}{SelectReferenceNode}
-    \SetKwFunction{getNodeInstruction}{GetNodeInstruction}
+    \SetKwFunction{getNodeInstruction}{GetNodeInstruction}	
     \SetKwFunction{latency}{Latency}
     \SetKwFunction{isBranch}{IsBranch}
     \SetKwFunction{isReturn}{IsReturn}
