@@ -449,12 +449,16 @@ Cycles within a branch of a secret dependent node are not supported by the propo
 In this case the algorithm correctly aligns the nodes of the branches but the latency traces will still not be identical.
 The branch that contains the cycle will be executed a higher number of times, resulting in a longer latency trace. 
 
+
+
+\subsection{Secret-dependent branches}
+The detection of secret dependent branches is not part of the algorithm or the implementation. The user has to provide the algorithm with the address of the target instruction. 
+At the time of writing secret dependent branching instructions need to be identified through manual inspection. However, research has shown that static detection of these side channels is possible, though 
+this is currently limited to the MSP430 architecture \cite{MSP430Detection}.
+
 \subsection{Closing timing leaks}
 Algorithm \ref{alg:closeleaks} illustrates the top-level operation of the algorithm. 
 The secret-dependent branching instructions are passed to the algorithm as arguments. 
-Determining which branching instructions are secret-dependent is not part of the proposed algorithm. 
-The user has to provide the algorithm with the address of the target instruction.
-
 Based on the given instructions the secret-dependent nodes of the CFG are determined. 
 These are all nodes that contain a secret-dependent instruction. 
 First the equalizing operations are applied for each secret-dependent node. 

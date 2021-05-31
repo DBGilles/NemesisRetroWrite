@@ -39,12 +39,12 @@
 \contentsline {subsection}{\numberline {2.4.4}Example}{14}%
 \contentsline {section}{\numberline {2.5}The algorithm}{14}%
 \contentsline {subsection}{\numberline {2.5.1}Cycles}{14}%
-\contentsline {subsection}{\numberline {2.5.2}Closing timing leaks}{15}%
+\contentsline {subsection}{\numberline {2.5.2}Secret-dependent branches}{15}%
+\contentsline {subsection}{\numberline {2.5.3}Closing timing leaks}{15}%
 \contentsline {chapter}{\chapternumberline {3}Implementation}{21}%
-\contentsline {subsubsection}{RetroWrite}{21}%
-\contentsline {subsubsection}{Binary Rewriting}{22}%
-\contentsline {subsubsection}{Secret-dependent branches}{22}%
-\contentsline {subsubsection}{Instruction Latencies}{22}%
+\contentsline {section}{\numberline {3.1}Binary Rewriting}{21}%
+\contentsline {section}{\numberline {3.2}RetroWrite}{21}%
+\contentsline {section}{\numberline {3.3}Instruction Latencies}{22}%
 \contentsline {chapter}{\chapternumberline {4}Evaluation}{23}%
 \contentsline {section}{\numberline {4.1}Benchmark Suite}{23}%
 \contentsline {section}{\numberline {4.2}Experiment Setup}{23}%

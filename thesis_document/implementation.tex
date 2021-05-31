@@ -1,8 +1,16 @@
-
-
 \chapter{Implementation}
 
-\subsubsection{RetroWrite}
+\section{Binary Rewriting}
+The algorithm has been implemented as a binary rewriting tool. 
+This approach has a number of advantages. 
+Firstly the algorithm can be applied to existing binaries. It does not require recompilation of original code and does not require the source code of the program. 
+This means that it is suitable for use on commercial off-the-shelf binaries deployed in the field. 
+Additionally there is no need for a modified compiler of hardware. 
+
+
+
+
+\section{RetroWrite}
 The algorithm is implemented for the Intel x64\_86 architecture. It is written in X lines of Python code as part of the RetroWrite framework. 
 RetroWrite is a binary rewriting tool developed for statically instrumenting C and C++ binaries. 
 The authors are able to leverage relocation information present in position independent code to reconstruct assembly files from a compiled binary. 
@@ -23,27 +31,15 @@ Each node of the CFG consists of a sequence of \textit{InstructionWrapper}s.
 The edges of the CFG are reconstructed based on the instruction mapping stored in the \textit{Function} instances. 
 The CFG data structure implements  an interface for the insertion of additional nodes into the graph and the insertion of additional instructions into nodes. 
 This interface is built on top of the RetroWrite API, so all modifications to the CFG result in modification to the underlying \textit{InstructionWrapper} instances. 
-Once all necessary modifications are made to the CFGs functionality provided by RetroWrite is used to writing the instructions to an assembly file. 
-This file can be then be compiled using any off-the-shelf compiler.
-RetroWrite provides functionality for writing the instruction to assembly files. This assembly file can then be compiled using any of-the-shelf compiler. 
-
+Once all necessary modifications have been made to the CFG the instructions are written to an assembly file using functionality provided by RetroWrite. 
+This file can be then be compiled using any off-the-shelf compiler to create an executable. 
 
 The RetroWrite framework imposes some restrictions on the binary. The binary must be compiled as position independent code, it must contain instructions from x86\_64 architecture, and 
 it cannot be stripped of symbols \cite{hexhive}. 
 As a result the implementation only supports binaries that meet these restrictions. 
 
-\subsubsection{Binary Rewriting}
-Implementing the algorithm as part of a binary rewriting framework has two main advantages. 
-Firstly the algorithm can be applied to existing binaries. It does not require recompilation of original code.
-Secondly the algorithm does not require the source code of the program. It can be applied to third-party software. 
 
-
-\subsubsection{Secret-dependent branches}
-The detection of secret dependent branches is not part of the algorithm or the implementation. The user has to provide the algorithm with the address of the target instruction. 
-At the time of writing secret dependent branching instructions need to be identified through manual inspection. However, research has shown that static detection of these side channels is possible, though 
-this is currently limited to the MSP430 architecture \cite{MSP430Detection}.
-
-\subsubsection{Instruction Latencies}
+\section{Instruction Latencies}
 The construction of NOP instructions as described in section \ref{sec:nop} is based on data that measures the latency of instructions in the x86-64 architecture.
 Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual} but this data is not complete.
 To obtain better data Abel et. al  \cite{uops} developed novel algorithms to infer the latency throughput and port usage based on automatically-generated microbenchmarks. 
