@@ -51,5 +51,5 @@
 \contentsline {section}{\numberline {4.3}Results}{25}%
 \contentsline {chapter}{\chapternumberline {5}Conclusion}{27}%
 \contentsline {section}{\numberline {5.1}Discussion}{27}%
-\contentsline {section}{\numberline {5.2}Future work}{27}%
+\contentsline {section}{\numberline {5.2}Future work}{28}%
 \contentsline {chapter}{Bibliography}{29}%

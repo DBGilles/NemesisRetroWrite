@@ -151,7 +151,7 @@ completed.8060_4038: # 4038 -- 4039
 multifork:
 .L1150:
 .LC1150:
-pushq %rcx
+pushq %r12
 	pushq %rbp
 .LC1151:
 	movq %rsp, %rbp
@@ -168,7 +168,7 @@ pushq %rcx
 .LC1162:
 	je .L118f
 .LC1168:
-movq -0x4(%rbp), %rcx
+movq -0x4(%rbp), %r12
 	jmp .L116d
 .L116d:
 .LC116d:
@@ -178,7 +178,7 @@ movq -0x4(%rbp), %rcx
 .LC1173:
 	je .L119b
 .LC1179:
-movq -0x4(%rbp), %rcx
+movq -0x4(%rbp), %r12
 	jmp .L117e
 .L117e:
 .LC117e:
@@ -188,7 +188,7 @@ movq -0x4(%rbp), %rcx
 .LC1184:
 	je .L11a7
 .LC118a:
-movq -0x4(%rbp), %rcx
+movq -0x4(%rbp), %r12
 	jmp .L11b3
 .L118f:
 .LC118f:
@@ -208,51 +208,51 @@ movq -0x4(%rbp), %rcx
 .L11b3:
 .LC11b3:
 	movl $0, -8(%rbp)
-jmp .R670
+jmp .R592
 .L11ba:
 .LC11ba:
 .L8:
-movq -0x4(%rbp), %rcx
-jmp .R670
+movq -0x4(%rbp), %r12
+jmp .R592
 .L7:
-movq -0x4(%rbp), %rcx
+movq -0x4(%rbp), %r12
 add $0, %rax
-jmp .R165
-.R165:
+jmp .R212
+.R212:
 .L6:
-movq -0x4(%rbp), %rcx
-jmp .R36
-.R36:
+movq -0x4(%rbp), %r12
+jmp .R474
+.R474:
 .L5:
-movq -0x4(%rbp), %rcx
-jmp .R670
+movq -0x4(%rbp), %r12
+jmp .R592
 .L4:
-movq -0x4(%rbp), %rcx
+movq -0x4(%rbp), %r12
 add $0, %rax
-jmp .R833
-.R833:
+jmp .R586
+.R586:
 .L3:
-movq -0x4(%rbp), %rcx
-jmp .R504
-.R504:
+movq -0x4(%rbp), %r12
+jmp .R34
+.R34:
 .L2:
-movq -0x4(%rbp), %rcx
+movq -0x4(%rbp), %r12
 add $0, %rax
-jmp .R844
-.R844:
+jmp .R440
+.R440:
 .L1:
-movq -0x4(%rbp), %rcx
-jmp .R285
-.R285:
+movq -0x4(%rbp), %r12
+jmp .R495
+.R495:
 .L0:
-movq -0x4(%rbp), %rcx
-jmp .R831
-.R831:
-.R670:
+movq -0x4(%rbp), %r12
+jmp .R16
+.R16:
+.R592:
 	movl -8(%rbp), %eax
 .LC11bd:
 	popq %rbp
-popq %rcx
+popq %r12
 .LC11be:
 	retq 
 .size multifork,.-multifork

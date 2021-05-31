@@ -151,7 +151,7 @@ completed.8060_4038: # 4038 -- 4039
 fork:
 .L1150:
 .LC1150:
-pushq %r14
+pushq %r9
 	pushq %rbp
 .LC1151:
 	movq %rsp, %rbp
@@ -177,16 +177,16 @@ jmp .R586
 .L1176:
 .LC1176:
 .L0:
-movq -0x4(%rbp), %r14
+movq -0x4(%rbp), %r9
 add $0, %rax
-movq -0x4(%rbp), %r14
+movq -0x4(%rbp), %r9
 jmp .R34
 .R34:
 .R586:
 	movl -0xc(%rbp), %eax
 .LC1179:
 	popq %rbp
-popq %r14
+popq %r9
 .LC117a:
 	retq 
 .size fork,.-fork
