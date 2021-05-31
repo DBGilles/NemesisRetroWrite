@@ -1,3 +1,4 @@
+
 @inproceedings{WinderixHans,
 journal = {2021 IEEE European Symposium on Security and Privacy (EuroS&P)},
 year = {2021},
@@ -255,3 +256,93 @@ isbn="978-3-540-33355-5"
  url={https://github.com/sancus-tee/sancus-support},
  journal={GitHub},
  author={sancus-tee}}
+
+@article{rewriting-survey,
+author = {Wenzl, Matthias and Merzdovnik, Georg and Ullrich, Johanna and Weippl, Edgar},
+title = {From Hack to Elaborate Technique—A Survey on Binary Rewriting},
+year = {2019},
+issue_date = {July 2019},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {52},
+number = {3},
+issn = {0360-0300},
+url = {https://doi.org/10.1145/3316415},
+doi = {10.1145/3316415},
+abstract = {Binary rewriting is changing the semantics of a program without having the source code at hand. It is used for diverse purposes, such as emulation (e.g., QEMU), optimization (e.g., DynInst), observation (e.g., Valgrind), and hardening (e.g., Control flow integrity enforcement). This survey gives detailed insight into the development and state-of-the-art in binary rewriting by reviewing 67 publications from 1966 to 2018. Starting from these publications, we provide an in-depth investigation of the challenges and respective solutions to accomplish binary rewriting. Based on our findings, we establish a thorough categorization of binary rewriting approaches with respect to their use-case, applied analysis technique, code-transformation method, and code generation techniques. We contribute a comprehensive mapping between binary rewriting tools, applied techniques, and their domain of application. Our findings emphasize that although much work has been done over the past decades, most of the effort was put into improvements aiming at rewriting general purpose applications but ignoring other challenges like altering throughput-oriented programs or software with real-time requirements, which are often used in the emerging field of the Internet of Things. To the best of our knowledge, our survey is the first comprehensive overview on the complete binary rewriting process.},
+journal = {ACM Comput. Surv.},
+month = jun,
+articleno = {49},
+numpages = {37},
+keywords = {full-translation, dynamic rewriting, binary hardening, Binary rewriting, minimal-invasive, static rewriting, reassembly}
+}
+
+@inproceedings{E9Patch,
+author = {Duck, Gregory J. and Gao, Xiang and Roychoudhury, Abhik},
+title = {Binary Rewriting without Control Flow Recovery},
+year = {2020},
+isbn = {9781450376136},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3385412.3385972},
+doi = {10.1145/3385412.3385972},
+abstract = {Static binary rewriting has many important applications in software security and systems, such as hardening, repair, patching, instrumentation, and debugging. While many different static binary rewriting tools have been proposed, most rely on recovering control flow information from the input binary. The recovery step is necessary since the rewriting process may move instructions, meaning that the set of jump targets in the rewritten binary needs to be adjusted accordingly. Since the static recovery of control flow information is a hard problem in general, most tools rely on a set of simplifying heuristics or assumptions, such as specific compilers, specific source languages, or binary file meta information. However, the reliance on assumptions or heuristics tends to scale poorly in practice, and most state-of-the-art static binary rewriting tools cannot handle very large/complex programs such as web browsers.  In this paper we present E9Patch, a tool that can statically rewrite x86_64 binaries without any knowledge of control flow information. To do so, E9Patch develops a suite of binary rewriting methodologies---such as instruction punning, padding, and eviction---that can insert jumps to trampolines without the need to move other instructions. Since this preserves the set of jump targets, the need for control flow recovery and related heuristics is eliminated. As such, E9Patch is robust by design, and can scale to very large (&gt;100MB) stripped binaries including the Google Chrome and FireFox web browsers. We also evaluate the effectiveness of E9Patch against realistic applications such as binary instrumentation, hardening and repair.},
+booktitle = {Proceedings of the 41st ACM SIGPLAN Conference on Programming Language Design and Implementation},
+pages = {151–163},
+numpages = {13},
+keywords = {binary repair, static binary rewriting, binary instrumentation, binary patching, memory management, instruction punning, instruction eviction},
+location = {London, UK},
+series = {PLDI 2020}
+}
+
+@inproceedings{10.1145/3062341.3062344,
+author = {Chamith, Buddhika and Svensson, Bo Joel and Dalessandro, Luke and Newton, Ryan R.},
+title = {Instruction Punning: Lightweight Instrumentation for X86-64},
+year = {2017},
+isbn = {9781450349888},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3062341.3062344},
+doi = {10.1145/3062341.3062344},
+abstract = { Existing techniques for injecting probes into running applications are limited;  they either fail to support probing arbitrary locations, or to support scalable,  rapid toggling of probes. We introduce a new technique on x86-64, called  instruction punning, which allows scalable probes at any instruction. The key  idea is that when we inject a jump instruction, the relative address of the jump  serves simultaneously as data and as an instruction sequence. We show that this  approach achieves probe invocation overheads of only a few dozen cycles, and  probe activation/deactivation costs that are cheaper than a system call, even  when all threads in the system are both invoking probes and toggling them. },
+booktitle = {Proceedings of the 38th ACM SIGPLAN Conference on Programming Language Design and Implementation},
+pages = {320–332},
+numpages = {13},
+keywords = {dynamic instrumentation, application profiling},
+location = {Barcelona, Spain},
+series = {PLDI 2017}
+}
+
+@article{instruction-punning,
+author = {Chamith, Buddhika and Svensson, Bo Joel and Dalessandro, Luke and Newton, Ryan R.},
+title = {Instruction Punning: Lightweight Instrumentation for X86-64},
+year = {2017},
+issue_date = {June 2017},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {52},
+number = {6},
+issn = {0362-1340},
+url = {https://doi.org/10.1145/3140587.3062344},
+doi = {10.1145/3140587.3062344},
+abstract = { Existing techniques for injecting probes into running applications are limited;  they either fail to support probing arbitrary locations, or to support scalable,  rapid toggling of probes. We introduce a new technique on x86-64, called  instruction punning, which allows scalable probes at any instruction. The key  idea is that when we inject a jump instruction, the relative address of the jump  serves simultaneously as data and as an instruction sequence. We show that this  approach achieves probe invocation overheads of only a few dozen cycles, and  probe activation/deactivation costs that are cheaper than a system call, even  when all threads in the system are both invoking probes and toggling them. },
+journal = {SIGPLAN Not.},
+month = jun,
+pages = {320–332},
+numpages = {13},
+keywords = {application profiling, dynamic instrumentation}
+}
+
+@inproceedings{microsbs,
+journal = {Proceedings of the 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020)},
+pages = {381--395},
+publisher = {USENIX Association},
+isbn = {978-1-939133-18-2},
+year = {2020},
+title = {mSBS: Static binary sanitization of bare-metal embedded devices for fault observability},
+author = {Salehi, Majid and Hughes, Danny and Crispo, Bruno},
+url = {$$Uhttps://www.usenix.org/conference/raid2020/presentation/salehi},
+}
+
+
+

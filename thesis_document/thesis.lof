@@ -14,7 +14,7 @@
 \babel@toc {english}{}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Assembly pseudo-code with a secret-dependent branch that is vulnerable to Nemesis attack\relax }}{2}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Assembly pseudo-code with a secret-dependent branch that is vulnerable to Nemesis attack\relax }}{3}%
 \addvspace {10pt}
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Example program with corresponding CFG\relax }}{7}%
 \contentsline {figure}{\numberline {2.2}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{8}%

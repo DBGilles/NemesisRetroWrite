@@ -16,12 +16,24 @@ M.~Busi, J.~Noorman, J.~Van~Bulck, L.~Galletta, P.~Degano, J.~Mühlberg, and
 \newblock Provably secure isolation for interruptible enclaved execution on
   small microprocessors: Extended version, 01 2020.
 
+\bibitem{instruction-punning}
+B.~Chamith, B.~J. Svensson, L.~Dalessandro, and R.~R. Newton.
+\newblock Instruction punning: Lightweight instrumentation for x86-64.
+\newblock {\em SIGPLAN Not.}, 52(6):320–332, June 2017.
+
 \bibitem{Dinesh2020RetroWriteSI}
 S.~Dinesh, N.~Burow, D.~Xu, and M.~Payer.
 \newblock Retrowrite: Statically instrumenting cots binaries for fuzzing and
   sanitization.
 \newblock {\em 2020 IEEE Symposium on Security and Privacy (SP)}, pages
   1497--1511, 2020.
+
+\bibitem{E9Patch}
+G.~J. Duck, X.~Gao, and A.~Roychoudhury.
+\newblock Binary rewriting without control flow recovery.
+\newblock In {\em Proceedings of the 41st ACM SIGPLAN Conference on Programming
+  Language Design and Implementation}, PLDI 2020, page 151–163, New York, NY,
+  USA, 2020. Association for Computing Machinery.
 
 \bibitem{smart}
 K.~Eldefrawy, D.~Perito, and G.~Tsudik.
@@ -97,6 +109,12 @@ S.~Pouyanrad, J.~T. M\"{u}hlberg, and W.~Joosen.
   Availability, Reliability and Security}, ARES '20, New York, NY, USA, 2020.
   Association for Computing Machinery.
 
+\bibitem{microsbs}
+M.~Salehi, D.~Hughes, and B.~Crispo.
+\newblock msbs: Static binary sanitization of bare-metal embedded devices for
+  fault observability.
+\newblock pages 381--395. USENIX Association, 2020.
+
 \bibitem{sancussupport}
 sancus tee.
 \newblock sancus-tee/sancus-support.
@@ -113,6 +131,11 @@ J.~Van~Bulck, F.~Piessens, and R.~Strackx.
 \newblock In {\em Proceedings of the 2018 ACM SIGSAC Conference on Computer and
   Communications Security}, CCS '18, page 178–195, New York, NY, USA, 2018.
   Association for Computing Machinery.
+
+\bibitem{rewriting-survey}
+M.~Wenzl, G.~Merzdovnik, J.~Ullrich, and E.~Weippl.
+\newblock From hack to elaborate technique—a survey on binary rewriting.
+\newblock {\em ACM Comput. Surv.}, 52(3), June 2019.
 
 \bibitem{WinderixHans}
 H.~Winderix, J.~T. Mühlberg, and f.~Piessens.
