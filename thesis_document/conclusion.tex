@@ -29,4 +29,10 @@ Because of this additional experiments are needed to fully verify if the algorit
 Empirical measurements in the form of latency traces are needed to determine if an attacker can still distinguish between branches of a secret-dependent conditional node. 
 
 
+
+\subsection{Secret-dependent branches}
+The detection of secret dependent branches is not part of the algorithm or the implementation. The user has to provide the algorithm with the address of the target instruction. 
+At the time of writing secret dependent branching instructions need to be identified through manual inspection. However, research has shown that static detection of these side channels is possible, though 
+this is currently limited to the MSP430 architecture \cite{MSP430Detection}.
+
 \section{Future work}

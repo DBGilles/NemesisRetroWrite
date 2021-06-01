@@ -29,24 +29,23 @@
 \contentsline {subsection}{\numberline {2.3.1}Extract Sub-graph}{9}%
 \contentsline {subsection}{\numberline {2.3.2}Equalize Path Lengths}{10}%
 \contentsline {subsection}{\numberline {2.3.3}Equalize branches}{10}%
-\contentsline {section}{\numberline {2.4}Alignment}{11}%
-\contentsline {subsection}{\numberline {2.4.1}Basic Operation}{12}%
-\contentsline {subsection}{\numberline {2.4.2}Selecting the Reference Node}{12}%
-\contentsline {subsection}{\numberline {2.4.3}Constructing NOP instruction}{13}%
-\contentsline {subsection}{\numberline {2.4.4}Example}{14}%
-\contentsline {section}{\numberline {2.5}The algorithm}{14}%
-\contentsline {subsection}{\numberline {2.5.1}Cycles}{14}%
-\contentsline {subsection}{\numberline {2.5.2}Secret-dependent branches}{15}%
-\contentsline {subsection}{\numberline {2.5.3}Closing timing leaks}{15}%
-\contentsline {chapter}{\chapternumberline {3}Implementation}{21}%
-\contentsline {section}{\numberline {3.1}Binary Rewriting}{21}%
-\contentsline {section}{\numberline {3.2}RetroWrite}{21}%
-\contentsline {section}{\numberline {3.3}Instruction Latencies}{22}%
-\contentsline {chapter}{\chapternumberline {4}Evaluation}{23}%
-\contentsline {section}{\numberline {4.1}Benchmark Suite}{23}%
-\contentsline {section}{\numberline {4.2}Experiment Setup}{23}%
-\contentsline {section}{\numberline {4.3}Results}{25}%
-\contentsline {chapter}{\chapternumberline {5}Conclusion}{27}%
-\contentsline {section}{\numberline {5.1}Discussion}{27}%
-\contentsline {section}{\numberline {5.2}Future work}{28}%
-\contentsline {chapter}{Bibliography}{29}%
+\contentsline {subsection}{\numberline {2.3.4}Cycles}{13}%
+\contentsline {section}{\numberline {2.4}Alignment}{13}%
+\contentsline {subsection}{\numberline {2.4.1}Basic Operation}{14}%
+\contentsline {subsection}{\numberline {2.4.2}Selecting the Reference Node}{14}%
+\contentsline {subsection}{\numberline {2.4.3}Constructing NOP instruction}{14}%
+\contentsline {subsection}{\numberline {2.4.4}Example}{15}%
+\contentsline {subsection}{\numberline {2.4.5}Closing timing leaks}{17}%
+\contentsline {chapter}{\chapternumberline {3}Implementation}{19}%
+\contentsline {section}{\numberline {3.1}Binary Rewriting}{19}%
+\contentsline {section}{\numberline {3.2}RetroWrite}{19}%
+\contentsline {section}{\numberline {3.3}Instruction Latencies}{20}%
+\contentsline {chapter}{\chapternumberline {4}Evaluation}{21}%
+\contentsline {section}{\numberline {4.1}Benchmark Suite}{21}%
+\contentsline {section}{\numberline {4.2}Experiment Setup}{21}%
+\contentsline {section}{\numberline {4.3}Results}{23}%
+\contentsline {chapter}{\chapternumberline {5}Conclusion}{25}%
+\contentsline {section}{\numberline {5.1}Discussion}{25}%
+\contentsline {subsection}{\numberline {5.1.1}Secret-dependent branches}{26}%
+\contentsline {section}{\numberline {5.2}Future work}{26}%
+\contentsline {chapter}{Bibliography}{27}%
