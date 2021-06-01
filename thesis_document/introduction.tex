@@ -42,7 +42,7 @@ privileged software such as the OS \cite{SGX}.
 Research has shown that it is still possible to extract information from protected applications in PMAs. In their work Xu et al. \cite{xu} introduce a novel type of side-channel attack 
 called controlled-attacks. These attacks are categorized by untrusted operating systems that create side-channels through its extensive control of the system.
 The authors were able to leverage the OS's high degree of control over the system to extract large amounts of data from applications which were until 
-then safe from side-channel attacks . 
+then safe from side-channel attacks. 
 
 \section{Nemesis}
 More recently Van Bulck et al. \cite{Nemesis} developed Nemesis, a controlled-channel attack that leverages the interrupt mechanism to extract sensitive information from 
@@ -85,21 +85,38 @@ Binary rewriting tools have been developed for both low-end architectures found 
 
 
 \section{Related Work}
-\subsubsection{Automated if-conversion}
-"Moreover, if-conversion comes with a significant performance overhead [12] that somewhat invalidates the
-PMA promise of native code execution in a protected environment." -- Nemesis 
-
 \subsubsection{Software-based approaches}
 
-Molnar et. at \cite{programcounter} introduce methods for the detection and mitigation of control-flow side channel attacks.
-They define a model called the \textit{program counter transcript model} to model attacks where the adversary can see the control flow of the program. 
-In this model the only information 
-\textbf{TODO ... is dit wel van toepasssing}
-Quote van dit artikel": "Nonetheless, we believe these assumptions are reasonable for some embedded devices, namely those which do not have caches or
-sophisticated arithmetic units
+A large number of countermeasures have been proposed for closing timing side-channels. These can broadly be categorized as being either software-based or hardware-based. 
+Hardware-based solution are based on modification to the architecture, whereas software-based solutions are implemented at the language level \cite{Barthe}. 
 
-\textbf{TODO: iets over constant time policies}
-%Commonly used software-based approaches to mitigating timing-based side-channel attacks are the program counter and constant-time policies \cite{Barthe}.
+Popular software-based approaches to closing timing-leaks include constant-time policies and the program counter model \cite{Barthe}. 
+Constant time policies require that memory access and control-flow should not depend on secret data. 
+Unfortunately writing code that adheres to these policies can be difficult since it requires knowledge of the compiler and requires developers to deviate from 
+conventional programming practices.
+% TODO: doen papers verify-constant-time en barthe wat ik zeg hieronder? 
+A number of solutions have been proposed to verify if a program adheres to constant-time policies \cite{verify-constant-time, Barthe}.
+
+
+Molnar et al. \cite{programcounter} first introduced the program counter model in their work, proposing methods for the detection and mitigation of control-flow side channel attacks. 
+The authors consider the case where an adversary is able to make an observation of a side channel at each step of the computation. 
+The result is a sequence of observations $T= (T_1, T_2, ... T_n)$ called a \textit{transcript}.
+The \textit{program counter model} or \textit{PC model} is then the model where each value of the transcript is the processor's program counter during the computation. 
+A program is then said to be  PC-secure if the program if this transcript is secure. 
+The authors state that \textit{any program that is PC-secure will also be secure against timing attacks}.
+Based on this definition of PC-security the authors introduce a code transformation for creating PC-secure C code.
+The authors note that they made a number of assumptions in their work. Although these assumptions do not hold for a number of architectures the authors are confident 
+that they are reasonable for some embedded devices. 	
+
+%\subsubsection{Automated if-conversion}
+%"Moreover, if-conversion comes with a significant performance overhead [12] that somewhat invalidates the
+%PMA promise of native code execution in a protected environment." -- Nemesis 
+%
+%
+%
+%
+%\textbf{TODO: iets over constant time policies}
+%%Commonly used software-based approaches to mitigating timing-based side-channel attacks are the program counter and constant-time policies \cite{Barthe}.
  
 
 \subsubsection{Hardware-based approaches}
@@ -111,17 +128,7 @@ This design is based on an earlier version of Sancus with non-interruptible encl
 A limitation of their approach is that their design is based on the assumption that the timing of instruction is predictable. This is generally not the case for more complex architectures such as Intel's x86\_64.
 Additionally their approach requires hardware modifications which means it cannot be applied to off-the-shelf and existing devices. 
 
-%In the case of \textit{interrupt-aware} architectures security policies could be implemented that use excessive interrupt rates as a trigger to terminate an enclave \cite{Nemesis}. 
-% Zie nemesis paper, iets over intel sgx instructions (niet 100 procent of dit wel relevant is, nakijken) 
-
-
-\subsubsection{Constant time policy}
-
-
-\subsubsection{Automatic detection of timing side channels / leaks}
-
-
-\subsubsection{Beetze.de}
+%\subsubsection{Beetze.de}
 	
 \section{Thesis Goal and Outline}
 This paper presents a novel algorithm for automatically transforming a program in order to remove any timing leaks. It achieves this by addressing the core cause of the vulnerability: differences in 

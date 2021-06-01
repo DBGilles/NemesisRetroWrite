@@ -11,7 +11,7 @@ Additionally there is no need for a modified compiler of hardware.
 
 
 \section{RetroWrite}
-The algorithm is implemented for the Intel x64\_86 architecture. It is written in X lines of Python code as part of the RetroWrite framework. 
+The algorithm is implemented for the Intel x86\_64 architecture. It is written in X lines of Python code as part of the RetroWrite framework. 
 RetroWrite is a binary rewriting tool developed for statically instrumenting C and C++ binaries. 
 The authors are able to leverage relocation information present in position independent code to reconstruct assembly files from a compiled binary. 
 These files can be modified and reassembled into binaries. 
@@ -42,7 +42,7 @@ As a result the implementation only supports binaries that meet these restrictio
 \section{Instruction Latencies}
 The construction of NOP instructions as described in section \ref{sec:nop} is based on data that measures the latency of instructions in the x86-64 architecture.
 Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual} but this data is not complete.
-To obtain better data Abel et. al  \cite{uops} developed novel algorithms to infer the latency throughput and port usage based on automatically-generated microbenchmarks. 
+To obtain better data Abel et al.  \cite{uops} developed novel algorithms to infer the latency throughput and port usage based on automatically-generated microbenchmarks. 
 The authors claim that their results are more accurate and precise than existing work. 
 Another source of data on instruction latencies is provided by Agner Fog who provides the results of his own measurements \cite{fog_2021}. 
 

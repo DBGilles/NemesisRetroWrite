@@ -10,11 +10,6 @@ The style file: abbrv.bst
 Database file #1: references.bib
 Warning--entry type for "Busi" isn't style-file defined
 --line 213 of file references.bib
-You're missing a field name---line 222 of file references.bib
- : 
- : %  author={Barthe, Gilles and Grégoire, Benjamin and Laporte, Vincent},
-(Error may have been on previous line)
-I'm skipping whatever remains of this entry
 Warning--to sort, need author, editor, or key in intel-ref-manual
 Warning--empty author and editor in intel-ref-manual
 Warning--empty publisher in intel-ref-manual
@@ -24,45 +19,45 @@ Warning--empty booktitle in trustlite
 Warning--empty booktitle in microsbs
 Warning--empty publisher in psma
 Warning--empty booktitle in WinderixHans
-You've used 25 entries,
+You've used 27 entries,
             2118 wiz_defined-function locations,
-            647 strings with 8936 characters,
-and the built_in function-call counts, 9781 in all, are:
-= -- 941
-> -- 527
-< -- 9
-+ -- 209
-- -- 182
-* -- 668
-:= -- 1541
-add.period$ -- 76
-call.type$ -- 25
-change.case$ -- 163
+            659 strings with 9432 characters,
+and the built_in function-call counts, 10565 in all, are:
+= -- 1016
+> -- 563
+< -- 10
++ -- 223
+- -- 194
+* -- 718
+:= -- 1661
+add.period$ -- 82
+call.type$ -- 27
+change.case$ -- 175
 chr.to.int$ -- 0
-cite$ -- 34
-duplicate$ -- 397
-empty$ -- 718
-format.name$ -- 182
-if$ -- 2117
+cite$ -- 36
+duplicate$ -- 434
+empty$ -- 785
+format.name$ -- 194
+if$ -- 2294
 int.to.chr$ -- 0
-int.to.str$ -- 25
-missing$ -- 21
-newline$ -- 121
-num.names$ -- 50
-pop$ -- 212
+int.to.str$ -- 27
+missing$ -- 23
+newline$ -- 131
+num.names$ -- 54
+pop$ -- 229
 preamble$ -- 1
-purify$ -- 140
+purify$ -- 150
 quote$ -- 0
-skip$ -- 336
+skip$ -- 362
 stack$ -- 0
-substring$ -- 472
-swap$ -- 137
-text.length$ -- 9
+substring$ -- 510
+swap$ -- 149
+text.length$ -- 10
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 96
+type$ -- 104
 warning$ -- 9
-while$ -- 72
-width$ -- 27
-write$ -- 264
-(There was 1 error message)
+while$ -- 78
+width$ -- 29
+write$ -- 287
+(There were 10 warnings)
