@@ -1,16 +1,16 @@
 \chapter{Implementation}
-
-\section{Binary Rewriting}
-The algorithm has been implemented as a binary rewriting tool. 
-This approach has a number of advantages. 
-Firstly the algorithm can be applied to existing binaries. It does not require recompilation of original code and does not require the source code of the program. 
-This means that it is suitable for use on commercial off-the-shelf binaries deployed in the field. 
-Additionally there is no need for a modified compiler of hardware. 
-
-
+\label{cha:implementation}
+The algorithm has been implemented using the Python programming language, in X lines of code. The implementation is built on top of the RetroWrite framework. 
+The raw binary is dissambled using Capstone, a multi-architecture dissasembly framework. An ELF parsing library called pyelftools is used to load ELF files and parse relocation information. 
+The disassembled instructions together with the relocation information is then used by RetroWrite to create an assemly file that can be modified and recompiled. 
+Section \ref{sec:retrowrite} further outlines the workings of RetroWrite and how the implementation makes use of it. 
+An important aspect of the implementation is obtaining accurate data on the latencies of instructions. 
+This is discussed in section  \ref{sec:latencies}
 
 
 \section{RetroWrite}
+\label{sec:retrowrite}
+%In this section go into more detail on RetroWrite 
 The algorithm is implemented for the Intel x86\_64 architecture. It is written in X lines of Python code as part of the RetroWrite framework. 
 RetroWrite is a binary rewriting tool developed for statically instrumenting C and C++ binaries. 
 The authors are able to leverage relocation information present in position independent code to reconstruct assembly files from a compiled binary. 
@@ -40,6 +40,7 @@ As a result the implementation only supports binaries that meet these restrictio
 
 
 \section{Instruction Latencies}
+\label{sec:latencies}
 The construction of NOP instructions as described in section \ref{sec:nop} is based on data that measures the latency of instructions in the x86-64 architecture.
 Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual} but this data is not complete.
 To obtain better data Abel et al.  \cite{uops} developed novel algorithms to infer the latency throughput and port usage based on automatically-generated microbenchmarks. 

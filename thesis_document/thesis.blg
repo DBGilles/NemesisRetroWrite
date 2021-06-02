@@ -2,9 +2,16 @@ This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesis.aux
 A level-1 auxiliary file: introduction.aux
+A level-1 auxiliary file: background.aux
+Case mismatch error between cite keys xu and Xu
+---line 16 of file background.aux
+ : \citation{xu
+ :             }
+I'm skipping whatever remains of this command
 A level-1 auxiliary file: design.aux
 A level-1 auxiliary file: implementation.aux
 A level-1 auxiliary file: evaluation.aux
+A level-1 auxiliary file: related.aux
 A level-1 auxiliary file: conclusion.aux
 The style file: abbrv.bst
 Database file #1: references.bib
@@ -19,45 +26,45 @@ Warning--empty booktitle in trustlite
 Warning--empty booktitle in microsbs
 Warning--empty publisher in psma
 Warning--empty booktitle in WinderixHans
-You've used 27 entries,
+You've used 28 entries,
             2118 wiz_defined-function locations,
-            659 strings with 9432 characters,
-and the built_in function-call counts, 10565 in all, are:
-= -- 1016
-> -- 563
-< -- 10
-+ -- 223
-- -- 194
-* -- 718
-:= -- 1661
-add.period$ -- 82
-call.type$ -- 27
-change.case$ -- 175
+            668 strings with 9576 characters,
+and the built_in function-call counts, 11063 in all, are:
+= -- 1066
+> -- 584
+< -- 11
++ -- 230
+- -- 200
+* -- 747
+:= -- 1735
+add.period$ -- 86
+call.type$ -- 28
+change.case$ -- 180
 chr.to.int$ -- 0
-cite$ -- 36
-duplicate$ -- 434
-empty$ -- 785
-format.name$ -- 194
-if$ -- 2294
+cite$ -- 37
+duplicate$ -- 458
+empty$ -- 827
+format.name$ -- 200
+if$ -- 2412
 int.to.chr$ -- 0
-int.to.str$ -- 27
-missing$ -- 23
-newline$ -- 131
-num.names$ -- 54
-pop$ -- 229
+int.to.str$ -- 28
+missing$ -- 24
+newline$ -- 136
+num.names$ -- 58
+pop$ -- 237
 preamble$ -- 1
-purify$ -- 150
+purify$ -- 154
 quote$ -- 0
-skip$ -- 362
+skip$ -- 382
 stack$ -- 0
-substring$ -- 510
-swap$ -- 149
-text.length$ -- 10
+substring$ -- 543
+swap$ -- 159
+text.length$ -- 11
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 104
+type$ -- 108
 warning$ -- 9
-while$ -- 78
-width$ -- 29
-write$ -- 287
-(There were 10 warnings)
+while$ -- 83
+width$ -- 30
+write$ -- 299
+(There was 1 error message)

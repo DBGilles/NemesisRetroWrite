@@ -17,6 +17,12 @@ G.~Barthe, B.~Grégoire, and V.~Laporte.
 \newblock In {\em 2018 IEEE 31st Computer Security Foundations Symposium
   (CSF)}, pages 328--343, 2018.
 
+\bibitem{side-channel}
+S.~Bhunia and M.~Tehranipoor.
+\newblock Chapter 8 - side-channel attacks.
+\newblock In S.~Bhunia and M.~Tehranipoor, editors, {\em Hardware Security},
+  pages 193--218. Morgan Kaufmann, 2019.
+
 \bibitem{verify-constant-time}
 S.~Blazy, D.~Pichardie, and A.~Trieu.
 \newblock {Verifying Constant-Time Implementations by Abstract Interpretation}.
@@ -157,7 +163,7 @@ H.~Winderix, J.~T. Mühlberg, and f.~Piessens.
   latency side-channel attacks.
 \newblock 2021.
 
-\bibitem{xu}
+\bibitem{Xu}
 Y.~Xu, W.~Cui, and M.~Peinado.
 \newblock Controlled-channel attacks: Deterministic side channels for untrusted
   operating systems.

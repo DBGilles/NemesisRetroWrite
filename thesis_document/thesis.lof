@@ -14,15 +14,17 @@
 \babel@toc {english}{}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Assembly pseudo-code with a secret-dependent branch that is vulnerable to Nemesis attack\relax }}{3}%
 \addvspace {10pt}
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Example program with corresponding CFG\relax }}{7}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{8}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces problematic structures in CFG\relax }}{9}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Equalizing path lengths\relax }}{12}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Equalizing branch depths\relax }}{13}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces Example of alignment of a set of three nodes\relax }}{17}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Assembly pseudo-code with a secret-dependent branch that is vulnerable to Nemesis attack\relax }}{7}%
+\addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Example program with corresponding CFG\relax }}{11}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{12}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces problematic structures in CFG\relax }}{13}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Equalizing path lengths\relax }}{16}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Equalizing branch depths\relax }}{16}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Example of alignment of a set of three nodes\relax }}{21}%
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Results of the evaluation experiments\relax }}{24}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Results of the evaluation experiments\relax }}{28}%
+\addvspace {10pt}
 \addvspace {10pt}

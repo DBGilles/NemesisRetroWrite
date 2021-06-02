@@ -9,43 +9,43 @@
 \babel@toc {english}{}
 \contentsline {chapter}{Preface}{i}%
 \contentsline {chapter}{Contents}{ii}%
-\contentsline {chapter}{Abstract}{iii}%
+\contentsline {chapter}{Abstract}{iv}%
 \babel@toc {dutch}{}
-\contentsline {chapter}{Samenvatting}{iv}%
+\contentsline {chapter}{Samenvatting}{v}%
 \babel@toc {english}{}
-\contentsline {chapter}{List of Figures and Tables}{v}%
+\contentsline {chapter}{List of Figures and Tables}{vi}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}%
-\contentsline {section}{\numberline {1.1}Protected Module Architectures}{1}%
-\contentsline {section}{\numberline {1.2}Nemesis}{2}%
-\contentsline {section}{\numberline {1.3}Binary Rewriting}{2}%
-\contentsline {section}{\numberline {1.4}Related Work}{3}%
-\contentsline {subsubsection}{Software-based approaches}{3}%
-\contentsline {subsubsection}{Hardware-based approaches}{4}%
-\contentsline {section}{\numberline {1.5}Thesis Goal and Outline}{4}%
-\contentsline {chapter}{\chapternumberline {2}Design}{5}%
-\contentsline {section}{\numberline {2.1}Algorithm Goals}{5}%
-\contentsline {section}{\numberline {2.2}CFG}{6}%
-\contentsline {section}{\numberline {2.3}Equalising}{8}%
-\contentsline {subsection}{\numberline {2.3.1}Extract Sub-graph}{9}%
-\contentsline {subsection}{\numberline {2.3.2}Equalize Path Lengths}{10}%
-\contentsline {subsection}{\numberline {2.3.3}Equalize branches}{10}%
-\contentsline {subsection}{\numberline {2.3.4}Cycles}{13}%
-\contentsline {section}{\numberline {2.4}Alignment}{13}%
-\contentsline {subsection}{\numberline {2.4.1}Basic Operation}{14}%
-\contentsline {subsection}{\numberline {2.4.2}Selecting the Reference Node}{14}%
-\contentsline {subsection}{\numberline {2.4.3}Constructing NOP instruction}{14}%
-\contentsline {subsection}{\numberline {2.4.4}Example}{15}%
-\contentsline {subsection}{\numberline {2.4.5}Closing timing leaks}{17}%
-\contentsline {chapter}{\chapternumberline {3}Implementation}{19}%
-\contentsline {section}{\numberline {3.1}Binary Rewriting}{19}%
-\contentsline {section}{\numberline {3.2}RetroWrite}{19}%
-\contentsline {section}{\numberline {3.3}Instruction Latencies}{20}%
-\contentsline {chapter}{\chapternumberline {4}Evaluation}{21}%
-\contentsline {section}{\numberline {4.1}Benchmark Suite}{21}%
-\contentsline {section}{\numberline {4.2}Experiment Setup}{21}%
-\contentsline {section}{\numberline {4.3}Results}{23}%
-\contentsline {chapter}{\chapternumberline {5}Conclusion}{25}%
-\contentsline {section}{\numberline {5.1}Discussion}{25}%
-\contentsline {subsection}{\numberline {5.1.1}Secret-dependent branches}{26}%
-\contentsline {section}{\numberline {5.2}Future work}{26}%
-\contentsline {chapter}{Bibliography}{27}%
+\contentsline {section}{\numberline {1.1}Thesis Goal and Outline}{2}%
+\contentsline {chapter}{\chapternumberline {2}background}{5}%
+\contentsline {section}{\numberline {2.1}Protected Module Architectures}{5}%
+\contentsline {section}{\numberline {2.2}Nemesis}{6}%
+\contentsline {section}{\numberline {2.3}Binary Rewriting}{6}%
+\contentsline {chapter}{\chapternumberline {3}Design}{9}%
+\contentsline {section}{\numberline {3.1}Algorithm Goals}{9}%
+\contentsline {section}{\numberline {3.2}CFG}{10}%
+\contentsline {section}{\numberline {3.3}Equalising}{12}%
+\contentsline {subsection}{\numberline {3.3.1}Extract Sub-graph}{13}%
+\contentsline {subsection}{\numberline {3.3.2}Equalize Path Lengths}{14}%
+\contentsline {subsection}{\numberline {3.3.3}Equalize branches}{14}%
+\contentsline {subsection}{\numberline {3.3.4}Cycles}{17}%
+\contentsline {section}{\numberline {3.4}Alignment}{17}%
+\contentsline {subsection}{\numberline {3.4.1}Basic Operation}{18}%
+\contentsline {subsection}{\numberline {3.4.2}Selecting the Reference Node}{18}%
+\contentsline {subsection}{\numberline {3.4.3}Constructing NOP instruction}{19}%
+\contentsline {subsection}{\numberline {3.4.4}Example}{21}%
+\contentsline {subsection}{\numberline {3.4.5}Closing timing leaks}{21}%
+\contentsline {section}{\numberline {3.5}Binary Rewriting}{21}%
+\contentsline {chapter}{\chapternumberline {4}Implementation}{23}%
+\contentsline {section}{\numberline {4.1}RetroWrite}{23}%
+\contentsline {section}{\numberline {4.2}Instruction Latencies}{24}%
+\contentsline {chapter}{\chapternumberline {5}Evaluation}{25}%
+\contentsline {section}{\numberline {5.1}Benchmark Suite}{25}%
+\contentsline {section}{\numberline {5.2}Experiment Setup}{26}%
+\contentsline {section}{\numberline {5.3}Results}{27}%
+\contentsline {chapter}{\chapternumberline {6}Related Work}{29}%
+\contentsline {section}{\numberline {6.1}software-based approaches}{29}%
+\contentsline {section}{\numberline {6.2}Hardware-based approaches}{30}%
+\contentsline {chapter}{\chapternumberline {7}Conclusion}{31}%
+\contentsline {section}{\numberline {7.1}Discussion}{31}%
+\contentsline {section}{\numberline {7.2}Conclusion}{32}%
+\contentsline {chapter}{Bibliography}{35}%

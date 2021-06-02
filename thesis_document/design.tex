@@ -1,7 +1,13 @@
 \chapter{Design}
 \label{cha:design}
 
-This chapter details the design of the proposed algorithm. Section ... \textbf{TODO}
+This chapter outlines the design of the proposed algorithm.
+The first section describes the goal of the algorithm, and introduces and formalizes the property it aims to enforce.
+The primary data structure used by the algorithm is the control flow graph (CFG), and is defined in section \ref{sec:cfg}.
+The following two sections describe the two main stages, the first one being the insertion of additional nodes into the CFG, and the second one being
+the level-wise alignment of nodes. 
+Finally section \ref{sec:cfg} discusses the use of binary rewriting in the algorithm, the altering of a compiled program without access to its source code. 
+
 
 \section{Algorithm Goals}
 \label{sec:goals}
@@ -642,3 +648,20 @@ This can occur when, for example, a program contains a nested if-statement. Cycl
     \caption{Close timing leaks}
     \label{alg:closeleaks}
 \end{algorithm*}
+
+\section{Binary Rewriting}
+\label{sec:rewriting}
+The algorithm has been implemented as a binary rewriting tool. 
+Binary rewriting is the alteration of a compiled program without having the source code at hand \cite{rewriting-survey}.
+The target binary is first decompiled into an assembly file after which additional instructions are inserted. 
+The CFG introduces in this section serves as a layer of abstraction for these insertions. 
+The operations of the CFG ultimately result in modifications of the assembly file. 
+ 
+This approach has a number of advantages. 
+Firstly the algorithm can be applied to existing binaries. It does not require recompilation of original code and does not require the source code of the program. 
+This means that it is suitable for use on commercial off-the-shelf binaries deployed in the field. 
+Additionally there is no need for a modified compiler of hardware. 
+
+The proposed algorithm is practical for every architecture for which binary rewriting tools exists. Binary rewriting frameworks have been developed for both low-end and high-end architectures. 
+MicroSBS \ref{microsbs}, for example, is a binary rewriting tool developed for the static instrumentation of ARM devices. Although it was initially developed for making memory corruptions observable in embedded devices it 
+could be expanded to also support the proposed algorithm. This would extend support of the algorithm to ARM  devices
