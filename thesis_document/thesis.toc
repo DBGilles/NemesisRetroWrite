@@ -16,9 +16,9 @@
 \contentsline {chapter}{List of Figures and Tables}{vi}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}%
 \contentsline {section}{\numberline {1.1}Thesis Goal and Outline}{2}%
-\contentsline {chapter}{\chapternumberline {2}background}{5}%
+\contentsline {chapter}{\chapternumberline {2}Background}{5}%
 \contentsline {section}{\numberline {2.1}Protected Module Architectures}{5}%
-\contentsline {section}{\numberline {2.2}Nemesis}{6}%
+\contentsline {section}{\numberline {2.2}Nemesis Side-Channel Attack}{6}%
 \contentsline {section}{\numberline {2.3}Binary Rewriting}{6}%
 \contentsline {chapter}{\chapternumberline {3}Design}{9}%
 \contentsline {section}{\numberline {3.1}Algorithm Goals}{9}%
@@ -43,7 +43,7 @@
 \contentsline {section}{\numberline {5.2}Experiment Setup}{26}%
 \contentsline {section}{\numberline {5.3}Results}{27}%
 \contentsline {chapter}{\chapternumberline {6}Related Work}{29}%
-\contentsline {section}{\numberline {6.1}software-based approaches}{29}%
+\contentsline {section}{\numberline {6.1}Software-based approaches}{29}%
 \contentsline {section}{\numberline {6.2}Hardware-based approaches}{30}%
 \contentsline {chapter}{\chapternumberline {7}Conclusion}{31}%
 \contentsline {section}{\numberline {7.1}Discussion}{31}%

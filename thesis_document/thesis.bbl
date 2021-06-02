@@ -144,6 +144,12 @@ R.~Strackx, J.~Noorman, I.~Verbauwhede, B.~Preneel, and F.~Piessens.
 \newblock {\em Protected Software Module Architectures}, pages 241--251.
 \newblock 01 2013.
 
+\bibitem{sgx-step}
+J.~Van~Bulck, F.~Piessens, and R.~Strackx.
+\newblock Sgx-step: A practical attack framework for precise enclave execution
+  control.
+\newblock pages 1--6, 10 2017.
+
 \bibitem{Nemesis}
 J.~Van~Bulck, F.~Piessens, and R.~Strackx.
 \newblock Nemesis: Studying microarchitectural timing leaks in rudimentary cpu
