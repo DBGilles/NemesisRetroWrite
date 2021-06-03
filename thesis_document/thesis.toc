@@ -13,7 +13,7 @@
 \babel@toc {dutch}{}
 \contentsline {chapter}{Samenvatting}{v}%
 \babel@toc {english}{}
-\contentsline {chapter}{List of Figures and Tables}{vi}%
+\contentsline {chapter}{List of Figures and Tables}{vii}%
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}%
 \contentsline {section}{\numberline {1.1}Thesis Goal and Outline}{2}%
 \contentsline {chapter}{\chapternumberline {2}Background}{5}%

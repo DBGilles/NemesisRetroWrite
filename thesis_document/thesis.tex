@@ -42,17 +42,61 @@ Finally I want to thank my sister for providing much needed emotional support.
 \tableofcontents
 
 \begin{abstract}
-%The \texttt{abstract} environment contains a more extensive overview of
-%the work. But it should be limited to one page.s
-%"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
+Protected Module Architectures are a promising line of research to safeguard sensitive applications executing in an untrusted operating system. 
+These architectures ensure that an untrusted OS is prevented from accessing the module's code or data. 
+Recent research has shown, however, that PMAs are still vulnerable to controlled-channel attacks, a type of side-channel attack that leverages 
+the attacker's high level of control over the OS to open additional side-channels. 
+
+One such attack is Nemesis. 
+Nemesis exploits the CPU's interrupt mechanism to leak micro-architectural timings from protected modules. 
+The attacker is able to infer information about the secret-dependent control flow of a program based on differences in instruction timings 
+in branches of conditional jump instructions. 
+This thesis proposes a novel algorithm for automatically transforming existing binaries to close these timing leaks. 
+Additional instructions are inserted into branches of a conditional jump instruction to ensure that corresponding instructions have identical 
+latencies, making the branches indistinguishable to an attacker who is able to observe instruction timings.
+The proposed algorithm applies these transformations through the use of binary rewriting. 
+Unlike previous solutions that require either recompilation of the source code, or modifications to the hardware, the proposed algorithm can be applied to 
+commercial off-the-shelf binaries. This makes it an attractive solution for use in the field. 
+
+An implementation is presented for the Intel x86\_64 architecture.
+A number of experiments are performed to evaluate the effectiveness and correctness of the algorithm. 
+The results indicate that the proposed solution effectively close all timing leaks without altering the program outcome. 
 \end{abstract}
 
 \begin{abstract*}
-%In dit \texttt{abstract} environment wordt een al dan niet uitgebreide
-%Nederlandse samenvatting van het werk gegeven.
-%Wanneer de tekst voor een Nederlandstalige master in het Engels wordt
-%geschreven, wordt hier normaal een uitgebreide samenvatting verwacht,
-%bijvoorbeeld een tiental bladzijden.
+Als gevolg van de toenemende populariteit van IoT-apparaten en cloud-computingdiensten, wordt software vaak uitgevoerd op platformen van derden. 
+IoT apparaten onderstukken vaak de mogelijkheid extra software te installeren. Grote providers van cloud-computingdiensten, zoals Amazon en Google, bieden de mogelijkheid aan 
+om vrijwel eender welk stuk software te installeren op hun servers. 
+Het resultaat hiervan is dat er meer en meer aandacht besteed wordt aan het beveiligen van software die uitgevoerd wordt op een onbetrouwbaar besturingssyteem. 
+Een veelbelovend onderzoeksveld binnen deze context is het gebruik van \textit{Protected Module Architectures}. 
+Deze zijn architecturen die hardware-matig de isolatie van verschillende modules in het systeem garanderen, en die ervoor zorgen dan een onbetrouwbaar besturingssyteem geen toegang
+heeft tot de code of gegevens van de software. 
+
+Recent onderzoek heeft echter aangetoond dat het nog steeds mogelijk is gevoelige informatie te extraheren door middel van \textit{controlled-channel attacks}. 
+Deze zijn een type van \textit{side-channel attack} die gebruik maken van de verhoogde graad van controle over het besturinggsysteem om nieuwe \textit{side-channels} te open. 
+\textit{Side-channel attacks} trachten gevoelige informatie te halen uit software door het meten van fysieke parameters zoals voedingsstroom, en uitvoeringstijd. 
+\textit{Controlled-channel attacks} maken gebruik van \textit{system events} (e.g. \textit{page faults}, \textit{cache flushes}, en \textit{interrupts}) om nieuwe 
+\textit{side-channels} te openen. 
+
+Een voorbeeld van zo een \textit{controlled-channel attack} is Nemesis. Nemesis misbruikt het interruptmechanisme om micro-architecturale instructietimings te bepalen voor
+instructies van applicaties binnen een \textit{Protected Module Architecture}. Door deze instructietimings te verzamelen voor verschilende inputs en de verschillen te vergelijken
+is het mogelijk om te bepalen welke paden van de \textit{control flow} het programma heeft gevolgd voor een gegeven input. 
+Aan de hand hiervan is het mogelijk om inferenties te maken over geheime data die gebruikt wordt om \textit{control flow} beslissingen te maken. 
+
+Deze thesis stelt een nieuwe oplossing voor die een automatische transformatie toepast op programma's om dergelijke \textit{timing side-channels} te sluiten. 
+Dit algoritme voegt aan de hand van \textit{binary rewriting} extra instructies toe om verschillen in instructietimings tussen takken van conditionele sprongen te elimineren. 
+\textit{Binary rewriting} is het aanpassen van een gecompileerd programma zonder gebruikt te maken van de originele code. 
+Omdat deze oplossing niet berust op het aanpassen van de hardware, of op het hercompileren van de code, is het mogelijk om deze toe te passen op bestaande 'off-the-shelf' programma's. 
+
+Het voorgestelde algoritme manipuleert het programma door aanpassingen uit te voeren op de \textit{Control Flow Graph} (CFG). 
+Dit is een datastructuur die de \textit{control flow} van een programma voorstelt, bestaande uit knopen en zijden. Hierbij bevat elke knoop een verzameling van instructies die telkens 
+als een geheel uitgevoerd worden. De eerste fase van het algoritme vult de CFG met extra knopen aan zodat de graaf voldoet aan bepaalde eigenschappen. 
+De tweede fase voegt dan niveau-gewijs instructies toe aan de knopen van de CFG om zo de \textit{timing leaks} te sluiten. 
+
+
+Een aantal experiment is uitgevoerd op een verzamling van testprogramma's om te bepalen of het algorithme effectief is in het sluiten van de \textit{timing-leaks}, of het dit doet 
+zonder de output van het programma te veranderen, en om de impact op de performantie van het programma te evaluaren. 
+
 \end{abstract*}
 
 

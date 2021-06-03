@@ -15,7 +15,7 @@
 \chapter{Introduction}
 \label{cha:introduction}
 As a result of the increasing popularity of IoT devices and cloud-computing services, software is often executed on third party platforms. 
-Embedded devices often support software extensibility, allowing users to install additional software onto their device. 
+Embedded devices often support software extensibility, allowing users to install additional software into their device. 
 Large cloud-service providers such as Amazon and Microsoft allow users to run virtually any piece of software on their devices. 
 To ensure that the various components on these systems are isolated from each other, a sizeable software layer is often introduced in the form of an operating system or 
 a hyper visor.
@@ -39,6 +39,7 @@ An attacker with control over the system can exploit this by carefully timing in
 Van Bulck et al. \cite{Nemesis} convincingly demonstrate that it is possible to use these Nemesis-type interrupt attacks to leak information about secret-dependent control flow of the program. 
 The authors require two branches of a conditional jump that contain instruction with different execution times. 
 If the control flow depends on a secret, the attacker is able to infer some information about it. 
+
 
 A number of countermeasures have been proposed for closing timing side-channels, both software-based approaches and hardware-based approaches. 
 Hardware based-approaches aim to close side-channels by modifying the architecture. 
@@ -66,7 +67,7 @@ The main contributions of this paper are:
 \item The paper presents an evaluation of the algorithm based on a suite of benchmark programs. 
 \end{enumerate}
 
-Chapter \ref{cha:background} will provide additional background information on PMA's, the Nemesis attack, and binary rewriting. 
+Chapter \ref{cha:background} will provide additional background information on PMAs, the Nemesis attack, and binary rewriting. 
 Chapter \ref{cha:design} outlines the design of the proposed algorithm, and formalizes the property it aims to enforce.  
 Aspects specific to the implementation of the algorithm are further discussed in chapter \ref{cha:implementation}. 
 A number of experiments have been designed and run to evaluate if the proposed algorithm is effective and correct. 
