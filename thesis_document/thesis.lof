@@ -19,7 +19,7 @@
 \addvspace {10pt}
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Example program with corresponding CFG\relax }}{11}%
 \contentsline {figure}{\numberline {3.2}{\ignorespaces then-else regions for secret-dependent nodes\relax }}{12}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces problematic structures in CFG\relax }}{13}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces problematic structures in CFG alignment procedure\relax }}{13}%
 \contentsline {figure}{\numberline {3.4}{\ignorespaces Equalizing path lengths\relax }}{16}%
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Equalizing branch depths\relax }}{16}%
 \contentsline {figure}{\numberline {3.6}{\ignorespaces Example of alignment of a set of three nodes\relax }}{21}%

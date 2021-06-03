@@ -47,8 +47,11 @@ To obtain better data Abel et al.  \cite{uops} developed novel algorithms to inf
 The authors claim that their results are more accurate and precise than existing work. 
 Another source of data on instruction latencies is provided by Agner Fog who provides the results of his own measurements \cite{fog_2021}. 
 
-The data provided by Abel et. al is  used as the primary source of instruction latencies. In the case where an instruction is not covered by their work the data 
-provided by Agner Fog and Intel are used as a secondary source. If a program contains an instruction that is not covered by any of the datasets then the it cannot
-be aligned. The exception to this rule are branching instructions. There is no latency information available about these instructions in any of the sources. 
-To account for this  all branching instructions are aligned with new branching instructions. To preserve the control flow of the program the target of 
-the branching instruction is equal to the address of the next instruction. 
+The data provided by Abel et al. \cite{uops} is  used as the primary source of instruction latencies. In the case where an instruction is not covered by their work the data 
+provided by Agner Fog \cite{fog_2021} and Intel are used as a secondary source. If a program contains an instruction that is not covered by any of the datasets then it cannot
+be aligned. 
+The exception to this rule are branching instructions. 
+There is no latency information available about these instructions in any of the sources. 
+All branching instructions are aligned with new branching instructions. 
+%To account for this all branching instructions are aligned with new branching instructions. 
+To preserve the control flow of the program the target of the branching instruction is equal to the address of the next instruction. 

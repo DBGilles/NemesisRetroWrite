@@ -7,7 +7,7 @@ The setup of the experiments is then described in section \ref{sec:setup}. Final
 
 \section{Benchmark Suite}
 \label{sec:benchmark-suite}
-Winderix et. al. \cite{WinderixHans} have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
+Winderix et al. \cite{WinderixHans} have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
 collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources. 
 To evaluate the proposed algorithm a subset of this benchmark suite was selected. 
 
@@ -16,9 +16,9 @@ since they are not supported by the proposed algorithm.
 The original authors of the Nemesis attack provide two case studies to demonstrate their attack. 
 The first case study is a password comparison routine from the Texas Instruments MSP430 Bootstrap Loader (BSL). 
 The second case study is secure keypad application that guarantees secrecy of its PIN code \cite{Nemesis}.
-Both of these are included in the benchmark suite created by Winderix et. al and are also selected as a benchmark for the proposed algorithm. 
+Both of these are included in the benchmark suite created by Winderix et al.\cite{WinderixHans}  and are also selected as a benchmark for the proposed algorithm. 
 
-The implementation of Nemesis and the benchmark suite created by Winderix et. al are implemented for the Sancus environment. Any pieces of code specific to this
+Nemesis and the benchmark suite created by Winderix et al. \cite{WinderixHans} are implemented for the Sancus environment. Any pieces of code specific to this
 environment have been removed from the benchmark programs. The semantics of the programs remain unchanged. 
 
 One additional synthetic programs was added to the benchmark suite to evaluate a case that was not yet covered. This program contains a call to a function that 
@@ -79,7 +79,7 @@ are not affected by the algorithm and are therefore not considered in this evalu
 \section{Results}
 \label{sec:results}
 The results of the experiments are summarized in figure \ref{fig:experiment results}.
-A check mark in the second column indicates that all timing-leaks were closes. 
+A check mark in the second column indicates that all timing-leaks have been removed. 
 A check mark in the third column indicates that the program output has not changed. 
 The third column contains the increase in the sum of the latency along various paths in the program, expressed as a percentage increase.
 
@@ -97,8 +97,10 @@ If one branch is significantly deeper then a larger number of nodes will be inse
 Because each inserted node has to be aligned, a larger number of instructions will be inserted. 
 
 This effect is the cause for the relatively large increase in latencies in the benchmark  program \textit{multifork}. 
-This program contains a secret-dependent switch statement. This is equivalent to three nested secret-dependent if statements. 
-The path followed by the control flow if the very first case matches the expression is much shorter than the path followed if the very last expression matches. 
+This program contains a secret-dependent switch statement with three cases, which is equivalent to three nested secret-dependent if statements. 
+In the best case the program only has to check the first condition. If it is true the body is executed and the control flow branches past the switch statement. 
+In the worst case the program has to check all three conditions before being able to leave the switch statement. 
+The path followed by the control flow in the best case is much shorter than the path followed in the worst case. 
 Because all paths need to have the same length the number of instructions inserted in this shorter path is much larger. 
 
 The second factor is the presence of a larger conditional code block. All instructions found in the conditional node also have to be inserted in the path where the condition is false. 

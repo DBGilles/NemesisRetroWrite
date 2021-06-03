@@ -13,8 +13,8 @@ Finally section \ref{sec:cfg} discusses the use of binary rewriting in the algor
 \label{sec:goals}
 The root cause of the vulnerability exposed by Nemesis is a difference in the latencies of two corresponding instructions in different branches of a 
 conditional jump. 
-In this context two instructions correspond if they are the same distance away from the conditional jump. 
-Van Bulck et. al \cite{Nemesis} convincingly demonstrated that is is possible to exploit this vulnerability by inspecting latency traces of the program.
+In this context, two instructions correspond if they are the same distance away from the conditional jump. 
+Van Bulck et al. \cite{Nemesis} convincingly demonstrated that is is possible to exploit this vulnerability by inspecting latency traces of the program.
 To create a latency trace the attacker configures a timer such that each instruction of the program is interrupted, effectively single-stepping through the program. 
 The attacker then implements the Interrupt Service Routine (ISR) such that it logs the latency of the interrupted instruction \cite{nemesisrepo, sancussupport}.
 By varying the input he creates a set of latency traces that will reflect any differences in latencies of corresponding instructions.
@@ -23,11 +23,11 @@ If the corresponding instructions are part of a secret-dependent branch then the
 
 If the architecture has completely deterministic instruction latencies then a single latency trace per input value is sufficient for an attacker to leak information.
 In the presence of advanced architectural features, such as paging, caching, and out-of-order execution, instruction latencies are not deterministic. 
-Van Bulck et. al \cite{Nemesis} show that in these cases is still possible to leak information from the program by correlating latency traces from repeated executions over the same input. 
+Van Bulck et. al \cite{Nemesis} show that in these cases, it is still possible to leak information from the program by correlating latency traces from repeated executions over the same input. 
 The authors demonstrate that the latency measurements follow a normal distribution across all executions and are able to use basic statistical measures to create an overall latency trace 
 of the program. 
 	
-In their paper Pouyanrad et. al have formally defined the Nemesis-Sensitive property.
+In their paper Pouyanrad et al. \cite{MSP430Detection} have formally defined the Nemesis-Sensitive property.
 Let $region^{then}(ep)$ and $region^{else}(ep)$ capture the set of execution points belonging to the branch target and the other region of some branching instruction $ep$.
 Let $ep^i$ be the i'th instruction in a region. A program P with a secret-dependent branch in $ep$ and $region^{then}(ep)$ 
 and region $region^{else}(ep)$ with the same number of execution points, satisfies the nemesis-sensitive property if and only if:  
@@ -38,7 +38,7 @@ and region $region^{else}(ep)$ with the same number of execution points, satisfi
     (s_{ep^i} \xrightarrow[]{t} s_{ep^i_{next}}) \land (s_{ep^j} \xrightarrow[]{t'} s_{ep^j_{next}}) \iff t = t' \\ 
     \end{split}
 \end{equation}
-\cite{MSP430Detection}
+
 
 The relation $s \xrightarrow[]{t} s'$ models the transition between program states $s$ and $s'$, declaring that the transition between $s$ and $s'$ takes a time $t$. 
 For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions their latencies should be the same.
@@ -149,7 +149,7 @@ The first stage of the algorithm consists of inserting nodes such that these str
 
 The first such structure, illustrated in figure \ref{fig:optional}, occurs when a function contains some sequence of instructions that is only executed if some condition is true.
 Analogously the corresponding CFG will contain a node that is only reached if the condition is true.
-A consequence of this is that there will be some node in the CFG that has at least two paths to it. 
+There will be some node in the CFG that has at least two paths to it. 
 One path will contain the conditional node while the other will not. 
 Additionally, the path with the conditional node will be longer than the other path. 
 %In such cases it is impossible to align the latency traces of the two paths since one of the latency traces will always be longer than the other one. 
@@ -181,7 +181,7 @@ Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict the pro
         \caption{unequal branches}
         \label{fig:unequal}
     \end{subfigure}
-    \caption{problematic structures in CFG}
+    \caption{problematic structures in CFG alignment procedure}
     \label{fig:problemstructures}
 \end{figure*}
 
@@ -420,13 +420,13 @@ well-defined value. The alignment stage iterates over all the levels of the sub-
 
 \subsection{Basic Operation}
 The core of the alignment operation consists of repeatedly selecting a reference node and inserting instructions into the other nodes to match the latencies of the reference. 
-Each iteration a set of candidate nodes is determined from which the reference node is then selected. 
+In each iteration a set of candidate nodes is determined from which the reference node is then selected. 
 
 An index variable $i_{ref}$ is used to keep track of the position of the first instruction that has not yet been aligned. This variable is initially equal to zero and is incremented every iteration. 
 The instruction at position $i_{ref}$ in the reference node is called the reference instruction.
 
 The algorithm iterates over all nodes that are not the reference node and verifies if the instruction at position $i_{ref}$ has the same latency. 
-If the two latencies are not equal or if the node is shorter than the reference node a dummy instruction is inserted at position$i_{ref}$. 
+If the two latencies are not equal or if the node is shorter than the reference node a dummy instruction is inserted at position $i_{ref}$. 
 The latency of this new instruction is equal to the latency of the reference instruction. 
 Once this has been repeated for all nodes in the set then all instruction at position $i_{ref}$ have the same latency and the variable can be incremented. 
 
@@ -600,7 +600,7 @@ result in erroneous program outputs.
 
 \subsection{Example}
 Figure \ref{fig:align-example} illustrates the different iterations of the alignment of a set of three nodes. 
-Each node is labeled with its latency sequence. The set of instructions that have been aligned are underlined. Each iteration the variable $i_{ref}$ is incremented by one. 
+Each node is labeled with its latency sequence. The set of instructions that have been aligned are underlined. In each iteration the variable $i_{ref}$ is incremented by one. 
 The set of candidate nodes is marked in each iteration by a red rectangle. 
 If there are multiple candidate nodes with non-branching instructions at position $i_{ref}$ then the first node is arbitrarily selected as the reference node.  
 
