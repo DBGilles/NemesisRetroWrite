@@ -8,7 +8,7 @@ The setup of the experiments is then described in section \ref{sec:setup}. Final
 \section{Benchmark Suite}
 \label{sec:benchmark-suite}
 Winderix et al. \cite{WinderixHans} have created the first benchmark suite of programs with timing side-channel vulnerabilities. This suite consists of a 
-collection of synthetic programs with a wide range of control-flow patterns as well as third party benchmark programs from different sources. 
+collection of synthetic programs with a wide range of control-flow patterns, as well as third party benchmark programs from different sources. 
 To evaluate the proposed algorithm a subset of this benchmark suite was selected. 
 
 All programs that contain loops inside vulnerable branches were discarded from the synthetic programs in the benchmark suite
@@ -16,7 +16,7 @@ since they are not supported by the proposed algorithm.
 The original authors of the Nemesis attack provide two case studies to demonstrate their attack. 
 The first case study is a password comparison routine from the Texas Instruments MSP430 Bootstrap Loader (BSL). 
 The second case study is secure keypad application that guarantees secrecy of its PIN code \cite{Nemesis}.
-Both of these are included in the benchmark suite created by Winderix et al.\cite{WinderixHans}  and are also selected as a benchmark for the proposed algorithm. 
+Both of these are included in the benchmark suite created by Winderix et al.\cite{WinderixHans}, and are also selected as a benchmark for the proposed algorithm. 
 
 Nemesis and the benchmark suite created by Winderix et al. \cite{WinderixHans} are implemented for the Sancus environment. Any pieces of code specific to this
 environment have been removed from the benchmark programs. The semantics of the programs remain unchanged. 
@@ -40,11 +40,11 @@ These values were supplied as inputs to both the original program and the balanc
 verify that the algorithm correctly modified the program without changing the output. 
 
 The effect on the program's performance is evaluated by measuring the increase in the sum of the latencies along paths in the programs CFG. 
-To measure this increase CFGs are constructed from the original binary and from the modified binary. 
+To measure this increase, CFGs are constructed from the original binary and from the modified binary. 
 For each path in the original CFG its corresponding path in the modified CFG is determined. To do so a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
 This mapping takes into account the condition of a branching instruction, and can be defined inductively. 
 The root of the original CFG is mapped to the root of the root of the balanced CFG. 
-If two nodes are mapped and they both have one successor then their successors are mapped. 
+If two nodes are mapped and they both have one successor, then their successors are mapped. 
 If two nodes are mapped and they have two successors, then then nodes that are reached if the branching condition is true are mapped,
 and those that are reached if the condition is false are mapped.
 
@@ -69,11 +69,11 @@ Then its corresonding path in $G'$ is defined as follows
 $$ p': F(p_1) \rightarrow F(p_2) \rightarrow ... \rightarrow F(p_n)$$
 
 This definition requires that $G$ and $G'$ are isomorphic. If during the first stage of the algorithm additional nodes were inserted in the CFG
-then this will not be true. Therefore before being able to evaluate the effect on runtime the first stage of the algorithm has to be reapplied on $G$ such 
+then this will not be true. Therefore, before being able to evaluate the effect on runtime, the first stage of the algorithm has to be reapplied on $G$ such 
 that it is isomorphic to $G'$
 
-To evaluate the effect on runtime performance the sum of the latencies along all relevants paths in G are compared to the sum of the latencies of their corresponding paths. A relevant path is a path that starts in secret-depdendent node and ends in a final node of one of the branches. Any nodes that do not belong to such a path 
-are not affected by the algorithm and are therefore not considered in this evaluation. 
+To evaluate the effect on runtime performance, the sum of the latencies along all relevants paths in G are compared to the sum of the latencies of their corresponding paths. A relevant path is a path that starts in secret-depdendent node and ends in a final node of one of the branches. Any nodes that do not belong to such a path 
+are not affected by the algorithm, and are therefore not considered in this evaluation. 
 
     
 \section{Results}
@@ -91,24 +91,24 @@ The erroneous test case contains a call to a function that modifies the global s
 During balancing of the program this function call is copied to the other branch. 
 Because the function call has side effects the final output of the program is different. 
 
-The effect on performances ranges from an increase by a factor of 1.8 to no increase at all. 
+The effect on performances ranges from an increase by a factor of 1.8, to no increase at all. 
 There are two factors that cause larger increases in the sum of the latencies along a path. The first is the difference in depths between two secret dependent branches. 
 If one branch is significantly deeper then a larger number of nodes will be inserted in the other branch, lengthening the paths found in the shorter branch. 
 Because each inserted node has to be aligned, a larger number of instructions will be inserted. 
 
 This effect is the cause for the relatively large increase in latencies in the benchmark  program \textit{multifork}. 
 This program contains a secret-dependent switch statement with three cases, which is equivalent to three nested secret-dependent if statements. 
-In the best case the program only has to check the first condition. If it is true the body is executed and the control flow branches past the switch statement. 
+In the best case the program only has to check the first condition. If it is true, the body is executed and the control flow branches past the switch statement. 
 In the worst case the program has to check all three conditions before being able to leave the switch statement. 
 The path followed by the control flow in the best case is much shorter than the path followed in the worst case. 
-Because all paths need to have the same length the number of instructions inserted in this shorter path is much larger. 
+Because all paths need to have the same length, the number of instructions inserted in this shorter path is much larger. 
 
 The second factor is the presence of a larger conditional code block. All instructions found in the conditional node also have to be inserted in the path where the condition is false. 
-As the number of instruction in the conditional node increases so does the sum of the latencies in the other path.
+As the number of instruction in the conditional node increases, so does the sum of the latencies in the other path.
 
 This is reflected in the difference between the experiment results for the benchmarks \textit{triangle} and \textit{fork}. The structure of the CFGs is similar for both these benchmarks as both contain a conditional node.
-Benchmark \textit{fork} assign the result of an expression to a variable inside this, whereas \textit{triangle} simply assigns a constant. The number of instruction in the optional node is therefore larger in \textit{fork}, resulting 
-in a larger effect on performance in \textit{fork}.
+Benchmark \textit{fork} assign the result of an expression to a variable inside this node, whereas \textit{triangle} simply assigns a constant. The number of instruction in the optional node is therefore larger in \textit{fork}, resulting 
+in a larger effect on performance.
 
 \begin{figure}
     \centering

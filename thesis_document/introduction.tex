@@ -17,16 +17,16 @@
 As a result of the increasing popularity of IoT devices and cloud-computing services, software is often executed on third party platforms. 
 Embedded devices often support software extensibility, allowing users to install additional software onto their device. 
 Large cloud-service providers such as Amazon and Microsoft allow users to run virtually any piece of software on their devices. 
-To ensure the various components on these systems are isolated from each other a sizeable software layer is often introduced in the form of an operating system or 
+To ensure that the various components on these systems are isolated from each other, a sizeable software layer is often introduced in the form of an operating system or 
 a hyper visor.
 Unfortunately, however, this software layer is very difficult to get sufficiently secure \cite{psma}.
 As a result it has become increasingly important to protect software from attacks even in the presence of a compromised system. 
-One line of research is the use of Protected Module Architecures (PMAs). 
+One line of research is the use of Protected Module Architectures (PMAs). 
 These are architectures that enforce isolation of components directly in hardware.
 PMAs ensure that the untrusted OS cannot access the data or code of a protected module \cite{Nemesis}. 
 
 Recent research has shown, however, that it is still possible to extract secret data from protected modules through the use of controlled-channel attacks. 
-Controlled-channel attacks are a type of side-channel attack that leverage an attackers control of the system to extract more information \cite{Xu}.	
+Controlled-channel attacks are a type of side-channel attack that leverage an attacker's control of the system to extract more information \cite{Xu}.	
 Side-channel attacks aim at extracting secrets from a system through measurement of physical parameters \cite{side-channel}. 
 In the case of controlled-attacks an attacker has increased capabilities for extracting data, since he can use system events such as as page faults, scheduling decisions, and interrupts to open additional side-channels. 
 Research has shown that these attacks are able to extract information even from modules that are protected by PMAs. 
@@ -38,14 +38,14 @@ An attacker with control over the system can exploit this by carefully timing in
 
 Van Bulck et al. \cite{Nemesis} convincingly demonstrate that it is possible to use these Nemesis-type interrupt attacks to leak information about secret-dependent control flow of the program. 
 The authors require two branches of a conditional jump that contain instruction with different execution times. 
-If the control flow depends on a secret the attacker is then able to infer some information about it. 
+If the control flow depends on a secret, the attacker is able to infer some information about it. 
 
 A number of countermeasures have been proposed for closing timing side-channels, both software-based approaches and hardware-based approaches. 
 Hardware based-approaches aim to close side-channels by modifying the architecture. 
-A limitation of hardware-based approaches is that they require the replacement or modification of existing devices. This makes these approaches difficult
+A limitation of hardware-based approaches is that they require the replacement or modification of existing devices. This makes them difficult
 to apply in the field. 
-Software-based approaches are implemented at the language level. A number of transformations have been proposed that can automatically close timing leaks. 
-Additionally tools exists that can verify if a program is safe from leaks. Unfortunately these solutions often require recompilation of the program. This means
+Software-based approaches are implemented at the language level. A number of transformations have been proposed that can automatically close timing leaks \cite{programcounter}. 
+Additionally tools exists that can verify if a program is safe from leaks \cite{verify-constant-time, Barthe}. Unfortunately these solutions often require recompilation of the program. This means
 that the source code of the program has to be available. As a result these solutions are not generally applicable to commercial off-the-shelf binaries. 
 
 The solution proposed in this thesis makes use of binary rewriting to circumvent this issue. Binary rewriting is the alteration and transformation of a compiled program without having the source code at hand \cite{rewriting-survey}. 

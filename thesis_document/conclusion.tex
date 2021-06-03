@@ -13,7 +13,7 @@ A solution that addresses this would have to make more extensive changes to the 
 Before aligning the nodes, the structure of the cycle would have to be duplicated into the second branch such that the corresponding section is executed the same number of times. 
 This requires additional analysis to determine which register contains the loop counter and how many time it is incremented. 
 The duplication of the cycle also requires more significant changes than those implemented by the current algorithm.
-Due to the added complexity such a solution is not included in the proposed algorithm and is left to future research. 
+Due to the added complexity such a solution is not included in the proposed algorithm, and is left to future research. 
 
 A second limitation is the incomplete coverage of the latency data. There are certain instructions for which there is no available data. 
 If these instructions are encountered in branches of  a secret-dependent branching instruction then the algorithm is not able to close the timing leaks. 
@@ -33,9 +33,9 @@ However the design is not limited to this specific architecture and can be porte
 Future work could extend these binary rewriting tools to support the proposed algorithm. 
 
 The evaluation of the effectiveness of the algorithm is based on a statistical analysis of the program before and after alignment. 
-If the instruction latencies are fully deterministic then the static analysis tool can correctly predict the actual run-time instruction latencies. The resulting analysis 
+If the instruction latencies are fully deterministic, then the static analysis tool can correctly predict the actual run-time instruction latencies. The resulting analysis 
 is then sufficient for demonstrating that the algorithm correctly closes all timing leaks. 
-In the presence of advanced micro-architectural features the instruction latencies are to some extend random, however. 
+In the presence of advanced micro-architectural features, however,  the instruction latencies are to some extent random. 
 As a result the run-time latencies diverge from the predicted latencies. 
 Although the results indicate that all timing leaks are closed it is possible that some differences still exist between branches because of these random variations. 
 Because of this additional experiments are needed to fully verify if the algorithm is effective for complex architectures with non-deterministic latencies.
@@ -44,8 +44,8 @@ A tool that can be used for this purpose is SGX-step \cite{sgx-step}.
 This framework allows user to single-step through an enclaved program, measuring the instruction latency at each point to create a final latency trace. 
 
 \section{Conclusion}
-Recent research has shown that programs are still vulnerable to timing side-channel attacks even when deployed in a protected module architecture. 
-Attacks that are able to extract information from PMAs are also categorized by higher level of control over the system by the attacker. 
+Recent research has shown that programs are still vulnerable to timing side-channel attacks, even when deployed in a protected module architecture. 
+Attacks that are able to extract information from PMA's are also categorized by higher level of control over the system by the attacker. 
 One such attack is Nemesis, a timing side-channel attack that leverage its control over the CPU interrupt mechanism to leak instruction timings. 
 Based on instruction duration attackers are then able to infer information about the program's control flow and, by extension, any secret data that is used to make control flow decisions. 
 
@@ -53,6 +53,6 @@ The algorithm proposed in this thesis aims to close these timing leaks by automa
 Additional instruction are inserted into the program through binary rewriting to ensure that instruction 
 timings cannot leak any information about the control flow. An evaluation indicates that the algorithm is effective in doing so.
 Unlike other work this solution does not require recompilation of the 
-source code or access to it. 
-As a result it is applicable to commercial off-the-shelf binaries.   
-If a binary rewriting tool exists then the implementation can also easily be ported to other architectures. 
+source code, or access to it. 
+As a result it is applicable to commercial off-the-shelf binaries.  
+The algorithm can be relatively easy be ported to other architectures, if a suitable binary rewriting tool exists.  

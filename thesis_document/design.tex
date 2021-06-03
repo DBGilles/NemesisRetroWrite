@@ -19,12 +19,12 @@ To create a latency trace the attacker configures a timer such that each instruc
 The attacker then implements the Interrupt Service Routine (ISR) such that it logs the latency of the interrupted instruction \cite{nemesisrepo, sancussupport}.
 By varying the input he creates a set of latency traces that will reflect any differences in latencies of corresponding instructions.
 Through careful inspection the attacker is able to infer information about which path the control flow of the program followed for a given input. 
-If the corresponding instructions are part of a secret-dependent branch then the attacker is then able to infer some information about the value of the secret. 
+If the corresponding instructions are part of a secret-dependent branch, the attacker is able to infer some information about the value of the secret. 
 
-If the architecture has completely deterministic instruction latencies then a single latency trace per input value is sufficient for an attacker to leak information.
+If the architecture has completely deterministic instruction latencies, then a single latency trace per input value is sufficient for an attacker to leak information.
 In the presence of advanced architectural features, such as paging, caching, and out-of-order execution, instruction latencies are not deterministic. 
 Van Bulck et. al \cite{Nemesis} show that in these cases, it is still possible to leak information from the program by correlating latency traces from repeated executions over the same input. 
-The authors demonstrate that the latency measurements follow a normal distribution across all executions and are able to use basic statistical measures to create an overall latency trace 
+The authors demonstrate that the latency measurements follow a normal distribution across all executions, and are able to use basic statistical measures to create an overall latency trace 
 of the program. 
 	
 In their paper Pouyanrad et al. \cite{MSP430Detection} have formally defined the Nemesis-Sensitive property.
@@ -43,15 +43,15 @@ and region $region^{else}(ep)$ with the same number of execution points, satisfi
 The relation $s \xrightarrow[]{t} s'$ models the transition between program states $s$ and $s'$, declaring that the transition between $s$ and $s'$ takes a time $t$. 
 For a given instruction this time $t$ is equal the instruction's latency. This property states that for any two corresponding instructions their latencies should be the same.
 
-If a program satisfies the nemesis-sensitive property then an attacker will not be able to leak information from the program based on its latency traces.
+If a program satisfies the nemesis-sensitive property, then an attacker will not be able to leak information from the program based on its latency traces.
 For simple architectures with deterministic instruction latencies the resulting latency traces will be indistinguishable. 
 Architectures with more complex features will still have minor differences in the resulting traces due to the random nature of the instruction latencies. 
-However these differences will not be large enough to be statistically significant.
+However, these differences will not be large enough to be statistically significant.
 As a result the attacker will not be able to infer any information about the control flow of the program. 
 
 The goal of the proposed algorithm is to ensure that latency traces cannot leak information by enforcing the nemesis-sensitive property.
 The algorithm inserts additional instructions into secret-dependent branches such that corresponding instruction always have the same latency. 
-These instruction are carefully constructed such that they have no effect on the program output. 
+These instruction are carefully constructed to ensure they have no effect on the program output. 
 
 \section{CFG}\label{sec:cfg}
 
@@ -101,11 +101,11 @@ int main(){
 
 Following the property described in property \ref{eq:nemesisProperty}, the nemesis-sensitive property can be defined for a node in the CFG. Let $v$ be a secret-dependent node. 
 Let $v_f$ be a node such that all paths from $v$ to some leaf go through $v_f$. Then $region^{then}(v)$ can be defined as the set of nodes reachable following the 
-first of $v$'s outgoing edges up to and including $v_f$ and $region^{else}(v)$ as the set of nodes reachable following the other outgoing edge up to and including $v_f$.
+first of $v$'s outgoing edges up to and including $v_f$, and $region^{else}(v)$ as the set of nodes reachable following the other outgoing edge up to and including $v_f$.
 
 Any differences in the latency sequences of two nodes can only be used to infer which branch was taken at the nearest branching point that is an ancestor of both nodes. 
 Any differences in latencies between two nodes that are descendants of $v_f$ can therefore only be used to infer information about which branch was taken at $v_f$. 
-This means that all nodes below $v_f$ do not have to be considered. If no such node $v_f$ exists then the regions simply consist of all nodes reachable from $v$ through one of its outgoing edges. 
+This means that all nodes below $v_f$ do not have to be considered. If no such node $v_f$ exists, then the regions simply consist of all nodes reachable from $v$ through one of its outgoing edges. 
 
 The depth of $region(v)$ is defined as being the length of the longest path from $v$ to some node $v' \in region(v)$ that does not contain a cycle.
 Let $n^i \in region(v)$ be a node such that there is a path going to it from node $v$ of length $i$. 
@@ -117,7 +117,7 @@ A secret-dependent node $v$ and $region^{then}(v)$ and $region^{else}(v)$ with t
     \end{split}
 \end{equation}
 where $latencies(n)$ is a function mapping a node $n$ to its latency sequence. This property states that the latency sequence of any two nodes that are the same distance away 
-from some secret-dependent node must have identical latency sequences. If this property holds then the critical sections of latency traces will be identical and cannot be used to 
+from some secret-dependent node must have identical latency sequences. If this property holds, then the critical sections of latency traces will be identical and cannot be used to 
 infer information about the secret-dependent branch. 
 
 Figure \ref{fig:regionExamples} illustrates how the borders of each region are defined. The secret-dependent node is marked in green, while the two branches are marked in red and blue. In the second example, the node marked in purple belongs to both regions. In example \ref{fig:regionExampleA} there is no node such that all paths from the secret-dependent node to a leaf go through it, so the regions extend all the way to the leaves. In example \ref{fig:regionExampleB} all paths that start in the secret-dependent node go through the node 6. Any differences in nodes 7 and 8 can only be used to infer information about the branch in node 6. These nodes therefore do not have to be considered.  
@@ -162,7 +162,7 @@ This makes it impossible to align them.
 
 The nemesis-sensitive property as defined in section \ref{eq:nemesisPropertyNode} entails that it is impossible for a node to satisfy the property if one of these 
 structures occurs in its branches, since in both cases the regions have different depths. 
-The first stage of the algorithm therefore consists inserting additional nodes into the CFG such that all path lengths to a given node are equal as well as all branch depths. 
+The first stage of the algorithm therefore consists of inserting additional nodes into the CFG such that all path lengths to a given node are equal as well as all branch depths. 
 Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict the procedures for equalizing paths lengths and equalizing branches respectively. 
 
  
@@ -187,20 +187,22 @@ Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict the pro
 
 \subsection{Extract Sub-graph}
 The different procedures described in this section only need to take into account the branches of secret dependent nodes. 
-These branches correspond to the regions $region_{then}(v)$ and $region_{else}(v)$ as defined in section \ref{sec:cfg}.
+These branches correspond to the regions $region_{then}(v)$ and $region_{else}(v)$, as defined in section \ref{sec:cfg}.
 The procedure \textit{ExtractSubgraph}, shown in algorithm \ref{alg:equalizePaths}}, extracts the subset of the graph that contains only the nodes that belong to 
 either one of these regions for a given secret-dependent node. 
 The edges of this new CFG are all the edges of the original CFG whose head and tail are a part of this subset. 
 
-To determine which nodes are a part of this subgraph all immediate dominators are determined starting from node $n$. 
+To determine which nodes are a part of this subgraph, all immediate dominators are determined starting from node $n$. 
 A node $u$ is said to dominate another node $w$ with respect to $n$ if every path from $n$ to $w$ passes through 
 $u$. 
 Node $v$ is the immediate dominator of $w$ if $v$ dominates $w$ and every other dominator of $w$ dominates $v$ \cite{dominator}.
-The immediate dominator is determined for each node reachable from $n$. If all leaves reachable from $n$ have the same immediate dominator $d$ then all paths from $n$ to some leaf go through $d$. 
+The immediate dominator is determined for each node reachable from $n$. 
+If all leaves reachable from $n$ have the same immediate dominator $d$, then all paths from $n$ to some leaf go through $d$. 
 In this case any descendants of $d$ are not part of $region_{then}(v)$ or $region_{else}(v)$ and do not have to be included in the sub-graph. 
 
-If such a node $d$ exists then the nodes that are a part of the sub-graph are all nodes that are on a path from $n$ to $d$. If $d$ does not exists 
-the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
+If such a node $d$ exists, then the nodes that are a part of the sub-graph are all nodes that are on a path from $n$ to $d$. 
+If $d$ does not exists, the sub-graph nodes are all nodes that are on a path from $n$ to some leaf. 
+This definition is analogous to the definition for $region_{else}(v)$ and $region_{then}(v)$ as defined in section \ref{sec:cfg}.
 
 \subsection{Equalize Path Lengths}
 
@@ -211,7 +213,7 @@ only the regions $region^{then}(v)$ and $region^{else}(v)$ are considered.
 Next the length of the longest path is computed from $v$ to all nodes in the sub-graph. 
 
 Let $(u, v)$ be an edge in the sub-graph. Let $d(u)$ and $d(v)$ be the length of the longest path to $u$ and $v$. If the difference between $d(u)$ and $d(v)$ is more than 
-one then there exist at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
+one, then there exist at least two paths to $v$. The first path goes through $u$ and has length $d(u)+1$. The second path goes through a different predecessor of $v$ and has 
 length $d(v)$. 
 
 The solution is based on the observation that the edge $(u, v)$ is a part of the shorter path. 
@@ -335,12 +337,13 @@ Additional nodes are inserted to get the graph shown in figure \ref{fig:equalize
 \subsection{Equalize branches}
 The branches of the CFG can be equalized in a similar way. 
 The procedure for doing so is shown in algorithm \ref{alg:equalizeBranches}.
-Given some secret-dependent node $v$ the subset of the CFG is extracted that contains $region_{then}(v)$ and $region_{else}(v)$. 
+Given some secret-dependent node $v$, the subset of the CFG is extracted that contains $region_{then}(v)$ and $region_{else}(v)$. 
 The lengths of the longest paths are computed for all nodes in the sub-graph. 
 The maximum path length is then determined as being the longest path length to one of the leaves of the CFG.
 The procedure iterates over all leaves in the sub-graph and determines the difference between the distance to the leaf and the maximum path length. 
-If this difference is larger than zero then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
-path length. Any additional nodes have to be inserted as predecessors because the final instruction in a leaf is a return statement. 
+If this difference is larger than zero, then additional nodes are inserted as the predecessor to the leaf until the distance to the leaf is equal to the maximum 
+path length.
+Any additional nodes have to be inserted as predecessors because the final instruction in a leaf is a return statement. 
 
 Figure \ref{fig:equalize-branches} shows how nodes are inserted in order to equalize branch depths. The CFG in figure \ref{fig:equalize-branches-1} has one branch with depth equal to one. 
 Two additional nodes are added as ancestors to the branch's leaf in order to increase the branch depth to three. The result of this process is shown in \ref{fig:equalize-branches-2}.
@@ -400,13 +403,13 @@ Two additional nodes are added as ancestors to the branch's leaf in order to inc
 
 \subsection{Cycles}
 The operations described in this section require the CFG to be acyclic.
-To account for this all cycles are removed from the CFG beforehand and later restored. 
+To account for this, all cycles are removed from the CFG beforehand and later restored. 
 The edge that needs to be removed is determined based on the depths of the nodes in the cycle. 
 The depth of a node is defined as being the length of the longest path to the node from the root. 
 Removing the cycle is done by removing the edge from that graph that connects the deepest node to the most shallow node. 
 The tail and head are stored for all edges that are removed so that they can later be restored. 
 
-The removal of these edges has no effect on the operations of the algorithm if the cycle is not nested inside the branch of a secret dependent node.  
+The removal of these edges has no effect on the operations of the algorithm, if the cycle is not nested inside the branch of a secret dependent node.  
 Cycles within a branch of a secret dependent node are not supported by the proposed algorithm.
 In this case the algorithm correctly aligns the nodes of the branches but the latency traces will still not be identical.
 The branch that contains the cycle will be executed a higher number of times, resulting in a longer latency trace. 
@@ -415,43 +418,45 @@ The branch that contains the cycle will be executed a higher number of times, re
 \section{Alignment} \label{seq:alignment}
 During the second stage of the algorithm the nodes of the CFG are aligned in a level-wise manner. 
 The alignment of a set of nodes consists of inserting instructions such that all instructions at a given position across all nodes in the set have the same latency. 
-The level of a node is defined as being the distance between the root of the graph and the node. The first stage of the algorithm ensures that all paths to a given nodes have the same length making the level of a node a 
-well-defined value. The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
+The level of a node is defined as being the distance between the root of the graph and the node. The first stage of the algorithm ensures that all paths to a given nodes have the same length,
+making the level of a node a well-defined value. 
+The alignment stage iterates over all the levels of the sub-graph and aligns the set of nodes found at that level. Algorithm \ref{alg:align} depicts pseudocode for this stage of the algorithm.
 
 \subsection{Basic Operation}
 The core of the alignment operation consists of repeatedly selecting a reference node and inserting instructions into the other nodes to match the latencies of the reference. 
-In each iteration a set of candidate nodes is determined from which the reference node is then selected. 
+In each iteration a set of candidate nodes is determined, from which the reference node is then selected. 
 
-An index variable $i_{ref}$ is used to keep track of the position of the first instruction that has not yet been aligned. This variable is initially equal to zero and is incremented every iteration. 
+An index variable $i_{ref}$ is used to keep track of the position of the first instruction that has not yet been aligned. 
+This variable is initially equal to zero and is incremented every iteration. 
 The instruction at position $i_{ref}$ in the reference node is called the reference instruction.
 
 The algorithm iterates over all nodes that are not the reference node and verifies if the instruction at position $i_{ref}$ has the same latency. 
-If the two latencies are not equal or if the node is shorter than the reference node a dummy instruction is inserted at position $i_{ref}$. 
+If the two latencies are not equal, or if the node is shorter than the reference node, a dummy instruction is inserted at position $i_{ref}$. 
 The latency of this new instruction is equal to the latency of the reference instruction. 
-Once this has been repeated for all nodes in the set then all instruction at position $i_{ref}$ have the same latency and the variable can be incremented. 
+Once this has been repeated for all nodes in the set, all instruction at position $i_{ref}$ have the same latency and the variable can be incremented. 
 
 
 \subsection{Selecting the Reference Node}
-Because an instruction is potentially added to each node that is not the reference node the reference node needs to have at least as many instructions as the node with the largest number of instructions. 
+Because an instruction is potentially added to each node that is not the reference node, the reference node needs to have at least as many instructions as the node with the largest number of instructions. 
 This ensure that at some point all nodes have the same number of instructions. 
 The set of candidate nodes therefore consists of all nodes that have $n_{max}$ instructions, where $n_{max}$ is the number of instructions in the longest node. 
 
 A branching instruction is a special case that will result in the insertion of dummy branching instructions into the other nodes. 
-Additionally a branching instruction cannot be inserted into he middle of a node since this will change the program's control flow. 
+Additionally, a branching instruction cannot be inserted into he middle of a node since this will change the program's control flow. 
 A node can therefore not be selected as the reference node when the instruction at position $i_{ref}$ is a branching instruction, unless during the very last iteration.
 
-If among the set of candidate nodes there is at least one node with a non-branching instruction at position $i_{ref}$ then this node is selected as the reference node. 
-If there are multiple such nodes then a candidate node can be selected arbitrarily. 
+If among the set of candidate nodes there is at least one node with a non-branching instruction at position $i_{ref}$, then this node is selected as the reference node. 
+If there are multiple such nodes, then a candidate node can be selected arbitrarily. 
 The case where all candidate nodes have a branching instruction at position $i_{ref}$ can only occur during the very last iteration. 
-At this point any of the candidate nodes are suitable and one is selected arbitrarily again. 
+At this point any of the candidate nodes are suitable, and one is selected arbitrarily again. 
 
 \subsection{Constructing NOP instruction}
 \label{sec:nop}
-Any instructions that is inserted into the program can have no effect on the program outcome. In this regard they are the same as the no-operation instruction and are 
+Any instructions that is inserted into the program can have no effect on its outcome. In this regard they are the same as the no-operation instruction and are 
 referred to as NOP instructions. For each latency class a template NOP instruction has been determined. 
 For some latency classes a NOP instruction exists that has no effect on the program state. These can be inserted into the program as-is. 
 For other latency classes the NOP instruction modifies some register value. In these cases the algorithm selects a registers that can safely be used. 
-This needs to be a register that is not in use at the time of execution of the instruction in order to guarantee that the program outcome is not changed. 
+This needs to be a free register, one that is not in use at the time of execution of the instruction, in order to guarantee that the program outcome remains unchanged.
 
 There are two types of free registers. 
 Firstly a register can be free because its current value is no longer used.
@@ -460,8 +465,8 @@ Alternatively a register can be free because it isn't used anywhere in the curre
 In the latter case, however, it is possible that the register is in use by the caller, since there is no guarantee that the caller stored all the registers it uses. 
 
 The function is statically analyzed to determine which registers are free to use for this purpose. 
-If a register of the first type exists then it can be used as the operand of the NOP instruction and the resulting instruction 
-can be inserted as-is into the node. 
+If a register of the first type exists, then it can be used as the operand of the NOP instruction and the resulting instruction 
+can be inserted into the node as-is.
 If no such registers exists, a free register of the second type is selected. 
 In this case additional instructions are inserted into the program to ensure that the original value of the register is not lost. 
 In the root of the CFG a push instruction is inserted to store the register value onto the stack. 
@@ -469,16 +474,17 @@ A pop instruction is then inserted in every leaf of the CFG to restore the regis
 Once these instructions have been inserted the register effectively becomes a free register of the first type and can 
 later be reused when construction additional NOP instructions.
 
-If there are no free registers available, any register is arbitrarily selected. Additional instructions are inserted before and after the NOP instruction to push and pop the register value. To ensure the nodes are 
-still balanced these push and pop instructions are inserted across all nodes of the current level. 
+If there are no free registers available, any register is arbitrarily selected. 
+Additional instructions are inserted before and after the NOP instruction to push and pop the register value.
+To ensure the nodes are still balanced, these push and pop instructions are inserted across all nodes of the current level. 
 
-If the reference instruction is a branching instruction the the NOP instruction will also be a branching instruction. 
+If the reference instruction is a branching instruction, the the NOP instruction will also be a branching instruction. 
 A dummy label is inserted at the start of the node's successor. This label then becomes the target of the branching instruction. 
 
-If the reference instruction is a call to a function then the NOP instruction will be  a call to the same function. The instruction is simply duplicated into the current node. 
-If the function contains no secret dependent node then this ensures that any latency traces cannot leak information from the program. Otherwise the function that is called needs to be aligned as well. 
-It is only safe to insert a call to a function this way if the function in question has no effects on the program state. If the function does modify the program state then inserting additional calls can 
-result in erroneous program outputs. 
+If the reference instruction is a call to a function, then the NOP instruction will be  a call to the same function. The instruction is simply duplicated into the current node. 
+If the function contains no secret dependent node, then this ensures that any latency traces cannot leak information from the program. Otherwise the function that is called needs to be aligned as well. 
+It is only safe to insert a call to a function this way if the function in question has no effects on the program state. 
+If the function does modify the program state, then inserting additional calls can result in erroneous program outputs. 
 
 
 \begin{algorithm*}      
@@ -602,13 +608,13 @@ result in erroneous program outputs.
 Figure \ref{fig:align-example} illustrates the different iterations of the alignment of a set of three nodes. 
 Each node is labeled with its latency sequence. The set of instructions that have been aligned are underlined. In each iteration the variable $i_{ref}$ is incremented by one. 
 The set of candidate nodes is marked in each iteration by a red rectangle. 
-If there are multiple candidate nodes with non-branching instructions at position $i_{ref}$ then the first node is arbitrarily selected as the reference node.  
+If there are multiple candidate nodes with non-branching instructions at position $i_{ref}$, then the first node is arbitrarily selected as the reference node.  
 
 
 \subsection{Closing timing leaks}
 Algorithm \ref{alg:closeleaks} illustrates the top-level operation of the algorithm. 
 The secret-dependent branching instructions are passed to the algorithm as arguments. 
-Based on the given instructions the secret-dependent nodes of the CFG are determined. 
+Based on the given instructions, the secret-dependent nodes of the CFG are determined. 
 These are all nodes that contain a secret-dependent instruction. 
 First the equalizing operations are applied for each secret-dependent node. 
 Only once all necessary nodes have been inserted is the CFG aligned.
@@ -653,16 +659,16 @@ This can occur when, for example, a program contains a nested if-statement. Cycl
 \label{sec:rewriting}
 The algorithm has been implemented as a binary rewriting tool. 
 Binary rewriting is the alteration of a compiled program without having the source code at hand \cite{rewriting-survey}.
-The target binary is first decompiled into an assembly file after which additional instructions are inserted. 
-The CFG introduces in this section serves as a layer of abstraction for these insertions. 
+The target binary is first decompiled into an assembly file, after which additional instructions are inserted. 
+The CFG introduced in this section serves as a layer of abstraction for these insertions. 
 The operations of the CFG ultimately result in modifications of the assembly file. 
 
 This approach has a number of advantages. 
-Firstly the algorithm can be applied to existing binaries. It does not require recompilation of original code and does not require the source code of the program. 
+Firstly the algorithm can be applied to existing binaries. It does not require recompilation of original code, and does not require the source code of the program. 
 This means that it is suitable for use on commercial off-the-shelf binaries deployed in the field. 
 Additionally there is no need for a modified compiler of hardware. 
 
 The proposed algorithm is practical for every architecture for which binary rewriting tools exists. Binary rewriting frameworks have been developed for both low-end and high-end architectures. 
-MicroSBS \cite{microsbs}, for example, is a binary rewriting tool developed for the static instrumentation of ARM devices. Although it was initially developed for making memory corruptions observable in embedded devices it 
+MicroSBS \cite{microsbs}, for example, is a binary rewriting tool developed for the static instrumentation of ARM devices. Although it was initially developed for making memory corruptions observable in embedded devices, it 
 could be expanded to also support the proposed algorithm. An example at the higher end of the spectrum is RetroWrite, a binary rewriting tool for the Intel x86\_64 architecture.
 RetroWrite could be expanded in a similar way, extending support of the algorithm to both ARM and x86\_64 devices. 

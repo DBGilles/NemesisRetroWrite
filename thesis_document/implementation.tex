@@ -2,8 +2,8 @@
 \label{cha:implementation}
 The algorithm has been implemented using the Python programming language, in X lines of code. The implementation is built on top of the RetroWrite framework. 
 The raw binary is dissambled using Capstone, a multi-architecture dissasembly framework. An ELF parsing library called pyelftools is used to load ELF files and parse relocation information. 
-The disassembled instructions together with the relocation information is then used by RetroWrite to create an assemly file that can be modified and recompiled. 
-Section \ref{sec:retrowrite} further outlines the workings of RetroWrite and how the implementation makes use of it. 
+The disassembled instructions, together with the relocation information, are then used by RetroWrite to create an assemly file that can be modified and recompiled. 
+Section \ref{sec:retrowrite} further outlines the workings of RetroWrite, and how the implementation makes use of it. 
 An important aspect of the implementation is obtaining accurate data on the latencies of instructions. 
 This is discussed in section  \ref{sec:latencies}
 
@@ -24,13 +24,13 @@ Each of these data structure provide an interfaces for analyzing and modifying t
 One such logical abstraction is the \textit{InstructionWrapper}. 
 This datastructure stores, among other things, the instruction address, the mnemonic, and the operand string, and provides an interface
 for modifying the underlying instruction and for prepending or appending additional instructions.  
-The \textit{Function} datastructure contains a set of instructions and a function that maps each instruction to all instruction that can follow it \cite{Dinesh2020RetroWriteSI,  hexhive}. 
+The \textit{Function} datastructure contains a set of instructions, and a function that maps each instruction to all instruction that can follow it \cite{Dinesh2020RetroWriteSI, hexhive}. 
 
 The proposed algorithm is implemented as an additional abstraction layer on top of these data structures. 
 Each node of the CFG consists of a sequence of \textit{InstructionWrapper}s. 
 The edges of the CFG are reconstructed based on the instruction mapping stored in the \textit{Function} instances. 
-The CFG data structure implements  an interface for the insertion of additional nodes into the graph and the insertion of additional instructions into nodes. 
-This interface is built on top of the RetroWrite API, so all modifications to the CFG result in modification to the underlying \textit{InstructionWrapper} instances. 
+The CFG data structure implements  an interface for the insertion of additional nodes into the graph, and the insertion of additional instructions into nodes. 
+This interface is built on top of the RetroWrite API, so all modifications to the CFG result in modifications to the underlying \textit{InstructionWrapper} instances. 
 Once all necessary modifications have been made to the CFG the instructions are written to an assembly file using functionality provided by RetroWrite. 
 This file can be then be compiled using any off-the-shelf compiler to create an executable. 
 
@@ -42,16 +42,15 @@ As a result the implementation only supports binaries that meet these restrictio
 \section{Instruction Latencies}
 \label{sec:latencies}
 The construction of NOP instructions as described in section \ref{sec:nop} is based on data that measures the latency of instructions in the x86-64 architecture.
-Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual} but this data is not complete.
+Intel provides some data regarding the latencies of commonly used instructions \cite{intel-ref-manual}, but this data is not complete.
 To obtain better data Abel et al.  \cite{uops} developed novel algorithms to infer the latency throughput and port usage based on automatically-generated microbenchmarks. 
 The authors claim that their results are more accurate and precise than existing work. 
-Another source of data on instruction latencies is provided by Agner Fog who provides the results of his own measurements \cite{fog_2021}. 
+Another source of data on instruction latencies is provided by Agner Fog, who provides the results of his own measurements \cite{fog_2021}. 
 
-The data provided by Abel et al. \cite{uops} is  used as the primary source of instruction latencies. In the case where an instruction is not covered by their work the data 
-provided by Agner Fog \cite{fog_2021} and Intel are used as a secondary source. If a program contains an instruction that is not covered by any of the datasets then it cannot
+The data provided by Abel et al. \cite{uops} is  used as the primary source of instruction latencies. In the case where an instruction is not covered by their work, the data 
+provided by Agner Fog \cite{fog_2021} and Intel are used as a secondary source. If a program contains an instruction that is not covered by any of the datasets, then it cannot
 be aligned. 
 The exception to this rule are branching instructions. 
 There is no latency information available about these instructions in any of the sources. 
 All branching instructions are aligned with new branching instructions. 
-%To account for this all branching instructions are aligned with new branching instructions. 
 To preserve the control flow of the program the target of the branching instruction is equal to the address of the next instruction. 
