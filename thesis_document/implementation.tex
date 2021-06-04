@@ -1,6 +1,8 @@
 \chapter{Implementation}
 \label{cha:implementation}
-The algorithm has been implemented using the Python programming language, in X lines of code. The implementation is built on top of the RetroWrite framework. 
+The algorithm has been implemented using the Python programming language, in X lines of code. 
+The implementation is made publicly available at https://github.com/DBGilles/NemesisGuard. 
+The implementation is built on top of the RetroWrite framework. 
 The raw binary is dissambled using Capstone, a multi-architecture dissasembly framework. An ELF parsing library called pyelftools is used to load ELF files and parse relocation information. 
 The disassembled instructions, together with the relocation information, are then used by RetroWrite to create an assemly file that can be modified and recompiled. 
 Section \ref{sec:retrowrite} further outlines the workings of RetroWrite, and how the implementation makes use of it. 
