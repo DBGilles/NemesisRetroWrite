@@ -68,13 +68,13 @@ The results indicate that the proposed solution effectively close all timing lea
 Als gevolg van de toenemende populariteit van IoT-apparaten en cloud-computingdiensten, wordt software vaak uitgevoerd op platformen van derden. 
 IoT apparaten ondersteunen vaak de mogelijkheid extra software te installeren. Grote providers van cloud-computingdiensten, zoals Amazon en Google, bieden de mogelijkheid aan 
 om vrijwel eender welk stuk software te installeren op hun servers. 
-Het resultaat hiervan is dat er meer en meer aandacht besteed wordt aan het beveiligen van software die uitgevoerd wordt op een onbetrouwbaar besturingssyteem. 
+Het resultaat hiervan is dat er meer en meer aandacht besteed wordt aan het beveiligen van software die uitgevoerd wordt op een onbetrouwbaar besturingssysteem. 
 Een veelbelovend onderzoeksveld binnen deze context is het gebruik van \textit{Protected Module Architectures}. 
-Deze zijn architecturen die hardware-matig de isolatie van verschillende modules in het systeem garanderen, en die ervoor zorgen dan een onbetrouwbaar besturingssyteem geen toegang
+Deze zijn architecturen die hardwarematig de isolatie van verschillende modules in het systeem garanderen, en die ervoor zorgen dan een onbetrouwbaar besturingssysteem geen toegang
 heeft tot de code of gegevens van de software. 
 
 Recent onderzoek heeft echter aangetoond dat het nog steeds mogelijk is gevoelige informatie te extraheren uit programma's binnen dergelijke architecturen door middel van \textit{controlled-channel attacks}. 
-Deze zijn een type van \textit{side-channel attack} waarbij het besturringsysteem onder controle van aan aanvaller staat, en die gebruik maken van de verhoogde graad van controle over het besturinggsysteem om nieuwe \textit{side-channels} te open. 
+Deze zijn een type van \textit{side-channel attack} waarbij het besturingssysteem onder controle van aan aanvaller staat, en die gebruik maken van de verhoogde graad van controle over het besturingssysteem om nieuwe \textit{side-channels} te open. 
 \textit{Side-channel attacks} trachten gevoelige informatie te halen uit software door het meten van fysieke parameters zoals voedingsstroom, en uitvoeringstijd. 
 \textit{Controlled-channel attacks} maken gebruik van \textit{system events} (e.g. \textit{page faults}, \textit{cache flushes}, en \textit{interrupts}) om nieuwe 
 \textit{side-channels} te openen. 
@@ -82,7 +82,7 @@ Deze zijn een type van \textit{side-channel attack} waarbij het besturringsystee
 Een voorbeeld van zo een \textit{controlled-channel attack} is Nemesis. Nemesis misbruikt het interruptmechanisme om micro-architecturale instructietimings te bepalen voor
 instructies van applicaties binnen een \textit{Protected Module Architecture}. 
 Indien er conditionele sprongen zijn waarbij overeenkomstige instructies verschillende instructietimings hebben is het mogelijk om op basis van deze metingen te bepalen welke van de twee takken uitgevoerd wordt
-Door deze instructietimings te verzamelen voor verschilende inputs en de verschillen te vergelijken
+Door deze instructietimings te verzamelen voor verschillende inputs en de verschillen te vergelijken
 is het mogelijk om te bepalen welke paden van de \textit{control flow} het programma heeft gevolgd voor een gegeven input. 
 Aan de hand hiervan kan de aanvaller inferenties maken over geheime data die gebruikt wordt om \textit{control flow} beslissingen te maken. 
 
@@ -102,8 +102,8 @@ De eerste fase van het algoritme vult de CFG met extra knopen aan zodat de graaf
 De tweede fase voegt dan niveau-gewijs instructies toe aan de knopen van de CFG om zo de \textit{timing leaks} te sluiten. 
 
 Het algoritme is ge\"implementeerd voor de Intel x86\_64 architectuur aan de hand van RetroWrite, een \textit{binary rewriting} framework. 
-Een aantal experimenten zijn uitgevoerd op een verzamling van testprogramma's om te bepalen of het algorithme doeltreffend is in het sluiten van de \textit{timing leaks}, of het dit doet 
-zonder de output van het programma te veranderen, en om de impact op de performantie van het programma te evaluaren. 
+Een aantal experimenten zijn uitgevoerd op een verzameling van testprogramma's om te bepalen of het algoritme doeltreffend is in het sluiten van de \textit{timing leaks}, of het dit doet 
+zonder de output van het programma te veranderen, en om de impact op de performantie van het programma te evalueren. 
 Uit de resultaten blijkt dat het algoritme correct alle \textit{timing leaks} kan dichten. Het doet dit ook zonder de uitkomst te veranderen bij alle programma's, met \'e\'en uitzondering. 
 Deze uitzondering bevat een functie die opgeroepen wordt in \'e\'en tak van een conditionele sprong, waarbij de functie ook nog de globale staat van het programma aanpast. Het algoritme kopieert deze oproep naar de andere tak, waardoor
 het de globale staat van het programma gewijzigd wordt waar dit voorheen niet gebeurde. 
