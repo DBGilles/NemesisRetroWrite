@@ -22,6 +22,14 @@ This indicates that the most commonly used instructions are present in the data,
 Additionally this data is only needed if it is not provided by the manufacturer. 
 As a result the lack of latency data is believed to be only a minor issue.  
 
+A third limitation is the proposed solution for addressing function calls inside branches. 
+The results show that copying a function call to another branch erroneously affects the 
+program outcome, if this function modifies the global state. 
+Future research could aim to address this by proposing an alternative approach to function calls. 
+A possible approach is to create an entirely new function that consists only of NOP instructions, 
+such that the control flow and instruction timings of this new function are identical to the original function. 
+This newly created function can then safely be called to close the timing leaks without unintentionally altering the program outcome. 
+
 The detection of secret dependent branches is not part of the algorithm or the implementation. 
 The user has to provide the algorithm with the address of the target instruction. 
 At the time of writing secret dependent branching instructions need to be identified through manual inspection. 

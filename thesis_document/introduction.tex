@@ -26,7 +26,7 @@ These are architectures that enforce isolation of components directly in hardwar
 PMAs ensure that the untrusted OS cannot access the data or code of a protected module \cite{Nemesis}. 
 
 Recent research has shown, however, that it is still possible to extract secret data from protected modules through the use of controlled-channel attacks. 
-Controlled-channel attacks are a type of side-channel attack that leverage an attacker's control of the system to extract more information \cite{Xu}.	
+Controlled-channel attacks are a type of side-channel attack where an attacker is assumed to have control over the system, and that leverages this control to extract more information \cite{Xu}.	
 Side-channel attacks aim at extracting secrets from a system through measurement of physical parameters \cite{side-channel}. 
 In the case of controlled-attacks an attacker has increased capabilities for extracting data, since he can use system events such as as page faults, scheduling decisions, and interrupts to open additional side-channels. 
 Research has shown that these attacks are able to extract information even from modules that are protected by PMAs. 
