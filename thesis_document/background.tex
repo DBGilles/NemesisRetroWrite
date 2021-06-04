@@ -1,0 +1,80 @@
+\chapter{Background}
+\label{cha:background}
+This chapter aims to provide additional information on some concepts related to the thesis. 
+Section \ref{sec:pma} describes protected module architectures and the motivation behind them. 
+Section \ref{sec:nemesis} outlines the workings of the Nemesis attack, providing an example to further illustrate it. 
+Finally section \ref{sec:rewriting} introduces the concept of binary rewriting and discusses its uses. 
+\section{Protected Module Architectures}
+\label{sec:pma}
+Because of the increasing popularity of IoT devices, more and more embedded computing devices are being connected to the Internet. 
+These devices are often more susceptible to being exploited because they support software extensibility. 
+Additionally, because these devices are connected to a network, the risk increases since attacks can be done remotely. 
+
+An important technique for securing such devices is hardware-supported virtual memory and processor privilege levels.
+The OS can build on this support to isolate a process from any other malicious processes on the device. 
+However, this introduces a sizable software layer however which is difficult to get sufficiently secure \cite{psma}.
+If the attacker controls the OS then its capabilities for attacking a process on the devices increase considerably. 
+
+Maene et al. \cite{trusted-computing-architectures} state that \textit{the goal of trusted computing is to develop technologies which give users guarantees about the behaviour of the software running on their devices}.
+An important aspect of trusted computing is therefore to protect software even when attackers have full control of the system. 
+One means of achieving this is through the use of Protected Module Architectures (PMAs). 
+These architectures seperate critical components into protected modules, also called enclaves,
+that are isolated from one another through hardware.  
+
+A number of Protected Module Architectures (PMA) have been developed to address this problem, both by researchers and industry. 
+PMAs have been developed for both low-end microcontrollers found in embedded systems \cite{trustlite, smart} as well as high-end processors \cite{isox}.
+One architecture developed for embedded systems is Sancus. 
+Sancus is a security architecture that can provide strong isolation guarantees on networked embedded systems, 
+and has been implemented on a modified TI MSP430 micro-controller \cite{sancus}. 
+At the higher end of the spectrum, there is Intel SGX.
+Intel SGX is an extension  added to the Intel architecture that allows applications to instantiate enclaves. 
+Enclaves are areas in the application's memory that are protected from access from outside of the enclave, even from 
+privileged software such as the OS \cite{SGX}. 
+
+Research has shown that it is still possible to extract information from protected applications in PMAs. In their work Xu et al. \cite{Xu} introduce a novel type of side-channel attack 
+called controlled-attacks. These attacks are categorized by untrusted operating systems that create side-channels through its extensive control of the system.
+The authors were able to leverage the OS' high degree of control over the system to attack applications that were previously out of reach of side-channel attacks, and were able to 
+extract large amounts of data in a single run. 
+
+\section{Nemesis Side-Channel Attack}
+\label{sec:nemesis}
+More recently, Van Bulck et al. \cite{Nemesis} developed Nemesis, a controlled-channel attack that leverages the interrupt mechanism to extract sensitive information from 
+enclaved applications. The authors were able to exploit timing differences in the latency between the arrival of an interrupt request (IRQ) and the execution of the first instruction in the 
+interrupt service routine (ISR). They state that their attack is \textit{based on the key observation that an IRQ during a multi-cycle instruction increases the interrupt 
+latency with the number of cycles left to execute}. By carefully and deliberately interrupting a process at the right time the authors were able to infer the duration of the interrupted instruction. 
+Potential attackers can use this information to determine where the instruction is situated in the program's control flow. When the instruction is part of a secret-dependent branch, the 
+attacker is able to infer some information about the secret, successfully leaking sensitive information from the program. Van Bulck et al. \cite{Nemesis} showed that this attack is applicable to 
+the whole computing spectrum. They were able to apply their attack to the aforementioned Sancus architecture as well as Intel SGX enclaves.  
+
+Figure \ref{fig:pseudo-assembly} illustrates how such an attack might work with a piece of assembly pseudocode. An attacker who is in control of the OS could carefully interrupt the program right
+after the conditional jump at line 5. Depending on the value of register r1 the next interrupted instruction is either the addition instruction at line 4 or the multiplication instruction at line 7. 
+By measuring the interrupt latency the attacker can infer which of the two instructions was being executed at the time of the interrupt and, more importantly, infer if the value in register r0 is equal to 0. 
+
+
+
+\lstset{language=[x64]Assembler, numbers=left, stepnumber=1, frame=single}
+\begin{figure}
+
+    \begin{lstlisting}
+	CMP r1, $0
+	JEQ .l1
+	.l1: 
+	ADD r1, r2 		; 1 cycle instruction
+	JMP .end
+	.l2: 
+	MUL r1, r2 		; 2 cycle instruction
+	JMP .end
+	\end{lstlisting}
+	\caption{Assembly pseudo-code with a secret-dependent branch that is vulnerable to Nemesis attack}
+	\label{fig:pseudo-assembly}
+\end{figure}
+
+
+\section{Binary Rewriting}
+\label{sec:rewriting}
+Binary rewriting is the alteration of a compiled program without having the source code at hand. 
+Applications of binary rewriting include observing programs during execution, optimizing programs using run-time patching, and 
+hardening applications against attacks. In the case of dynamic binary rewriting the rewriting happens during execution of the program. 
+Static binary rewriting, on the other hand, occurs before the binary is executed \cite{rewriting-survey}. 
+Binary rewriting tools have been developed for both low-end architectures found in embedded devices \cite{microsbs} as well as high-end architectures found in home computers and servers 
+\cite{ instruction-punning, Dinesh2020RetroWriteSI, E9Patch}. 
