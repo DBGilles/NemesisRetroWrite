@@ -94,7 +94,7 @@ Omdat deze oplossing niet berust op het aanpassen van de hardware, of op het her
 
 Het voorgestelde algoritme manipuleert het programma door aanpassingen uit te voeren op de \textit{Control Flow Graph} (CFG). 
 Dit is een datastructuur die de \textit{control flow} van een programma voorstelt, bestaande uit knopen en zijden. Hierbij bevat elke knoop een verzameling van instructies die telkens 
-als een geheel uitgevoerd worden. De zijden geven aan hoe de \textit{control flow} van het programma spring tussen de verschillende noden. 
+als een geheel uitgevoerd wordt. De zijden geven aan hoe de \textit{control flow} van het programma springt tussen de verschillende noden. 
 De CFG moet voldoen aan twee eigenschappen vooraleer de nodige instructies toegevoegd kunnen worden. 
 Ten eerste moeten alle paden naar een gegeven node dezelfde lengte hebben, en ten tweede 
 moeten de lengtes van alle paden naar een blad in de CFG even lang zijn. Een blad is een node met geen uitgaande zijden. 
@@ -104,7 +104,7 @@ De tweede fase voegt dan niveau-gewijs instructies toe aan de knopen van de CFG 
 Het algoritme is ge\"implementeerd voor de Intel x86\_64 architectuur aan de hand van RetroWrite, een \textit{binary rewriting} framework. 
 Een aantal experimenten zijn uitgevoerd op een verzameling van testprogramma's om te bepalen of het algoritme doeltreffend is in het sluiten van de \textit{timing leaks}, of het dit doet 
 zonder de output van het programma te veranderen, en om de impact op de performantie van het programma te evalueren. 
-Uit de resultaten blijkt dat het algoritme correct alle \textit{timing leaks} kan dichten. Het doet dit ook zonder de uitkomst te veranderen bij alle programma's, met \'e\'en uitzondering. 
+Uit de resultaten blijkt dat het algoritme correct alle \textit{timing leaks} kan sluiten. Het doet dit ook zonder de uitkomst te veranderen bij alle programma's, met \'e\'en uitzondering. 
 Deze uitzondering bevat een functie die opgeroepen wordt in \'e\'en tak van een conditionele sprong, waarbij de functie ook nog de globale staat van het programma aanpast. Het algoritme kopieert deze oproep naar de andere tak, waardoor
 het de globale staat van het programma gewijzigd wordt waar dit voorheen niet gebeurde. 
 
