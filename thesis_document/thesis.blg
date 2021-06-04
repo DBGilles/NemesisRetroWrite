@@ -3,11 +3,6 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesis.aux
 A level-1 auxiliary file: introduction.aux
 A level-1 auxiliary file: background.aux
-Case mismatch error between cite keys xu and Xu
----line 16 of file background.aux
- : \citation{xu
- :             }
-I'm skipping whatever remains of this command
 A level-1 auxiliary file: design.aux
 A level-1 auxiliary file: implementation.aux
 A level-1 auxiliary file: evaluation.aux
@@ -21,30 +16,29 @@ Warning--empty publisher in intel-ref-manual
 Warning--empty year in intel-ref-manual
 Warning--empty journal in smart
 Warning--empty booktitle in trustlite
-Warning--empty booktitle in microsbs
 Warning--empty publisher in psma
 Warning--empty booktitle in sgx-step
 Warning--empty booktitle in WinderixHans
 You've used 29 entries,
             2118 wiz_defined-function locations,
-            672 strings with 9579 characters,
-and the built_in function-call counts, 11453 in all, are:
-= -- 1101
+            671 strings with 9554 characters,
+and the built_in function-call counts, 11447 in all, are:
+= -- 1097
 > -- 602
 < -- 12
 + -- 237
 - -- 206
 * -- 772
-:= -- 1794
-add.period$ -- 89
+:= -- 1792
+add.period$ -- 88
 call.type$ -- 29
 change.case$ -- 186
 chr.to.int$ -- 0
-cite$ -- 39
-duplicate$ -- 476
-empty$ -- 860
+cite$ -- 38
+duplicate$ -- 477
+empty$ -- 862
 format.name$ -- 206
-if$ -- 2500
+if$ -- 2498
 int.to.chr$ -- 0
 int.to.str$ -- 29
 missing$ -- 25
@@ -54,16 +48,16 @@ pop$ -- 247
 preamble$ -- 1
 purify$ -- 159
 quote$ -- 0
-skip$ -- 396
+skip$ -- 397
 stack$ -- 0
 substring$ -- 560
-swap$ -- 165
+swap$ -- 166
 text.length$ -- 12
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 112
-warning$ -- 10
+warning$ -- 9
 while$ -- 87
 width$ -- 31
 write$ -- 309
-(There was 1 error message)
+(There were 9 warnings)

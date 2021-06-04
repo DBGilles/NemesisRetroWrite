@@ -18,7 +18,7 @@ As a result of the increasing popularity of IoT devices and cloud-computing serv
 Embedded devices often support software extensibility, allowing users to install additional software into their device. 
 Large cloud-service providers such as Amazon and Microsoft allow users to run virtually any piece of software on their devices. 
 To ensure that the various components on these systems are isolated from each other, a sizeable software layer is often introduced in the form of an operating system or 
-a hyper visor.
+a hypervisor.
 Unfortunately, however, this software layer is very difficult to get sufficiently secure \cite{psma}.
 As a result it has become increasingly important to protect software from attacks even in the presence of a compromised system. 
 One line of research is the use of Protected Module Architectures (PMAs). 
@@ -57,7 +57,7 @@ Unlike previous solutions this algorithm can be applied to commercial off-the-sh
 \section{Thesis Goal and Outline}
 This paper presents a novel algorithm for automatically transforming a program in order to remove any timing leaks. It achieves this by addressing the core cause of the vulnerability: differences in 
 latencies between corresponding instructions in secret-dependent branches. Corresponding instructions are instructions that are the same distance away from a branching instruction. 
-The proposed algorithm inserts additional instructions such that all corresponding instructions have the same latency without changing affecting the program output. 
+The proposed algorithm inserts additional instructions such that all corresponding instructions have the same latency, without affecting the program output. 
 Unlike previous solutions that require recompilation, the proposed algorithm transforms the target program through binary rewriting. 
 
 The main contributions of this paper are:
@@ -70,7 +70,7 @@ The main contributions of this paper are:
 Chapter \ref{cha:background} will provide additional background information on PMAs, the Nemesis attack, and binary rewriting. 
 Chapter \ref{cha:design} outlines the design of the proposed algorithm, and formalizes the property it aims to enforce.  
 Aspects specific to the implementation of the algorithm are further discussed in chapter \ref{cha:implementation}. 
-A number of experiments have been designed and run to evaluate if the proposed algorithm is effective and correct. 
+A number of experiments have been designed and performed to evaluate if the proposed algorithm is effective and correct. 
 Chapter \ref{cha:evaluation} describes the setup of these experiments and discusses the results. 
 Next a number of related works is discussed in chapter \ref{cha:evaluation}.
 Finally chapter \ref{cha:conclusion} provides some discussions about the benefits and limitations of the proposed algorithm and suggests 

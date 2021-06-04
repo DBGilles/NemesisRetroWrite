@@ -131,9 +131,10 @@ S.~Pouyanrad, J.~T. M\"{u}hlberg, and W.~Joosen.
 
 \bibitem{microsbs}
 M.~Salehi, D.~Hughes, and B.~Crispo.
-\newblock msbs: Static binary sanitization of bare-metal embedded devices for
-  fault observability.
-\newblock pages 381--395. USENIX Association, 2020.
+\newblock $\mu$sbs: Static binary sanitization of bare-metal embedded devices
+  for fault observability.
+\newblock In {\em 23rd International Symposium on Research in Attacks,
+  Intrusions and Defenses ($\{$RAID$\}$ 2020)}, pages 381--395, 2020.
 
 \bibitem{sancussupport}
 sancus tee.

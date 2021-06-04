@@ -41,14 +41,14 @@ extract large amounts of data in a single run.
 More recently, Van Bulck et al. \cite{Nemesis} developed Nemesis, a controlled-channel attack that leverages the interrupt mechanism to extract sensitive information from 
 enclaved applications. The authors were able to exploit timing differences in the latency between the arrival of an interrupt request (IRQ) and the execution of the first instruction in the 
 interrupt service routine (ISR). They state that their attack is \textit{based on the key observation that an IRQ during a multi-cycle instruction increases the interrupt 
-latency with the number of cycles left to execute}. By carefully and deliberately interrupting a process at the right time the authors were able to infer the duration of the interrupted instruction. 
+latency with the number of cycles left to execute}. By carefully and deliberately interrupting a process at the right time, the authors were able to infer the duration of the interrupted instruction. 
 Potential attackers can use this information to determine where the instruction is situated in the program's control flow. When the instruction is part of a secret-dependent branch, the 
 attacker is able to infer some information about the secret, successfully leaking sensitive information from the program. Van Bulck et al. \cite{Nemesis} showed that this attack is applicable to 
 the whole computing spectrum. They were able to apply their attack to the aforementioned Sancus architecture as well as Intel SGX enclaves.  
 
 Figure \ref{fig:pseudo-assembly} illustrates how such an attack might work with a piece of assembly pseudocode. An attacker who is in control of the OS could carefully interrupt the program right
-after the conditional jump at line 5. Depending on the value of register r1 the next interrupted instruction is either the addition instruction at line 4 or the multiplication instruction at line 7. 
-By measuring the interrupt latency the attacker can infer which of the two instructions was being executed at the time of the interrupt and, more importantly, infer if the value in register r0 is equal to 0. 
+after the conditional jump at line 5. Depending on the value of register r1, the next interrupted instruction is either the addition instruction at line 4, or the multiplication instruction at line 7. 
+By measuring the interrupt latency the attacker can infer which of the two instructions was being executed at the time of the interrupt, and, more importantly, infer if the value in register r0 is equal to 0. 
 
 
 
