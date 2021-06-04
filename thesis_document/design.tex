@@ -6,7 +6,7 @@ The first section describes the goal of the algorithm, and introduces and formal
 The primary data structure used by the algorithm is the control flow graph (CFG), and is defined in section \ref{sec:cfg}.
 The following two sections describe the two main stages, the first one being the insertion of additional nodes into the CFG, and the second one being
 the level-wise alignment of nodes. 
-Finally section \ref{sec:cfg} discusses the use of binary rewriting in the algorithm, the altering of a compiled program without access to its source code. 
+Finally section \ref{sec:rewriting} discusses the use of binary rewriting in the algorithm, the altering of a compiled program without access to its source code. 
 
 
 \section{Algorithm Goals}
@@ -162,7 +162,7 @@ This makes it impossible to align them.
 
 The nemesis-sensitive property as defined in section \ref{eq:nemesisPropertyNode} entails that it is impossible for a node to satisfy the property if one of these 
 structures occurs in its branches, since in both cases the regions have different depths. 
-The first stage of the algorithm therefore consists of inserting additional nodes into the CFG such that all path lengths to a given node are equal as well as all branch depths. 
+The first stage of the algorithm therefore consists of inserting additional nodes into the CFG, such that all path lengths to a given node are equal as well as all branch depths. 
 Algorithms \ref{alg:equalizePaths} and \ref{alg:equalizeBranches} depict the procedures for equalizing paths lengths and equalizing branches respectively. 
 
  
@@ -406,7 +406,7 @@ The operations described in this section require the CFG to be acyclic.
 To account for this, all cycles are removed from the CFG beforehand and later restored. 
 The edge that needs to be removed is determined based on the depths of the nodes in the cycle. 
 The depth of a node is defined as being the length of the longest path to the node from the root. 
-Removing the cycle is done by removing the edge from that graph that connects the deepest node to the most shallow node. 
+Removing the cycle is done by removing the edge from the CFG that connects the deepest node to the most shallow node. 
 The tail and head are stored for all edges that are removed so that they can later be restored. 
 
 The removal of these edges has no effect on the operations of the algorithm, if the cycle is not nested inside the branch of a secret dependent node.  
@@ -452,7 +452,7 @@ At this point any of the candidate nodes are suitable, and one is selected arbit
 
 \subsection{Constructing NOP instruction}
 \label{sec:nop}
-Any instructions that is inserted into the program can have no effect on its outcome. In this regard they are the same as the no-operation instruction and are 
+Any instruction that is inserted into the program cannot have an effect on its outcome. In this regard they are the same as the no-operation instruction and are 
 referred to as NOP instructions. For each latency class a template NOP instruction has been determined. 
 For some latency classes a NOP instruction exists that has no effect on the program state. These can be inserted into the program as-is. 
 For other latency classes the NOP instruction modifies some register value. In these cases the algorithm selects a registers that can safely be used. 
@@ -671,4 +671,4 @@ Additionally there is no need for a modified compiler of hardware.
 The proposed algorithm is practical for every architecture for which binary rewriting tools exists. Binary rewriting frameworks have been developed for both low-end and high-end architectures. 
 MicroSBS \cite{microsbs}, for example, is a binary rewriting tool developed for the static instrumentation of ARM devices. Although it was initially developed for making memory corruptions observable in embedded devices, it 
 could be expanded to also support the proposed algorithm. An example at the higher end of the spectrum is RetroWrite, a binary rewriting tool for the Intel x86\_64 architecture.
-RetroWrite could be expanded in a similar way, extending support of the algorithm to both ARM and x86\_64 devices. 
+RetroWrite can be expanded in a similar way, extending support of the algorithm to both ARM and x86\_64 devices. 
