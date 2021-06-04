@@ -27,7 +27,7 @@ modifies a non-local variable though a pointer. This function is only called in 
 \section{Experiment Setup}
 \label{sec:setup}
 The algorithm is evaluated using three metrics. The first metric aims to measure the effectiveness of the algorithm. A static analysis tool was developed to verify 
-whether or not program satisfies the Nemesis-sensitive property as specified in section \ref{sec:goals}.
+whether or not a program satisfies the Nemesis-sensitive property as specified in section \ref{sec:goals}.
 Given a program and a set of secret-dependent branches, this tool partitions instructions into sets according to their positions in secret dependent branches. Following the notation of section \ref{sec:goals}, let \textit{ep} be a secret dependent branch, and let $ep^n$ be the n'th instruction in a region, then define the set 
 \begin{equation} \label{eq:toolSets}
     ep_i = \{ ep^n |i = n \land  (ep^n \in region_{then}(ep) \lor ep^n \in region_{else}(ep)\}
@@ -40,7 +40,7 @@ These values were supplied as inputs to both the original program and the balanc
 verify that the algorithm correctly modified the program without changing the output. 
 
 The effect on the program's performance is evaluated by measuring the increase in the sum of the latencies along paths in the programs CFG. 
-To measure this increase, CFGs are constructed from the original binary and from the modified binary. 
+To measure this increase CFGs are constructed from the original binary and from the modified binary. 
 For each path in the original CFG its corresponding path in the modified CFG is determined. To do so a mapping is created that maps all nodes in the original CFG to their corresponding node in the balanced CFG. 
 This mapping takes into account the condition of a branching instruction, and can be defined inductively. 
 The root of the original CFG is mapped to the root of the root of the balanced CFG. 
@@ -81,7 +81,7 @@ are not affected by the algorithm, and are therefore not considered in this eval
 The results of the experiments are summarized in figure \ref{fig:experiment results}.
 A check mark in the second column indicates that all timing-leaks have been removed. 
 A check mark in the third column indicates that the program output has not changed. 
-The third column contains the increase in the sum of the latency along various paths in the program, expressed as a percentage increase.
+The remaining columns contain the increase in the sum of the latency along various paths in the program, expressed as a percentage increase.
 
 The algorithm was able to ensure the Nemesis-sensitive property holds for all programs, as verified by the static analysis tool described in the previous section. This effectively closes the 
 timing leaks found in the program. 
@@ -93,7 +93,7 @@ Because the function call has side effects the final output of the program is di
 
 The effect on performances ranges from an increase by a factor of 1.8, to no increase at all. 
 There are two factors that cause larger increases in the sum of the latencies along a path. The first is the difference in depths between two secret dependent branches. 
-If one branch is significantly deeper then a larger number of nodes will be inserted in the other branch, lengthening the paths found in the shorter branch. 
+If one branch is significantly deeper, then a larger number of nodes will be inserted in the other branch, lengthening the paths found in the shorter branch. 
 Because each inserted node has to be aligned, a larger number of instructions will be inserted. 
 
 This effect is the cause for the relatively large increase in latencies in the benchmark  program \textit{multifork}. 

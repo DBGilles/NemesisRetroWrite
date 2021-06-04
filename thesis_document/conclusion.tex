@@ -55,7 +55,7 @@ This framework allows user to single-step through an enclaved program, measuring
 Recent research has shown that programs are still vulnerable to timing side-channel attacks, even when deployed in a protected module architecture. 
 Attacks that are able to extract information from PMA's are also categorized by higher level of control over the system by the attacker. 
 One such attack is Nemesis, a timing side-channel attack that leverage its control over the CPU interrupt mechanism to leak instruction timings. 
-Based on instruction duration attackers are then able to infer information about the program's control flow and, by extension, any secret data that is used to make control flow decisions. 
+Based on instruction duration, attackers are able to infer information about the program's control flow and, by extension, any secret data that is used to make control flow decisions. 
 
 The algorithm proposed in this thesis aims to close these timing leaks by automatically transforming the binary. 
 Additional instruction are inserted into the program through binary rewriting to ensure that instruction 

@@ -26,7 +26,7 @@ that they are reasonable for some embedded devices.
 
 Winderix et al. \cite{WinderixHans} recently proposed a new algorithm that aligns instructions in corresponding branches in a way similar to the algorithm outlined in this text, 
 by first equalizing path lengths and then aligning nodes. 
-They have implemented their algorithm for the Sancus architecture, in the form of a compiler pass in the LLVM structure. Their solution supports loops nested within secret-dependent branches 
+They have implemented their algorithm for the Sancus architecture as a compiler pass in the LLVM structure. Their solution supports loops nested within secret-dependent branches 
 and as a result covers a larger set of programs. Unlike the solution proposed in this work, however, their solution cannot be applied to off-the-shelf binaries, as it requires access to the source code and recompilation.  
  
 \section{Hardware-based approaches}
